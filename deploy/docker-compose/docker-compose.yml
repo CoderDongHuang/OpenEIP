@@ -1,0 +1,73 @@
+name: openeip
+
+services:
+  gateway:
+    image: nginxinc/nginx-unprivileged:1.27.3-alpine@sha256:9e7238f579a54582263a960d1b0094b4a3ecce641342eda3f8e2ff82b1703d2b
+    ports:
+      - "3000:8080"
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      java:
+        condition: service_healthy
+      python:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    networks:
+      - openeip
+
+  java:
+    build:
+      context: ../../java/platform
+      dockerfile: ../../deploy/docker/Dockerfile.java
+      args:
+        GRADLE_DISTRIBUTION_URL: ${GRADLE_DISTRIBUTION_URL:-https://services.gradle.org/distributions/gradle-8.12.1-bin.zip}
+        MAVEN_REPOSITORY_URL: ${MAVEN_REPOSITORY_URL:-}
+    environment:
+      SERVER_PORT: "8080"
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+    networks:
+      - openeip
+
+  python:
+    build:
+      context: ../../python
+      dockerfile: ../deploy/docker/Dockerfile.python
+      args:
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - openeip
+
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: ../deploy/docker/Dockerfile.frontend
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks:
+      - openeip
+
+networks:
+  openeip:
+    driver: bridge

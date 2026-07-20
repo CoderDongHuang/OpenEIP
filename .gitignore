@@ -15,6 +15,7 @@ java/**/.gradle/
 java/**/out/
 *.class
 *.jar
+!java/platform/gradle/wrapper/gradle-wrapper.jar
 *.war
 
 # Python

@@ -1,0 +1,18 @@
+# 全局所有者
+* @CoderDongHuang
+
+# Java Platform
+java/ @CoderDongHuang
+
+# Python AI Engine
+python/ @CoderDongHuang
+
+# Frontend
+frontend/ @CoderDongHuang
+
+# Documentation
+docs/ @CoderDongHuang
+*.md @CoderDongHuang
+
+# CI/CD
+.github/ @CoderDongHuang
