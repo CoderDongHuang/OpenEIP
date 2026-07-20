@@ -1,0 +1,50 @@
+# Roadmap
+
+## Release Train
+
+```
+v0.1 ──→ Foundation          发布就绪
+         仓库 / 官网 / CI / 三份基线文档 / 脚手架
+
+v0.2 ──→ MVP                 规划中
+         登录 / RBAC / 文件上传 / OCR / 知识库 / RAG / Chat / Agent
+
+v0.3 ──→ Knowledge           规划中
+         文档解析 / Embedding / 全文检索 / 向量检索 / Citation
+
+v0.4 ──→ Workflow            规划中
+         Node / Canvas / Execution / Trigger / Approval / Retry
+
+v0.5 ──→ Connector           规划中
+         MySQL / PostgreSQL / Kafka / Git / 飞书 / 企业微信 / Email
+
+v0.6 ──→ Agent               规划中
+         Tool / Memory / Planner / Multi-Agent / MCP / Evaluation
+
+v0.7 ──→ Governance          规划中
+         多租户 / 审计 / 模型管理 / Prompt 管理 / 成本 / Trace
+
+v0.8 ──→ Marketplace         规划中
+         Plugin / SDK / Connector Market / Agent Market
+
+v0.9 ──→ Performance         规划中
+         压测 / 调优 / 高可用 / 扩容 / 稳定性
+
+v1.0 ──→ LTS                 规划中
+         SSO / LDAP / K8S / 对象存储 / 安全合规 / 24 个月支持
+```
+
+## 当前阶段
+
+| 阶段 | 状态 | 发布条件 |
+|---|---|---|
+| Phase -1：Project Governance | 已完成 | 治理文档、初始维护机制、RFC/ADR 流程可执行 |
+| Phase 0：Repository Bootstrap | 已完成 | 基础文件、CI、官网和仓库骨架可构建 |
+| Phase 1：Architecture Baseline | 已完成 | PRD/SAD/SDD 与脚手架通过本地发布验证；首次 PR 需再通过 CI |
+| Phase 1.5：Technical Validation | 未开始 | 5 个 Spike 形成数据和 ADR |
+
+## LTS 策略
+
+- 每年发布一个 LTS 版本
+- LTS 版本提供 24 个月长期支持
+- 详见 [docs/00-governance/release-policy.md](docs/00-governance/release-policy.md)

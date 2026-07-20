@@ -1,0 +1,39 @@
+.main {
+  min-height: calc(100vh - 120px);
+  display: grid;
+  align-items: center;
+  background: #f7f8fa;
+  border-top: 4px solid #d94f3d;
+}
+
+.intro {
+  width: min(760px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 64px 0;
+}
+
+.intro h1 {
+  max-width: 720px;
+  font-size: clamp(2.25rem, 6vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.intro p {
+  max-width: 620px;
+  font-size: 1.125rem;
+  color: #4b5563;
+}
+
+.release {
+  font-family: var(--ifm-font-family-monospace);
+  color: #b33424 !important;
+  font-size: 0.875rem !important;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
