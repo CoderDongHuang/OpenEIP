@@ -6,7 +6,7 @@
 
 ## [Unreleased]
 
-## [0.1.0-alpha] - 未发布
+## [0.1.0-alpha] - 2026-07-21
 
 ### Added
 - 项目初始化：Phase -1 Project Governance 完成
