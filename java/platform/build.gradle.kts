@@ -10,7 +10,7 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 plugins {
     id("org.springframework.boot") version "3.5.16" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
-    id("com.github.spotbugs") version "6.0.26" apply false
+    id("com.github.spotbugs") version "6.0.28" apply false
     id("com.diffplug.spotless") version "7.2.1" apply false
 }
 
