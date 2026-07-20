@@ -1,0 +1,17 @@
+FROM python:3.12.8-slim@sha256:2199a62885a12290dc9c5be3ca0681d367576ab7bf037da120e564723292a2f0
+
+ARG PIP_INDEX_URL=https://pypi.org/simple
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN groupadd --system openeip && useradd --system --gid openeip --create-home openeip
+WORKDIR /app
+COPY pyproject.toml ./
+COPY requirements.lock ./
+COPY engine-core/ engine-core/
+RUN pip install --index-url "$PIP_INDEX_URL" -r requirements.lock \
+    && pip install --no-deps .
+USER openeip
+EXPOSE 8000
+CMD ["uvicorn", "engine_core.main:app", "--host", "0.0.0.0", "--port", "8000"]
