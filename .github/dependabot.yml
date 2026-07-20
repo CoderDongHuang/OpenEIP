@@ -18,6 +18,9 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
+      - dependency-name: "com.github.spotbugs"
+        versions:
+          - "6.5.9"
     labels:
       - "dependencies"
       - "java"

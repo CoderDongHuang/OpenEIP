@@ -8,10 +8,10 @@ import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
 import org.gradle.testing.jacoco.tasks.JacocoReport
 
 plugins {
-    id("org.springframework.boot") version "3.4.0" apply false
+    id("org.springframework.boot") version "3.5.16" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
     id("com.github.spotbugs") version "6.0.26" apply false
-    id("com.diffplug.spotless") version "7.0.2" apply false
+    id("com.diffplug.spotless") version "7.2.1" apply false
 }
 
 group = "com.openeip"
@@ -42,7 +42,7 @@ subprojects {
     }
 
     dependencies {
-        add("testImplementation", "org.springframework.boot:spring-boot-starter-test:3.4.0")
+        add("testImplementation", "org.springframework.boot:spring-boot-starter-test:3.5.16")
         add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher")
     }
 
