@@ -390,10 +390,10 @@ Connector 控制面 SPI 只在 Java 定义。Python 数据处理使用版本化 
 class AgentSpi(ABC):
     @abstractmethod
     def get_metadata(self) -> AgentMetadata: ...
-    
+
     @abstractmethod
     def get_tools(self) -> list[ToolDefinition]: ...
-    
+
     @abstractmethod
     async def execute(self, context: AgentContext) -> AgentResult: ...
 ```
