@@ -1,0 +1,64 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# Java
+java/**/build/
+java/**/target/
+java/**/.gradle/
+java/**/out/
+*.class
+*.jar
+*.war
+
+# Python
+python/**/__pycache__/
+python/**/*.py[cod]
+python/**/*.egg-info/
+python/**/.eggs/
+python/**/dist/
+python/**/.venv/
+python/**/venv/
+python/**/.pytest_cache/
+python/**/.coverage
+python/**/htmlcov/
+*.pyc
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+*.tsbuildinfo
+
+# Website
+website/node_modules/
+website/build/
+website/.docusaurus/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.log
+
+# Docker
+docker-compose.override.yml
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*~
