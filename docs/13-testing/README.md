@@ -30,3 +30,11 @@
 - [x] BCrypt 12 登录 P99 337.51ms（阈值 500ms）
 - [x] Trivy 仓库与 75 个 Boot JAR 运行时依赖扫描
 - [Auth Benchmark Evidence](results/auth-benchmark.json)
+
+## File Upload 基线
+
+- [x] 29 个 Unit / H2 Integration / MySQL / API / Event / Rollback 测试
+- [x] 指令覆盖率 94.84%
+- [x] 1 MiB 本地对象存储 P99 5.60ms（阈值 250ms）
+- [x] Trivy 仓库与 75 个聚合 Boot JAR 运行时依赖扫描
+- [File Upload Benchmark Evidence](results/file-upload-benchmark.json)

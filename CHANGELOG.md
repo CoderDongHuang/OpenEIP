@@ -7,6 +7,12 @@
 ## [Unreleased]
 
 ### Added
+- File Upload 文档控制平面（Issue #44）
+  - 认证用户的流式上传、列表、详情、下载和幂等删除
+  - owner/admin 访问控制、10 MiB 限制、MIME/后缀校验、SHA-256 和安全对象键
+  - MySQL 元数据、可逆 Migration、对象存储端口和失败补偿
+  - `document.file.uploaded` v1 事件 Schema、OpenAPI、MySQL/API/Event Contract
+  - 29 个测试、94.84% 指令覆盖率和 1 MiB 上传基准
 - Auth 认证授权模块（Issue #42）
   - 用户注册/登录、RS256 access/refresh token 和数据库单次轮换
   - 数据库实时 RBAC、角色查询/创建/分配与禁用账户拦截
@@ -21,6 +27,8 @@
 - Chromium 经 Nginx/FastAPI/OpenAI-compatible 上游的 SSE、错误、取消和重连验证
 
 ### Changed
+- Java 运行时使用 `platform-app` 聚合 Auth 与 Document 模块；共享响应信封和请求 ID 移入 `platform-common`
+- CI 对所有 PR base 运行，安全扫描改为展开聚合 Java 运行时
 - 接受 ADR-0002 和 ADR-0004；ADR-0003 以生产化前置条件接受
 - SAD 与 SDD 基线升级到 1.1，纳入 Phase 1.5 实测边界
 
