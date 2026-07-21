@@ -1,0 +1,70 @@
+openapi: 3.1.0
+info:
+  title: OpenEIP Document Parsing Internal API
+  version: 1.0.0
+  description: Bounded UTF-8 and OCR-result normalization/chunking contract.
+paths:
+  /api/v1/parsing/documents:
+    post:
+      operationId: parseDocument
+      summary: Normalize and chunk one text or OCR document
+      parameters:
+        - { $ref: '#/components/parameters/InternalToken' }
+        - { $ref: '#/components/parameters/TenantId' }
+        - { $ref: '#/components/parameters/UserId' }
+        - { $ref: '#/components/parameters/DocumentId' }
+        - { $ref: '#/components/parameters/RequestId' }
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema: { type: string, contentMediaType: 'text/plain; charset=utf-8' }
+          application/vnd.openeip.ocr-result.v1+json:
+            schema:
+              $ref: '../../contracts/ocr/ocr-result.v1.schema.json'
+      responses:
+        '200':
+          description: Parsed result in the standard envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, message, data, requestId, timestamp]
+                properties:
+                  code: { const: 0 }
+                  message: { const: success }
+                  data: { $ref: '../../contracts/document/document-parsed-result.v1.schema.json' }
+                  requestId: { type: string }
+                  timestamp: { type: string, format: date-time }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '413': { $ref: '#/components/responses/Error' }
+        '415': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+components:
+  parameters:
+    InternalToken:
+      { name: X-OpenEIP-Internal-Token, in: header, required: true, schema: { type: string } }
+    TenantId:
+      { name: X-Tenant-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    UserId:
+      { name: X-User-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    DocumentId:
+      { name: X-Document-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    RequestId:
+      { name: X-Request-Id, in: header, required: true, schema: { type: string, minLength: 1, maxLength: 128 } }
+  responses:
+    Error:
+      description: Stable parsing error envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [code, message, data, requestId, timestamp]
+            properties:
+              code: { type: string, pattern: '^DOC-[VPS]-[0-9]{3}$' }
+              message: { type: string }
+              data: { type: 'null' }
+              requestId: { type: string }
+              timestamp: { type: string, format: date-time }
+

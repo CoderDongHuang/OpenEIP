@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openeip.dev/contracts/events/document.lifecycle.parsed.v1.schema.json",
+  "title": "document.lifecycle.parsed v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "eventType", "eventVersion", "timestamp", "source", "tenantId", "userId", "traceId", "idempotencyKey", "payload"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "const": "document.lifecycle.parsed" },
+    "eventVersion": { "const": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "source": { "const": "python-engine-document" },
+    "tenantId": { "type": "string", "format": "uuid" },
+    "userId": { "type": "string", "format": "uuid" },
+    "traceId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "idempotencyKey": { "type": "string", "pattern": "^parse_[a-f0-9]{48}$" },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["documentId", "sourceType", "sourceSha256", "normalizedTextSha256", "chunkCount", "parserVersion"],
+      "properties": {
+        "documentId": { "type": "string", "format": "uuid" },
+        "sourceType": { "enum": ["TEXT", "OCR"] },
+        "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "normalizedTextSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "chunkCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "parserVersion": { "type": "string" }
+      }
+    }
+  }
+}
+
