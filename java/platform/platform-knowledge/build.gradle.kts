@@ -6,6 +6,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.kafka:spring-kafka")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-mysql")
 
@@ -16,6 +17,7 @@ dependencies {
     testImplementation("com.h2database:h2")
     testImplementation("org.testcontainers:junit-jupiter:1.21.3")
     testImplementation("org.testcontainers:mysql:1.21.3")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
 }
 

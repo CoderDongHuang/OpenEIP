@@ -217,6 +217,10 @@ public class KnowledgeBaseService {
     }
   }
 
+  public static void validExternalTenantUuid(String value) {
+    validUuid(value);
+  }
+
   @SuppressFBWarnings(
       value = {"EI_EXPOSE_REP", "EI_EXPOSE_REP2"},
       justification =

@@ -47,12 +47,14 @@ code and retry count, never source text or credentials.
 
 ## 5. Events and Delivery
 
-Parsed and embedding-completed adapters invoke one transactional service. `knowledge_processed_events`
+Parsed and embedding-completed Kafka adapters invoke one transactional service. `knowledge_processed_events`
 uses `(tenant_id, event_id)` as its durable de-duplication key. The same event and payload returns the
 stored outcome; an event ID reused with a different identity is rejected. Processing failures may be
-retried three times before an adapter sends the sanitized envelope to a DLQ. This module implements and
-tests the transactional consumer core; Kafka listener wiring remains disabled until the shared outbox
-and broker adapter are delivered, so no broker publication is claimed here.
+retried three times before the adapter sends the sanitized envelope to the source topic's `.DLQ` on the
+same partition. The listeners are disabled by default and require `KNOWLEDGE_KAFKA_ENABLED=true`.
+The external fixed tenant UUID is mapped to the RFC-0002 internal logical tenant `default`; unknown
+tenant UUIDs are rejected. This module consumes events but does not claim event publication or outbox
+delivery, which remain producer responsibilities.
 
 ## 6. Security and Observability
 
