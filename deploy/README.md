@@ -24,7 +24,14 @@ deploy/
 docker compose up --build
 ```
 
-启动后访问 <http://localhost:3000>。当前 Compose 只包含 Foundation 服务；数据库、Kafka、向量库等将在对应 Spike 验证后加入。
+启动后访问 <http://localhost:3000>。Compose 会同时启动 Auth 所需的 MySQL；Kafka、向量库等在对应模块开发时加入。
+
+该 Compose 仅用于本地开发。MySQL 使用本地凭据，并显式设置
+`JWT_ALLOW_EPHEMERAL_KEY=true`，因此 Auth 容器重启后已有 Token 会失效。
+
+生产部署必须通过 Secret Manager 注入 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`、
+`JWT_PRIVATE_KEY_BASE64` 和 `JWT_PUBLIC_KEY_BASE64`，并保持
+`JWT_ALLOW_EPHEMERAL_KEY=false`。RSA 密钥缺失、强度不足或不匹配时服务会拒绝启动。
 
 网络受限环境可以只对本次构建设置镜像，不需要修改仓库默认源：
 

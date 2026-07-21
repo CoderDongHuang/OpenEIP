@@ -141,6 +141,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+      - name: Build and unpack Auth runtime
+        shell: bash
+        run: |
+          chmod +x java/platform/gradlew
+          java/platform/gradlew --no-daemon -p java/platform :platform-auth:bootJar
+          mkdir -p /tmp/openeip-auth-runtime
+          cd /tmp/openeip-auth-runtime
+          jar -xf "$(find "$GITHUB_WORKSPACE/java/platform/platform-auth/build/libs" -name '*.jar' -print -quit)"
       - name: Scan repository
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -151,3 +165,12 @@ jobs:
           ignore-unfixed: true
           exit-code: '1'
           skip-dirs: '**/node_modules,**/.venv,**/build,**/dist,**/.gradle'
+      - name: Scan Auth runtime dependencies
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: rootfs
+          scan-ref: /tmp/openeip-auth-runtime
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
