@@ -43,6 +43,7 @@ class InMemoryVectorRepository:
             VectorSearchResult(
                 document_id=record.document_id,
                 chunk_id=record.chunk_id,
+                text=record.text,
                 score=sum(left * right for left, right in zip(query, record.vector, strict=True)),
                 source_sha256=record.source_sha256,
             )

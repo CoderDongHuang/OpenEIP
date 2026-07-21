@@ -62,6 +62,7 @@ class EmbeddingService:
                     knowledge_base_id=job.knowledge_base_id,
                     document_id=job.document_id,
                     chunk_id=chunk.chunk_id,
+                    text=chunk.text,
                     source_sha256=chunk.source_sha256,
                     model=self._provider.model,
                     model_version=self._provider.version,

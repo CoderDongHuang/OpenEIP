@@ -17,6 +17,11 @@ from engine_core.ocr.infrastructure.image_decoder import SafeImageDecoder
 from engine_core.parsing.api.router import build_parsing_router
 from engine_core.parsing.application.service import DocumentParsingService
 from engine_core.parsing.infrastructure.input_decoder import DocumentInputDecoder
+from engine_core.rag.api.router import build_rag_router
+from engine_core.rag.application.prompt import PromptBuilder
+from engine_core.rag.application.service import RagService
+from engine_core.rag.domain.ports import AnswerProvider
+from engine_core.rag.infrastructure.deterministic_provider import DeterministicAnswerProvider
 from engine_core.shared.api_error import EngineApiError
 from engine_core.shared.internal_api import safe_request_id
 
@@ -25,6 +30,7 @@ def create_app(
     settings: Settings | None = None,
     embedding_provider: EmbeddingProvider | None = None,
     vector_repository: VectorRepository | None = None,
+    answer_provider: AnswerProvider | None = None,
 ) -> FastAPI:
     """Create the AI engine with explicit settings for tests and deployments."""
     resolved = settings or Settings()
@@ -79,6 +85,24 @@ def create_app(
             max_body_bytes=resolved.embedding_max_body_bytes,
         )
     )
+    rag_service = RagService(
+        embedding_provider=provider,
+        repository=repository,
+        answer_provider=answer_provider or _answer_provider(resolved),
+        prompt_builder=PromptBuilder(resolved.rag_max_context_chars),
+        max_query_chars=resolved.rag_max_query_chars,
+        max_answer_chars=resolved.rag_max_answer_chars,
+        max_top_k=resolved.rag_max_top_k,
+    )
+    application.include_router(
+        build_rag_router(
+            service=rag_service,
+            internal_token=internal_token,
+            max_body_bytes=resolved.rag_max_body_bytes,
+            default_top_k=resolved.rag_default_top_k,
+            max_top_k=resolved.rag_max_top_k,
+        )
+    )
     parsing_service = DocumentParsingService(
         decoder=DocumentInputDecoder(max_body_bytes=resolved.parsing_max_body_bytes),
         chunk_size=resolved.parsing_chunk_size,
@@ -115,6 +139,12 @@ def _vector_repository(settings: Settings) -> VectorRepository:
     if settings.embedding_repository_backend != "memory":
         raise ValueError("Configured vector repository requires an injected adapter")
     return InMemoryVectorRepository()
+
+
+def _answer_provider(settings: Settings) -> AnswerProvider:
+    if settings.rag_answer_provider != "deterministic":
+        raise ValueError("Configured RAG answer provider requires an injected adapter")
+    return DeterministicAnswerProvider()
 
 
 def health_payload(settings: Settings) -> dict[str, str]:
