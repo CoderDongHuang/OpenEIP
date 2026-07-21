@@ -1,9 +1,9 @@
-package com.openeip.auth.api.dto.response;
+package com.openeip.common.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Instant;
 
-/** Stable response envelope for Auth APIs and security filters. */
+/** Stable JSON response envelope shared by Java control-plane modules. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ApiEnvelope<T>(
     Object code, String message, T data, String requestId, Instant timestamp) {

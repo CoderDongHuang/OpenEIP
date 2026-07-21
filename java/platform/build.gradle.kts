@@ -1,4 +1,5 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.quality.CheckstyleExtension
 import org.gradle.api.tasks.testing.Test
@@ -39,6 +40,12 @@ subprojects {
             maven(url = it)
         }
         mavenCentral()
+    }
+
+    extensions.configure<DependencyManagementExtension> {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.16")
+        }
     }
 
     dependencies {
