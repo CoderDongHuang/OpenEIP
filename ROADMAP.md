@@ -41,7 +41,8 @@ v1.0 ──→ LTS                 规划中
 | Phase -1：Project Governance | 已完成 | 治理文档、初始维护机制、RFC/ADR 流程可执行 |
 | Phase 0：Repository Bootstrap | 已完成 | 基础文件、CI、官网和仓库骨架可构建 |
 | Phase 1：Architecture Baseline | 已完成 | PRD/SAD/SDD 与脚手架通过本地发布验证；首次 PR 需再通过 CI |
-| Phase 1.5：Technical Validation | 未开始 | 5 个 Spike 形成数据和 ADR |
+| Phase 1.5：Technical Validation | 已完成 | 5 个 Spike 已形成可复现数据，ADR-0004 已接受 |
+| Phase 2：MVP Development | 规划中 | 按 Issue → Design → Review → Implementation → Quality Gate 交付首批 MVP 能力 |
 
 ## LTS 策略
 

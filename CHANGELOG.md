@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+### Added
+- Phase 1.5 Technical Validation：5 个可复现 Spike、固定依赖、Compose 编排和机器可读证据
+- Java 21 ↔ Python 3.12 gRPC unary/streaming/error 验证
+- Kafka 3.9.1 跨语言事件、幂等、重试和真实 DLQ 验证
+- Milvus 2.5.6 Embedding/Insert/HNSW Search 正确性与性能验证
+- 官方 MCP SDK 初始化、工具发现、调用和错误验证
+- Chromium 经 Nginx/FastAPI/OpenAI-compatible 上游的 SSE、错误、取消和重连验证
+
+### Changed
+- 接受 ADR-0002 和 ADR-0004；ADR-0003 以生产化前置条件接受
+- SAD 与 SDD 基线升级到 1.1，纳入 Phase 1.5 实测边界
+
 ## [0.1.0-alpha] - 2026-07-21
 
 ### Added

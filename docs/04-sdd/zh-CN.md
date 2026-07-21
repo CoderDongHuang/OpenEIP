@@ -1,6 +1,6 @@
 # Enterprise AI Platform 设计基线 (SDD Baseline)
 
-> 文档版本：1.0 | 产品基线：v0.1.0-alpha | 日期：2026-07-20 | 状态：Accepted Foundation Baseline
+> 文档版本：1.1 | 产品基线：Unreleased (Phase 1.5) | 日期：2026-07-21 | 状态：Accepted Technical Baseline
 >
 > 本文档定义 OpenEIP 项目的全局设计规范。各模块的详细设计在各自子 SDD 中展开。
 
@@ -44,6 +44,17 @@ OpenEIP/
 | Python → Java | REST HTTP | 请求/响应 | 回调通知 |
 | Java → Python | Kafka | 异步 | 事件通知（文档就绪、任务创建） |
 | Python → Java | Kafka | 异步 | 事件通知（处理完成、状态变更） |
+
+### 1.4 Phase 1.5 后的实现约束
+
+- gRPC 契约必须从共享 `.proto` 生成，禁止手工复制模型；所有调用设置 deadline 并统一映射状态码。
+- Kafka 使用至少一次投递，事件信封遵循第五章；Consumer 以持久化 `eventId` 去重，失败 3 次写入 `<topic>.dlq`。
+- Gateway 到浏览器的生成式输出使用 SSE，事件至少包含 `token`、`done`、`error`；客户端取消必须向上游传播。
+- Nginx SSE location 必须配置 `proxy_buffering off`、`proxy_cache off` 和足够的 `proxy_read_timeout`。
+- MCP 使用官方 SDK 的标准生命周期；自定义 REST/JSON-RPC 模拟不视为 MCP 兼容实现。
+- Milvus 仅是 Phase 3 候选组件，真实语料和容量验证完成前不得加入默认 Compose Profile。
+
+依据：[ADR-0004](../12-adr/adr-0004-spike-validation-decisions.md)。
 
 ---
 
@@ -237,11 +248,11 @@ KB-E-003    ← 知识库模块，业务错误，序号 003（知识库不存在
 
 用于 LLM Streaming 和实时通知：
 
-```
-event: message
+```text
+event: token
 data: {"token": "你好", "index": 0}
 
-event: message
+event: token
 data: {"token": "，", "index": 1}
 
 event: done
@@ -250,6 +261,8 @@ data: {"totalTokens": 150, "finishReason": "stop"}
 event: error
 data: {"code": "LLM-S-001", "message": "模型调用超时"}
 ```
+
+响应使用 `text/event-stream`、`Cache-Control: no-cache, no-transform` 和 `X-Accel-Buffering: no`。浏览器中止请求后，Gateway 与 Python 必须取消上游流；自动重试仅允许在尚未向用户输出 Token 且请求可证明幂等时执行。
 
 ### 3.8 WebSocket 规范
 
@@ -508,4 +521,5 @@ ReAct (Reasoning + Acting) 模式：
 
 | 版本 | 日期 | 变更说明 |
 |---|---|---|
+| v1.1 | 2026-07-21 | 增加 Phase 1.5 后的 gRPC、Kafka、SSE、MCP 和 Milvus 约束 |
 | v1.0 | 2026-07-20 | 初始 Baseline 版本 |

@@ -1,6 +1,6 @@
 # Enterprise AI Platform 软件架构设计说明书 (SAD)
 
-> 文档版本：1.0 | 产品基线：v0.1.0-alpha | 日期：2026-07-20 | 状态：Accepted Foundation Baseline
+> 文档版本：1.1 | 产品基线：Unreleased (Phase 1.5) | 日期：2026-07-21 | 状态：Accepted Technical Baseline
 >
 > 本文档是 OpenEIP 项目的唯一软件架构基线，所有模块设计和开发必须依据本文档。
 
@@ -83,9 +83,9 @@
 | 决策 | 选择 | 状态 | 记录 |
 |---|---|---|---|
 | 后端主语言 | Java + Python | Accepted | [ADR-0001](../12-adr/adr-0001-java-python-runtime.md) |
-| 同步与异步通信 | REST/gRPC + Event Bus | Proposed，待 Spike | [ADR-0002](../12-adr/adr-0002-communication-boundaries.md) |
+| 同步与异步通信 | REST/gRPC + Kafka + SSE | Accepted | [ADR-0002](../12-adr/adr-0002-communication-boundaries.md) |
 | 服务形态 | Java 模块化平台 + 独立 Python AI Engine | Accepted | [ADR-0001](../12-adr/adr-0001-java-python-runtime.md) |
-| 数据与检索组件 | 按用途选择，默认部署暂不包含 | Proposed，待 Spike | [ADR-0003](../12-adr/adr-0003-storage-baseline.md) |
+| 数据与检索组件 | 按用途验证引入，默认部署暂不包含 | Accepted with Conditions | [ADR-0003](../12-adr/adr-0003-storage-baseline.md) |
 | 容器化 | Docker Compose 起步，K8S 后续验证 | Partially Accepted | [RFC-0001](../11-rfc/rfc-0001-foundation-architecture.md) |
 
 ### 1.3 关键设计原则
@@ -95,6 +95,18 @@
 3. **同步调用有明确边界**：gRPC 仅用于低延迟的实时 AI 调用（如 Agent 对话）
 4. **扩展契约先行**：Connector、Agent、Workflow Node 在实现前通过 RFC 固化 SPI
 5. **无状态服务**：所有服务无状态，会话通过 Redis 共享
+
+### 1.4 Phase 1.5 验证基线
+
+| 技术假设 | 实测结论 | 架构边界 |
+|---|---|---|
+| Java ↔ Python gRPC | 通过 | 仅用于内部实时调用；生产实现补 TLS、deadline、错误映射和追踪 |
+| Kafka Eventing | 通过 | 至少一次投递；`eventId` 幂等；3 次失败进入 DLQ |
+| Milvus Vector Search | 有条件通过 | Phase 3 候选；真实语料和容量验证前不进入默认部署 |
+| MCP Runtime | 通过 | 使用官方 MCP SDK；远程认证和租户隔离另行设计 |
+| Browser LLM Streaming | 通过 | Gateway 到 Browser 使用 SSE；关闭代理缓冲并支持取消 |
+
+完整数据与限制见 [ADR-0004](../12-adr/adr-0004-spike-validation-decisions.md) 和 [`spike/`](../../spike/README.md)。
 
 ---
 
@@ -183,6 +195,7 @@ java/
 - Java 发布事件 → Kafka Topic → Python 消费
 - Python 发布事件 → Kafka Topic → Java 消费
 - Event Schema：统一在语言无关的 `contracts/events/` 中以 JSON Schema 或 Protobuf 定义；Java/Python 生成绑定代码
+- 交付语义：至少一次；Consumer 使用持久化 `eventId` 幂等键；业务失败 3 次后写入 `<topic>.dlq`
 
 ### 2.4 事务管理
 
@@ -512,6 +525,8 @@ Router 策略：
 └──────────────────────────────────────┘
 ```
 
+MCP Runtime 必须基于官方 SDK 的标准初始化、能力发现和工具调用语义实现。Phase 1.5 已验证 stdio Transport；远程 Transport、认证授权、租户隔离和审计必须在模块 SDD 中定义后才能发布。
+
 ---
 
 ## 第七章：权限架构
@@ -788,4 +803,5 @@ MySQL / ES / Milvus / Neo4j → 使用 Helm Chart 或外部托管
 
 | 版本 | 日期 | 变更说明 |
 |---|---|---|
+| v1.1 | 2026-07-21 | 合并 Phase 1.5 实测通信、Milvus、MCP 与 SSE 决策 |
 | v1.0 | 2026-07-20 | 初始 Baseline 版本 |
