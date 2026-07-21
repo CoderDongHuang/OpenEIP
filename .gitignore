@@ -29,6 +29,7 @@ python/**/venv/
 python/**/.pytest_cache/
 python/**/.coverage
 python/**/htmlcov/
+python/coverage.xml
 *.pyc
 
 # Frontend
@@ -62,6 +63,7 @@ spike/**/build/
 spike/**/__pycache__/
 
 # Temporary
+**/data/files/
 tmp/
 temp/
 *.tmp

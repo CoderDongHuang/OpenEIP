@@ -8,12 +8,16 @@ COPY gradle/ gradle/
 COPY config/ config/
 COPY platform-common/ platform-common/
 COPY platform-auth/ platform-auth/
-RUN sed -i "s|^distributionUrl=.*|distributionUrl=${GRADLE_DISTRIBUTION_URL}|" gradle/wrapper/gradle-wrapper.properties \
+COPY platform-document/ platform-document/
+COPY platform-app/ platform-app/
+RUN --mount=type=cache,target=/root/.gradle \
+    sed -i 's/\r$//' gradlew \
+    && sed -i "s|^distributionUrl=.*|distributionUrl=${GRADLE_DISTRIBUTION_URL}|" gradle/wrapper/gradle-wrapper.properties \
     && chmod +x gradlew \
     && if [ -n "$MAVEN_REPOSITORY_URL" ]; then \
-         ./gradlew --no-daemon -PmavenRepositoryUrl="$MAVEN_REPOSITORY_URL" :platform-auth:bootJar; \
+         ./gradlew --no-daemon -PmavenRepositoryUrl="$MAVEN_REPOSITORY_URL" :platform-app:bootJar; \
        else \
-         ./gradlew --no-daemon :platform-auth:bootJar; \
+         ./gradlew --no-daemon :platform-app:bootJar; \
        fi
 
 FROM eclipse-temurin:21-jre-alpine@sha256:3f08b13888f595cc49edabea7250ba69499ba25602b267da591720769400e08c
@@ -22,7 +26,7 @@ RUN apk add --no-cache wget \
     && addgroup -S openeip \
     && adduser -S openeip -G openeip
 WORKDIR /app
-COPY --from=builder /workspace/platform-auth/build/libs/*.jar app.jar
+COPY --from=builder /workspace/platform-app/build/libs/*.jar app.jar
 USER openeip
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

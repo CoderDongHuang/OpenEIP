@@ -30,11 +30,14 @@ services:
       DB_USERNAME: openeip
       DB_PASSWORD: local-openeip-password
       JWT_ALLOW_EPHEMERAL_KEY: "true"
+      DOCUMENT_STORAGE_ROOT: /app/data/files
     depends_on:
       mysql:
         condition: service_healthy
     expose:
       - "8080"
+    volumes:
+      - document-files:/app/data/files
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
       interval: 10s
@@ -99,3 +102,4 @@ networks:
 
 volumes:
   mysql-data:
+  document-files:
