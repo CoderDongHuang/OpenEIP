@@ -34,6 +34,8 @@ idna==3.18
     # via
     #   anyio
     #   httpx
+pillow==12.3.0
+    # via openeip-engine (pyproject.toml)
 pydantic==2.13.4
     # via
     #   fastapi

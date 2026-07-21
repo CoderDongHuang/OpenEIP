@@ -11,6 +11,7 @@ dependencies = [
     "pydantic>=2.0",
     "pydantic-settings>=2.0",
     "httpx>=0.27.0",
+    "pillow>=11.0.0",
 ]
 
 [project.optional-dependencies]
@@ -88,4 +89,7 @@ warn_return_any = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = "-v --cov=engine_core --cov-report=term-missing --cov-fail-under=80"
+addopts = "-v -m 'not benchmark' --cov=engine_core --cov-report=term-missing --cov-fail-under=80"
+markers = [
+    "benchmark: isolated performance gate that must run without coverage instrumentation",
+]

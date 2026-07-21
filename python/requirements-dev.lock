@@ -81,6 +81,8 @@ packaging==26.2
     #   pytest
 pathspec==1.1.1
     # via mypy
+pillow==12.3.0
+    # via openeip-engine (pyproject.toml)
 pip-api==0.0.34
     # via pip-audit
 pip-audit==2.10.1
