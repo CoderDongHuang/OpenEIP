@@ -5,6 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from engine_core.config import Settings
+from engine_core.embedding.api.router import build_embedding_router
+from engine_core.embedding.application.service import EmbeddingService
+from engine_core.embedding.domain.ports import EmbeddingProvider, VectorRepository
+from engine_core.embedding.infrastructure.deterministic_provider import DeterministicEmbeddingProvider
+from engine_core.embedding.infrastructure.memory_repository import InMemoryVectorRepository
 from engine_core.ocr.api.router import build_ocr_router
 from engine_core.ocr.application.service import OcrService
 from engine_core.ocr.infrastructure.deterministic_provider import DeterministicRasterProvider
@@ -16,7 +21,11 @@ from engine_core.shared.api_error import EngineApiError
 from engine_core.shared.internal_api import safe_request_id
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    embedding_provider: EmbeddingProvider | None = None,
+    vector_repository: VectorRepository | None = None,
+) -> FastAPI:
     """Create the AI engine with explicit settings for tests and deployments."""
     resolved = settings or Settings()
     internal_token = resolved.internal_api_secret()
@@ -50,6 +59,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             max_body_bytes=resolved.ocr_max_body_bytes,
         )
     )
+
+    provider = embedding_provider or _embedding_provider(resolved)
+    repository = vector_repository or _vector_repository(resolved)
+    if resolved.environment.casefold() == "production" and isinstance(repository, InMemoryVectorRepository):
+        raise ValueError("In-memory vector repository is forbidden in production")
+    embedding_service = EmbeddingService(
+        provider=provider,
+        repository=repository,
+        max_batch_size=resolved.embedding_max_batch_size,
+        max_text_chars=resolved.embedding_max_text_chars,
+        max_jobs=resolved.embedding_max_jobs,
+    )
+    application.state.vector_repository = repository
+    application.include_router(
+        build_embedding_router(
+            service=embedding_service,
+            internal_token=internal_token,
+            max_body_bytes=resolved.embedding_max_body_bytes,
+        )
+    )
     parsing_service = DocumentParsingService(
         decoder=DocumentInputDecoder(max_body_bytes=resolved.parsing_max_body_bytes),
         chunk_size=resolved.parsing_chunk_size,
@@ -74,6 +103,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return health_payload(resolved)
 
     return application
+
+
+def _embedding_provider(settings: Settings) -> EmbeddingProvider:
+    if settings.embedding_provider != "deterministic":
+        raise ValueError("Configured embedding provider requires an injected adapter")
+    return DeterministicEmbeddingProvider(settings.embedding_dimension)
+
+
+def _vector_repository(settings: Settings) -> VectorRepository:
+    if settings.embedding_repository_backend != "memory":
+        raise ValueError("Configured vector repository requires an injected adapter")
+    return InMemoryVectorRepository()
 
 
 def health_payload(settings: Settings) -> dict[str, str]:

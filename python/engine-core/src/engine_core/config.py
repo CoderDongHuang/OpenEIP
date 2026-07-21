@@ -46,6 +46,16 @@ class Settings(BaseSettings):
     parsing_chunk_overlap: int = 100
     parsing_max_chunks: int = 10_000
 
+    # Embedding internal API
+    environment: str = "development"
+    embedding_provider: str = "deterministic"
+    embedding_repository_backend: str = "memory"
+    embedding_dimension: int = 64
+    embedding_max_body_bytes: int = 128 * 1024
+    embedding_max_batch_size: int = 32
+    embedding_max_text_chars: int = 8192
+    embedding_max_jobs: int = 1000
+
     # LLM
     llm_default_model: str = "gpt-4o"
     openai_api_key: str = ""
