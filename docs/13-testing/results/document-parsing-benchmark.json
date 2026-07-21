@@ -1,0 +1,17 @@
+{
+  "benchmark": "document-parsing-one-mib",
+  "recordedAt": "2026-07-21T21:23:18.592908+00:00",
+  "payloadBytes": 1048576,
+  "chunkCount": 1172,
+  "chunkSize": 1000,
+  "overlap": 100,
+  "warmups": 5,
+  "measurements": 30,
+  "p50Ms": 54.365,
+  "p95Ms": 59.744,
+  "p99Ms": 60.63,
+  "mibPerSecondAtP50": 18.39,
+  "thresholdP99Ms": 250.0,
+  "pythonVersion": "3.12.13",
+  "os": "Windows 11 10.0.26200"
+}
