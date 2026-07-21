@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openeip.dev/contracts/ocr/ocr-result.v1.schema.json",
+  "title": "OpenEIP OCR Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["text", "blocks", "pageCount", "confidence", "durationMs", "contentSha256", "provider"],
+  "properties": {
+    "text": { "type": "string" },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["page", "text", "confidence", "boundingBox"],
+        "properties": {
+          "page": { "const": 1 },
+          "text": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "boundingBox": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["x", "y", "width", "height"],
+            "properties": {
+              "x": { "type": "integer", "minimum": 0 },
+              "y": { "type": "integer", "minimum": 0 },
+              "width": { "type": "integer", "minimum": 1 },
+              "height": { "type": "integer", "minimum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "pageCount": { "const": 1 },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "durationMs": { "type": "number", "minimum": 0 },
+    "contentSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "mode"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "mode": { "const": "deterministic-mvp" }
+      }
+    }
+  }
+}
+

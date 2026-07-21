@@ -22,6 +22,7 @@
 
 - [Auth Test and Benchmark Plan](auth-test-plan.md)
 - [File Upload Test and Benchmark Plan](file-upload-test-plan.md)
+- [OCR Test and Benchmark Plan](ocr-test-plan.md)
 
 ## Auth 基线
 

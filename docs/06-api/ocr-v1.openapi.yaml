@@ -1,0 +1,185 @@
+openapi: 3.1.0
+info:
+  title: OpenEIP OCR Internal API
+  version: 1.0.0
+  description: Versioned internal OCR execution contract for PNG and JPEG images.
+paths:
+  /api/v1/ocr/recognitions:
+    post:
+      operationId: recognizeImage
+      summary: Recognize one bounded raster image
+      parameters:
+        - $ref: '#/components/parameters/InternalToken'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          image/png:
+            schema:
+              type: string
+              contentEncoding: base64
+          image/jpeg:
+            schema:
+              type: string
+              contentEncoding: base64
+      responses:
+        '200':
+          description: OCR completed, including a valid empty result when no supported glyph is found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcrEnvelope'
+        '400':
+          description: Invalid identity, media type, body, image, or resource dimensions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          description: Missing or invalid internal credential.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '413':
+          description: Encoded body or decoded image exceeds the configured resource limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '415':
+          description: Unsupported or mismatched image media type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          description: OCR provider failed without exposing internal details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+components:
+  parameters:
+    InternalToken:
+      name: X-OpenEIP-Internal-Token
+      in: header
+      required: true
+      schema:
+        type: string
+    TenantId:
+      name: X-Tenant-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+    UserId:
+      name: X-User-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RequestId:
+      name: X-Request-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+        pattern: '^[A-Za-z0-9._:-]+$'
+  schemas:
+    OcrEnvelope:
+      type: object
+      additionalProperties: false
+      required: [code, message, data, requestId, timestamp]
+      properties:
+        code:
+          const: 0
+        message:
+          const: success
+        data:
+          $ref: '#/components/schemas/OcrResult'
+        requestId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    OcrResult:
+      type: object
+      additionalProperties: false
+      required: [text, blocks, pageCount, confidence, durationMs, contentSha256, provider]
+      properties:
+        text:
+          type: string
+        blocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/OcrBlock'
+        pageCount:
+          const: 1
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        durationMs:
+          type: number
+          minimum: 0
+        contentSha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        provider:
+          type: object
+          additionalProperties: false
+          required: [name, version, mode]
+          properties:
+            name:
+              type: string
+            version:
+              type: string
+            mode:
+              const: deterministic-mvp
+    OcrBlock:
+      type: object
+      additionalProperties: false
+      required: [page, text, confidence, boundingBox]
+      properties:
+        page:
+          const: 1
+        text:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        boundingBox:
+          type: object
+          additionalProperties: false
+          required: [x, y, width, height]
+          properties:
+            x: { type: integer, minimum: 0 }
+            y: { type: integer, minimum: 0 }
+            width: { type: integer, minimum: 1 }
+            height: { type: integer, minimum: 1 }
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [code, message, data, requestId, timestamp]
+      properties:
+        code:
+          type: string
+          pattern: '^OCR-[VPS]-[0-9]{3}$'
+        message:
+          type: string
+        data:
+          type: 'null'
+        requestId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
