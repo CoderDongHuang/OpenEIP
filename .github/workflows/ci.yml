@@ -67,6 +67,8 @@ jobs:
         run: ruff format --check --config python/pyproject.toml spike
       - name: Mypy
         run: mypy engine-core/src
+      - name: OCR Benchmark
+        run: pytest -m benchmark --no-cov
       - name: Unit Test
         run: pytest --cov-report=xml
       - name: Dependency Audit

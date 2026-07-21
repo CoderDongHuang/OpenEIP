@@ -1,0 +1,16 @@
+{
+  "benchmark": "ocr-deterministic-raster-pipeline",
+  "recordedAt": "2026-07-21T20:52:45.332130+00:00",
+  "payloadBytes": 338,
+  "corpus": "OPENEIP OCR 2026",
+  "warmups": 10,
+  "measurements": 100,
+  "p50Ms": 19.4,
+  "p95Ms": 22.957,
+  "p99Ms": 24.072,
+  "imagesPerSecondAtP50": 51.55,
+  "thresholdP99Ms": 100.0,
+  "pythonVersion": "3.12.13",
+  "pillowVersion": "12.3.0",
+  "os": "Windows 11 10.0.26200"
+}
