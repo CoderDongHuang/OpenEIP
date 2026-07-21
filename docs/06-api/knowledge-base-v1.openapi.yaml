@@ -1,0 +1,150 @@
+openapi: 3.1.0
+info:
+  title: OpenEIP Knowledge Base API
+  version: 1.0.0
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/knowledge/bases:
+    post:
+      operationId: createKnowledgeBase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpsertBase' }
+      responses:
+        '201': { $ref: '#/components/responses/Base' }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+    get:
+      operationId: listKnowledgeBases
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/PageSize' }
+      responses:
+        '200': { $ref: '#/components/responses/BasePage' }
+        '401': { $ref: '#/components/responses/Error' }
+  /api/v1/knowledge/bases/{baseId}:
+    parameters:
+      - { $ref: '#/components/parameters/BaseId' }
+    get:
+      operationId: getKnowledgeBase
+      responses:
+        '200': { $ref: '#/components/responses/Base' }
+        '404': { $ref: '#/components/responses/Error' }
+    patch:
+      operationId: updateKnowledgeBase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpsertBase' }
+      responses:
+        '200': { $ref: '#/components/responses/Base' }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+    delete:
+      operationId: deleteKnowledgeBase
+      responses:
+        '204': { description: Deleted }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/knowledge/bases/{baseId}/documents:
+    parameters:
+      - { $ref: '#/components/parameters/BaseId' }
+    post:
+      operationId: attachKnowledgeDocument
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AttachDocument' }
+      responses:
+        '201': { $ref: '#/components/responses/Document' }
+        '409': { $ref: '#/components/responses/Error' }
+    get:
+      operationId: listKnowledgeDocuments
+      responses:
+        '200': { $ref: '#/components/responses/DocumentList' }
+  /api/v1/knowledge/bases/{baseId}/documents/{documentId}:
+    parameters:
+      - { $ref: '#/components/parameters/BaseId' }
+      - { $ref: '#/components/parameters/DocumentId' }
+    get:
+      operationId: getKnowledgeDocument
+      responses:
+        '200': { $ref: '#/components/responses/Document' }
+        '404': { $ref: '#/components/responses/Error' }
+    delete:
+      operationId: detachKnowledgeDocument
+      responses:
+        '204': { description: Detached }
+        '403': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    BaseId: { name: baseId, in: path, required: true, schema: { type: string, format: uuid } }
+    DocumentId: { name: documentId, in: path, required: true, schema: { type: string, format: uuid } }
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    PageSize: { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+  schemas:
+    UpsertBase:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        description: { type: string, maxLength: 2000 }
+    AttachDocument:
+      type: object
+      additionalProperties: false
+      required: [documentId]
+      properties:
+        documentId: { type: string, format: uuid }
+    BaseData:
+      type: object
+      required: [id, name, description, role, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        role: { enum: [OWNER, EDITOR, VIEWER] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    DocumentData:
+      type: object
+      required: [documentId, status, retryCount, createdAt, updatedAt]
+      properties:
+        documentId: { type: string, format: uuid }
+        status: { enum: [PENDING_PARSE, PARSED, PENDING_EMBEDDING, READY, FAILED] }
+        failureCode: { type: [string, 'null'], maxLength: 64 }
+        retryCount: { type: integer, minimum: 0, maximum: 3 }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Envelope:
+      type: object
+      required: [code, message, requestId, timestamp, data]
+      properties:
+        code: { oneOf: [{ type: integer }, { type: string }] }
+        message: { type: string }
+        requestId: { type: string }
+        timestamp: { type: string, format: date-time }
+        data: {}
+  responses:
+    Base:
+      description: Knowledge base
+      content: { application/json: { schema: { $ref: '#/components/schemas/Envelope' } } }
+    BasePage:
+      description: Knowledge base page
+      content: { application/json: { schema: { $ref: '#/components/schemas/Envelope' } } }
+    Document:
+      description: Knowledge document
+      content: { application/json: { schema: { $ref: '#/components/schemas/Envelope' } } }
+    DocumentList:
+      description: Knowledge document list
+      content: { application/json: { schema: { $ref: '#/components/schemas/Envelope' } } }
+    Error:
+      description: Error envelope
+      content: { application/json: { schema: { $ref: '#/components/schemas/Envelope' } } }
