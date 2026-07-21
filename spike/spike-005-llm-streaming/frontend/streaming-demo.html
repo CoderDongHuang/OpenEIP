@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenEIP Streaming Spike</title>
+    <style>
+      :root { color-scheme: light; font-family: system-ui, sans-serif; }
+      body { margin: 0; background: #f5f6f8; color: #18202a; }
+      main { width: min(720px, calc(100% - 32px)); margin: 48px auto; }
+      h1 { font-size: 24px; letter-spacing: 0; }
+      textarea { box-sizing: border-box; width: 100%; min-height: 96px; padding: 12px; border: 1px solid #aeb7c2; border-radius: 6px; font: inherit; }
+      .actions { display: flex; gap: 8px; margin: 12px 0; }
+      button { min-height: 40px; padding: 0 16px; border: 1px solid #263746; border-radius: 6px; background: #263746; color: white; font: inherit; cursor: pointer; }
+      button.secondary { background: white; color: #263746; }
+      #status { min-height: 24px; color: #4c5967; }
+      #output { min-height: 120px; padding: 16px; border: 1px solid #d4d9df; border-radius: 6px; background: white; white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>OpenEIP LLM Streaming</h1>
+      <textarea id="prompt" aria-label="Prompt">normal</textarea>
+      <div class="actions">
+        <button id="send" type="button">发送</button>
+        <button id="cancel" class="secondary" type="button">取消</button>
+      </div>
+      <div id="status" data-testid="status">idle</div>
+      <div id="output" data-testid="output"></div>
+    </main>
+    <script>
+      const prompt = document.querySelector("#prompt");
+      const output = document.querySelector("#output");
+      const status = document.querySelector("#status");
+      let controller = null;
+      window.__spikeMetrics = {};
+
+      function updateStatus(value) {
+        status.textContent = value;
+      }
+
+      async function send() {
+        controller?.abort();
+        controller = new AbortController();
+        output.textContent = "";
+        updateStatus("streaming");
+        const started = performance.now();
+        window.__spikeMetrics = { started };
+        try {
+          const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: prompt.value }),
+            signal: controller.signal,
+          });
+          if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
+          while (true) {
+            const { value, done } = await reader.read();
+            buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+            const events = buffer.split("\n\n");
+            buffer = events.pop() || "";
+            for (const block of events) {
+              const event = block.split("\n").find((line) => line.startsWith("event: "))?.slice(7);
+              const dataLine = block.split("\n").find((line) => line.startsWith("data: "));
+              if (!event || !dataLine) continue;
+              const data = JSON.parse(dataLine.slice(6));
+              if (event === "token") {
+                if (!window.__spikeMetrics.firstToken) window.__spikeMetrics.firstToken = performance.now();
+                output.textContent += data.token;
+              } else if (event === "done") {
+                window.__spikeMetrics.completed = performance.now();
+                updateStatus("complete");
+              } else if (event === "error") {
+                updateStatus("error");
+              }
+            }
+            if (done) break;
+          }
+        } catch (error) {
+          updateStatus(error.name === "AbortError" ? "cancelled" : "error");
+        }
+      }
+
+      document.querySelector("#send").addEventListener("click", send);
+      document.querySelector("#cancel").addEventListener("click", () => controller?.abort());
+    </script>
+  </body>
+</html>

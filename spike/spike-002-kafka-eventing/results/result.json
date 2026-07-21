@@ -1,0 +1,36 @@
+{
+  "spike": "spike-002",
+  "executed_at": "2026-07-21T10:14:15.069810+00:00",
+  "records_received": 2003,
+  "events_processed": 2001,
+  "duplicates_skipped": 1,
+  "poison_attempts": 3,
+  "dlq": {
+    "found": true,
+    "record": {
+      "original": {
+        "eventId": "event-poison",
+        "eventType": "validation.poison",
+        "eventVersion": "1.0",
+        "timestamp": "2026-07-21T10:14:02.552186651Z",
+        "source": {
+          "instance": "local",
+          "service": "spike-002-java-producer"
+        },
+        "context": {
+          "userId": "system",
+          "tenantId": "tenant-spike",
+          "traceId": "trace-spike-002"
+        },
+        "payload": {
+          "sequence": 2001
+        }
+      },
+      "attempts": 3,
+      "error": "deliberate validation failure"
+    }
+  },
+  "elapsed_seconds": 0.2070186310011195,
+  "consumer_throughput_rps": 9675.457664431991,
+  "passed": true
+}

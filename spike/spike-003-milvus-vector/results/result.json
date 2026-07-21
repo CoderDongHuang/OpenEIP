@@ -1,0 +1,36 @@
+{
+  "spike": "spike-003",
+  "executed_at": "2026-07-21T10:20:28.220512+00:00",
+  "milvus_version": "2.5.6",
+  "collection": "spike_003_documents",
+  "index": {
+    "type": "HNSW",
+    "metric": "COSINE",
+    "M": 16,
+    "efConstruction": 128
+  },
+  "dimensions": 64,
+  "documents": 2000,
+  "inserted": 2000,
+  "corpus_embedding_ms": 932.1566330036148,
+  "insert_ms": 67.7072950056754,
+  "query_embedding": {
+    "samples": 200,
+    "mean_ms": 2.074687675194582,
+    "p50_ms": 2.0031960011692718,
+    "p95_ms": 2.6075150017277338,
+    "p99_ms": 3.4909299938590266
+  },
+  "milvus_search": {
+    "samples": 200,
+    "mean_ms": 3.198545629675209,
+    "p50_ms": 3.2244019967038184,
+    "p95_ms": 4.018305000499822,
+    "p99_ms": 4.976043004717212
+  },
+  "search_p99_threshold_ms": 100,
+  "correct_queries": 200,
+  "query_count": 200,
+  "top1_accuracy": 1.0,
+  "passed": true
+}

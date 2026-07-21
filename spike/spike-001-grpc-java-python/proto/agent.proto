@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package openeip.agent.v1;
+
+option java_package = "com.openeip.agent.v1";
+option java_outer_classname = "AgentProto";
+
+// Agent 对话服务
+service AgentService {
+  // Unary：单次问答
+  rpc Chat (ChatRequest) returns (ChatResponse);
+
+  // Server Streaming：Agent 流式思考+回复
+  rpc ChatStream (ChatRequest) returns (stream ChatStreamResponse);
+
+  // Bidirectional Streaming：多轮对话
+  rpc ChatBidi (stream ChatRequest) returns (stream ChatStreamResponse);
+}
+
+message ChatRequest {
+  string session_id = 1;
+  string message = 2;
+  map<string, string> context = 3;
+}
+
+message ChatResponse {
+  string session_id = 1;
+  string answer = 2;
+  int32 tokens_used = 3;
+}
+
+message ChatStreamResponse {
+  string session_id = 1;
+  oneof event {
+    ThinkingEvent thinking = 2;
+    TokenEvent token = 3;
+    ToolCallEvent tool_call = 4;
+    ToolResultEvent tool_result = 5;
+    DoneEvent done = 6;
+    ErrorEvent error = 7;
+  }
+}
+
+message ThinkingEvent {
+  string step = 1;      // planning / executing / reflecting
+  string message = 2;
+}
+
+message TokenEvent {
+  string token = 1;
+  int32 index = 2;
+}
+
+message ToolCallEvent {
+  string tool_name = 1;
+  string arguments = 2;
+}
+
+message ToolResultEvent {
+  string tool_name = 1;
+  string result = 2;
+}
+
+message DoneEvent {
+  int32 total_tokens = 1;
+  string finish_reason = 2;
+}
+
+message ErrorEvent {
+  string code = 1;
+  string message = 2;
+}

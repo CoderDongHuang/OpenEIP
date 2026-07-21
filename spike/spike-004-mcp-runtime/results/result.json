@@ -1,0 +1,29 @@
+{
+  "spike": "spike-004",
+  "executed_at": "2026-07-21T10:21:43.265226+00:00",
+  "protocol_version": "2025-11-25",
+  "server_name": "OpenEIP Spike MCP Server",
+  "server_version": "1.28.1",
+  "initialization_ms": 750.1263599988306,
+  "tools": [
+    "add_numbers",
+    "knowledge_search",
+    "workflow_status"
+  ],
+  "expected_tools": [
+    "add_numbers",
+    "knowledge_search",
+    "workflow_status"
+  ],
+  "schemas_present": true,
+  "calls": {
+    "knowledge_search": "{\n  \"query\": \"gRPC\",\n  \"matches\": [\n    \"OpenEIP result 1: gRPC\",\n    \"OpenEIP result 2: gRPC\"\n  ]\n}",
+    "add_numbers": "6.5",
+    "workflow_status": "{\n  \"workflow_id\": \"wf-001\",\n  \"status\": \"completed\"\n}"
+  },
+  "errors": {
+    "invalid_arguments_is_error": true,
+    "unknown_tool_is_error": true
+  },
+  "passed": true
+}

@@ -56,6 +56,11 @@ Thumbs.db
 # Docker
 docker-compose.override.yml
 
+# Technical Spikes
+spike/**/.gradle/
+spike/**/build/
+spike/**/__pycache__/
+
 # Temporary
 tmp/
 temp/
