@@ -11,6 +11,7 @@
 | [ADR-0002](adr-0002-communication-boundaries.md) | 通信边界——同步 vs 异步 | Accepted |
 | [ADR-0003](adr-0003-storage-baseline.md) | 存储基线选型 | Accepted with Conditions |
 | [ADR-0004](adr-0004-spike-validation-decisions.md) | Phase 1.5 Spike 验证结论与后续决策 | Accepted |
+| [ADR-0005](adr-0005-auth-token-security.md) | Auth Token 安全策略 | Accepted |
 
 ## ADR 编号规则
 

@@ -3,6 +3,10 @@
 > ER 图、DDL、Migration、索引规范、SQL 规范。
 > 在 MVP 开发阶段逐步完成。
 
+## 模块设计
+
+- [Auth Database Design](auth-schema.md)
+
 ## 待完成
 
 - [ ] 数据库 ER 图
