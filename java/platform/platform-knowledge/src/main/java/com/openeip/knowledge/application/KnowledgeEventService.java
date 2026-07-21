@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class KnowledgeEventService {
   public static final String PARSED = "document.lifecycle.parsed";
-  public static final String EMBEDDED = "knowledge.embedding.completed";
+  public static final String EMBEDDED = "embedding.job.completed";
 
   private final KnowledgeDocumentRepository documents;
   private final ProcessedKnowledgeEventRepository events;

@@ -62,7 +62,7 @@ public class KnowledgeKafkaEventListener {
   public void embeddingCompleted(String json) {
     EmbeddingEvent event = read(json, EmbeddingEvent.class);
     require(
-        "knowledge.embedding.completed".equals(event.eventType())
+        "embedding.job.completed".equals(event.eventType())
             && event.eventVersion() == 1
             && "python-engine-embedding".equals(event.source()),
         "Invalid embedding event contract");
@@ -136,9 +136,11 @@ public class KnowledgeKafkaEventListener {
       EmbeddingPayload payload) {}
 
   public record EmbeddingPayload(
+      String jobId,
       String knowledgeBaseId,
       String documentId,
       int chunkCount,
       String embeddingModel,
+      String modelVersion,
       int vectorDimension) {}
 }

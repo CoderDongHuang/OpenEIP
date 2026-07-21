@@ -112,8 +112,7 @@ class KnowledgeMySqlContractTest {
     JsonNode event =
         new ObjectMapper()
             .readTree(
-                root.resolve("contracts/events/knowledge.embedding.completed.v1.schema.json")
-                    .toFile());
+                root.resolve("contracts/events/embedding.job.completed.v1.schema.json").toFile());
     assertThat(event.path("additionalProperties").asBoolean()).isFalse();
     assertThat(event.path("properties").path("eventVersion").path("const").asInt()).isEqualTo(1);
     assertThat(event.path("properties").path("payload").path("additionalProperties").asBoolean())
