@@ -17,3 +17,15 @@
 - [ ] Benchmark 方案与基线
 
 未勾选项目随业务模块和 Phase 1.5 Spike 建立，不伪造无业务代码阶段的性能基线。
+
+## 模块计划
+
+- [Auth Test and Benchmark Plan](auth-test-plan.md)
+
+## Auth 基线
+
+- [x] 31 个 Unit / H2 Integration / MySQL Contract / Migration Rollback 测试
+- [x] 指令覆盖率 96.33%
+- [x] BCrypt 12 登录 P99 337.51ms（阈值 500ms）
+- [x] Trivy 仓库与 75 个 Boot JAR 运行时依赖扫描
+- [Auth Benchmark Evidence](results/auth-benchmark.json)

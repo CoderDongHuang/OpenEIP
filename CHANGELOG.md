@@ -7,6 +7,12 @@
 ## [Unreleased]
 
 ### Added
+- Auth 认证授权模块（Issue #42）
+  - 用户注册/登录、RS256 access/refresh token 和数据库单次轮换
+  - 数据库实时 RBAC、角色查询/创建/分配与禁用账户拦截
+  - 统一响应信封、请求 ID、JSON 401/403 和认证端点限流
+  - Flyway Schema、幂等引用数据初始化和可验证 rollback
+  - Unit、H2 API、MySQL Contract、OpenAPI Contract 和登录 Benchmark
 - Phase 1.5 Technical Validation：5 个可复现 Spike、固定依赖、Compose 编排和机器可读证据
 - Java 21 ↔ Python 3.12 gRPC unary/streaming/error 验证
 - Kafka 3.9.1 跨语言事件、幂等、重试和真实 DLQ 验证

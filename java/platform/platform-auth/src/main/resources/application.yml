@@ -4,10 +4,40 @@ server:
 spring:
   application:
     name: platform-auth
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+openeip:
+  jwt:
+    private-key-base64: ${JWT_PRIVATE_KEY_BASE64:}
+    public-key-base64: ${JWT_PUBLIC_KEY_BASE64:}
+    allow-ephemeral-key: ${JWT_ALLOW_EPHEMERAL_KEY:false}
+    access-expiration: 3600
+    refresh-expiration: 604800
+  auth:
+    rate-limit:
+      requests: ${AUTH_RATE_LIMIT_REQUESTS:20}
+      window-seconds: ${AUTH_RATE_LIMIT_WINDOW_SECONDS:60}
+      max-keys: ${AUTH_RATE_LIMIT_MAX_KEYS:10000}
 
 logging:
   level:
     com.openeip: INFO
+    org.springframework.security: WARN
 
 management:
   endpoints:

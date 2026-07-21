@@ -3,6 +3,10 @@
 > OpenAPI 规范、错误码、分页、认证、Webhook、SSE、WebSocket。
 > 在 MVP 开发阶段逐步完成。
 
+## 模块 API
+
+- [Auth API v1 OpenAPI](auth-v1.openapi.yaml)
+
 ## 待完成
 
 - [ ] REST API 设计规范
