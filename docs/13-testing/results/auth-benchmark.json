@@ -1,0 +1,14 @@
+{
+  "recordedAt" : "2026-07-21T17:59:20.686210700Z",
+  "runtime" : "21.0.4+8-LTS-274",
+  "database" : "MySQL mysql:8.4.4@sha256:23818b7d7de427096ab1427b2e3d9d5e14a5b933f9a4431a482d6414bc879091",
+  "bcryptStrength" : 12,
+  "warmups" : 5,
+  "measurements" : 30,
+  "p50Ms" : 242.65,
+  "p95Ms" : 319.58,
+  "p99Ms" : 337.51,
+  "totalMs" : 7477.49,
+  "thresholdP99Ms" : 500,
+  "passed" : true
+}

@@ -75,6 +75,7 @@ subprojects {
     }
 
     tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+        dependsOn("test")
         classDirectories.setFrom(
             files(classDirectories.files.map {
                 fileTree(it) {

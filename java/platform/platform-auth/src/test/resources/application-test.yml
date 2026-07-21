@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:openeip_test;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    open-in-view: false
+  flyway:
+    enabled: false
+
+openeip:
+  jwt:
+    private-key-base64:
+    public-key-base64:
+    allow-ephemeral-key: true
+    access-expiration: 3600
+    refresh-expiration: 604800
+  auth:
+    rate-limit:
+      requests: 1000
+      window-seconds: 60
+      max-keys: 1000
+
+logging:
+  level:
+    com.openeip: WARN
