@@ -1,0 +1,8 @@
+{
+  "normal_events" : 2000,
+  "records_sent" : 2003,
+  "elapsed_seconds" : 8.911583995,
+  "throughput_rps" : 224.7636336170784,
+  "duplicate_event_id" : "event-duplicate",
+  "poison_event_id" : "event-poison"
+}

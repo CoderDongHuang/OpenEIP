@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed - pending storage Spikes
+Accepted with Conditions
 
 ## Date
 
@@ -14,7 +14,9 @@ Proposed - pending storage Spikes
 
 ## Decision
 
-Foundation 默认部署不包含持久化组件。MySQL、Redis、Elasticsearch、Milvus、MinIO、Neo4j 和 ClickHouse 必须由对应模块需求与 Spike 数据证明后加入；每个组件需要所有权、备份、恢复、升级和退出方案。
+Foundation 默认部署不包含持久化组件。MySQL、Redis、Elasticsearch、Milvus、MinIO、Neo4j 和 ClickHouse 必须由对应模块需求与验证数据证明后，以可选 Profile 加入；每个组件需要所有权、备份、恢复、升级和退出方案。
+
+[Spike-003](../../spike/spike-003-milvus-vector/report.md) 已验证 Milvus 2.5.6 Standalone 的 Embedding → Insert → HNSW Search 链路，因此 Milvus 保留为 Phase 3 Knowledge 的候选向量存储。该验证仅有 2000 条确定性测试数据，不构成生产容量或真实模型检索质量结论；Phase 3 必须重新执行真实语料、并发和故障恢复验证后才能进入默认部署 Profile。
 
 ## Consequences
 

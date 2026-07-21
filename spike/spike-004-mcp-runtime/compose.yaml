@@ -1,0 +1,5 @@
+name: openeip-spike-004
+
+services:
+  runner:
+    build: .

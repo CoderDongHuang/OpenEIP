@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted (Bootstrap)
+Accepted
 
 ## Date
 
@@ -15,6 +15,8 @@ Accepted (Bootstrap)
 ## Decision
 
 Java 21 + Spring Boot 负责领域控制面和事务边界；Python 3.12 + FastAPI 负责无状态 AI 执行。跨运行时契约必须语言无关，不共享数据库内部模型。
+
+Phase 1.5 的 [Spike-001](../../spike/spike-001-grpc-java-python/report.md) 已验证 Java 21 与 Python 3.12 可通过生成的 Protobuf 契约完成 unary、服务端流、双向流和错误传播。该结果确认互操作性，不改变双方的数据所有权边界。
 
 ## Consequences
 

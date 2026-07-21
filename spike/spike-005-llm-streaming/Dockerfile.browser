@@ -1,0 +1,9 @@
+FROM mcr.microsoft.com/playwright/python:v1.52.0-noble
+
+WORKDIR /app
+RUN pip install --no-cache-dir httpx==0.28.1 playwright==1.52.0
+COPY browser-test browser-test
+RUN mkdir /results && chown pwuser:pwuser /results
+
+USER pwuser
+CMD ["python", "browser-test/verify.py"]

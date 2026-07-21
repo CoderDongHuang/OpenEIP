@@ -1,0 +1,19 @@
+{
+  "spike": "spike-005",
+  "executed_at": "2026-07-21T10:22:31.539707+00:00",
+  "path": "Chromium -> Nginx Gateway -> FastAPI -> OpenAI-compatible upstream -> SSE -> Chromium",
+  "first_token_ms": 179.30000000447035,
+  "first_token_threshold_ms": 500,
+  "total_ms": 396.3999999985099,
+  "total_threshold_ms": 3000,
+  "normal_output": "OpenEIP streaming works.",
+  "upstream_error_visible": true,
+  "client_cancellation_observed": true,
+  "reconnect_output": "OpenEIP streaming works.",
+  "backend_metrics": {
+    "completed": 2,
+    "upstream_errors": 1,
+    "client_cancellations": 1
+  },
+  "passed": true
+}

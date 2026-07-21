@@ -1,0 +1,19 @@
+name: openeip-spike-001
+
+services:
+  python-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    networks: [spike]
+
+  java-client:
+    build:
+      context: .
+      dockerfile: Dockerfile.java
+    depends_on:
+      - python-server
+    networks: [spike]
+
+networks:
+  spike:

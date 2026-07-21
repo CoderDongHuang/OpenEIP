@@ -1,0 +1,33 @@
+{
+  "spike" : "spike-001",
+  "executed_at" : "2026-07-21T10:12:04.954185422Z",
+  "unary" : {
+    "samples" : 200,
+    "p50_ms" : 1.656035,
+    "p95_ms" : 4.108196,
+    "p99_ms" : 5.762737,
+    "throughput_rps" : 495.4990096325032,
+    "threshold_p99_ms" : 50,
+    "passed" : true
+  },
+  "server_streaming" : {
+    "first_event_ms" : 7.609755,
+    "threshold_ms" : 100,
+    "completed" : true,
+    "errors" : [ ],
+    "passed" : true
+  },
+  "bidirectional_streaming" : {
+    "rounds_sent" : 3,
+    "rounds_received" : 3,
+    "finish_reasons" : [ "round-1", "round-2", "round-3" ],
+    "errors" : [ ],
+    "passed" : true
+  },
+  "error_propagation" : {
+    "expected_code" : "INVALID_ARGUMENT",
+    "observed_code" : "INVALID_ARGUMENT",
+    "passed" : true
+  },
+  "passed" : true
+}

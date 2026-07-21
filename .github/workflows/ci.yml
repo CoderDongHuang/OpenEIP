@@ -33,6 +33,11 @@ jobs:
         run: chmod +x gradlew
       - name: Build, test, and verify
         run: ./gradlew --no-daemon clean check build
+      - name: Compile Spike Java clients
+        working-directory: .
+        run: |
+          java/platform/gradlew --no-daemon -p spike/spike-001-grpc-java-python spotlessCheck compileJava
+          java/platform/gradlew --no-daemon -p spike/spike-002-kafka-eventing spotlessCheck compileJava
 
   python:
     name: Python Lint & Test
@@ -55,6 +60,12 @@ jobs:
         run: ruff check .
       - name: Ruff Format
         run: ruff format --check .
+      - name: Spike Python Lint
+        working-directory: .
+        run: ruff check --config python/pyproject.toml spike
+      - name: Spike Python Format
+        working-directory: .
+        run: ruff format --check --config python/pyproject.toml spike
       - name: Mypy
         run: mypy engine-core/src
       - name: Unit Test
@@ -115,6 +126,15 @@ jobs:
       - uses: actions/checkout@v7
       - name: Validate Docker Compose
         run: docker compose config --quiet
+      - name: Validate Spike Docker Compose
+        run: |
+          docker compose -f spike/spike-001-grpc-java-python/compose.yaml config --quiet
+          docker compose -f spike/spike-002-kafka-eventing/compose.yaml config --quiet
+          docker compose -f spike/spike-003-milvus-vector/compose.yaml config --quiet
+          docker compose -f spike/spike-004-mcp-runtime/compose.yaml config --quiet
+          docker compose -f spike/spike-005-llm-streaming/compose.yaml config --quiet
+      - name: Validate Spike evidence
+        run: python spike/validate_results.py
 
   security:
     name: Security Scan
