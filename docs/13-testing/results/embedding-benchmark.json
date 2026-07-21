@@ -1,0 +1,16 @@
+{
+  "module": "embedding",
+  "operation": "32 text deterministic embed and scoped upsert",
+  "dimension": 64,
+  "batchSize": 32,
+  "warmups": 5,
+  "samples": 100,
+  "p50Ms": 0.658,
+  "p95Ms": 0.992,
+  "p99Ms": 1.359,
+  "batchesPerSecondAtP50": 1519.3,
+  "vectorsPerSecondAtP50": 48617.44,
+  "top1ExactMatch": true,
+  "thresholdP99Ms": 50,
+  "result": "PASS"
+}
