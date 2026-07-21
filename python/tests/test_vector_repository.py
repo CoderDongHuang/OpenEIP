@@ -12,7 +12,7 @@ DOCUMENT = "55555555-5555-4555-8555-555555555555"
 
 
 def _record(tenant: str, base: str, chunk: str, vector: tuple[float, ...]) -> VectorRecord:
-    return VectorRecord(tenant, base, DOCUMENT, chunk, "a" * 64, "fixture", "1", vector)
+    return VectorRecord(tenant, base, DOCUMENT, chunk, f"text for {chunk}", "a" * 64, "fixture", "1", vector)
 
 
 def test_upsert_search_and_delete_are_tenant_and_base_scoped() -> None:
