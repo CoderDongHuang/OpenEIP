@@ -5,16 +5,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from engine_core.config import Settings
-from engine_core.ocr.api.router import build_ocr_router, safe_request_id
+from engine_core.ocr.api.router import build_ocr_router
 from engine_core.ocr.application.service import OcrService
 from engine_core.ocr.infrastructure.deterministic_provider import DeterministicRasterProvider
 from engine_core.ocr.infrastructure.image_decoder import SafeImageDecoder
-from engine_core.ocr.shared.errors import OcrError
+from engine_core.parsing.api.router import build_parsing_router
+from engine_core.parsing.application.service import DocumentParsingService
+from engine_core.parsing.infrastructure.input_decoder import DocumentInputDecoder
+from engine_core.shared.api_error import EngineApiError
+from engine_core.shared.internal_api import safe_request_id
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     """Create the AI engine with explicit settings for tests and deployments."""
     resolved = settings or Settings()
+    internal_token = resolved.internal_api_secret()
     application = FastAPI(
         title="OpenEIP AI Engine",
         version=resolved.version,
@@ -41,13 +46,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(
         build_ocr_router(
             service=service,
-            internal_token=resolved.ocr_internal_token.get_secret_value(),
+            internal_token=internal_token,
             max_body_bytes=resolved.ocr_max_body_bytes,
         )
     )
+    parsing_service = DocumentParsingService(
+        decoder=DocumentInputDecoder(max_body_bytes=resolved.parsing_max_body_bytes),
+        chunk_size=resolved.parsing_chunk_size,
+        overlap=resolved.parsing_chunk_overlap,
+        max_chunks=resolved.parsing_max_chunks,
+    )
+    application.include_router(
+        build_parsing_router(
+            service=parsing_service,
+            internal_token=internal_token,
+            max_body_bytes=resolved.parsing_max_body_bytes,
+        )
+    )
 
-    @application.exception_handler(OcrError)
-    async def handle_ocr_error(request: Request, error: OcrError) -> JSONResponse:
+    @application.exception_handler(EngineApiError)
+    async def handle_api_error(request: Request, error: EngineApiError) -> JSONResponse:
         request_id = safe_request_id(request.headers.get("X-Request-Id", ""))
         return JSONResponse(status_code=error.status_code, content=error.envelope(request_id))
 
