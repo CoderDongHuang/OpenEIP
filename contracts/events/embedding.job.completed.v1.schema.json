@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openeip.dev/contracts/events/embedding.job.completed.v1.schema.json",
+  "title": "embedding.job.completed v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "eventType", "eventVersion", "timestamp", "source", "tenantId", "traceId", "payload"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "const": "embedding.job.completed" },
+    "eventVersion": { "const": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "source": { "const": "python-engine-embedding" },
+    "tenantId": { "type": "string", "format": "uuid" },
+    "traceId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jobId", "knowledgeBaseId", "documentId", "chunkCount", "embeddingModel", "modelVersion", "vectorDimension"],
+      "properties": {
+        "jobId": { "type": "string", "format": "uuid" },
+        "knowledgeBaseId": { "type": "string", "format": "uuid" },
+        "documentId": { "type": "string", "format": "uuid" },
+        "chunkCount": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "embeddingModel": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "modelVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "vectorDimension": { "type": "integer", "minimum": 8, "maximum": 1536 }
+      }
+    }
+  }
+}
