@@ -1,6 +1,6 @@
 # Enterprise AI Platform 软件架构设计说明书 (SAD)
 
-> 文档版本：1.3 | 产品基线：v0.2.0 MVP (In Development) | 日期：2026-07-22 | 状态：Accepted Technical Baseline
+> 文档版本：1.4 | 产品基线：v0.2.0 MVP (In Development) | 日期：2026-07-22 | 状态：Accepted Technical Baseline
 >
 > 本文档是 OpenEIP 项目的唯一软件架构基线，所有模块设计和开发必须依据本文档。
 
@@ -264,10 +264,11 @@ python/
     └── metrics/           ← 评估指标
 ```
 
-上图是目标逻辑边界，不代表每个逻辑模块已经拆成独立 Python Distribution。v0.2 OCR 以
-`engine-core/src/engine_core/ocr` 包部署在唯一 Python Engine 进程中，保持 API、Application、
-Domain、Infrastructure 分层和内部 Provider 端口；后续提取为 `engine-document` 时必须保持
-`ocr-result` v1 契约兼容。Java 仍拥有文件元数据和授权事务，Python OCR 不直接写 Java 业务表。
+上图是目标逻辑边界，不代表每个逻辑模块已经拆成独立 Python Distribution。v0.2 OCR 与解析
+分别以 `engine-core/src/engine_core/ocr`、`engine-core/src/engine_core/parsing` 包部署在唯一 Python
+Engine 进程中，保持 API、Application、Domain、Infrastructure 分层和内部端口；后续提取为
+`engine-document` 时必须保持 `ocr-result` 与 `document-parsed-result` v1 契约兼容。Java 仍拥有
+文件元数据和授权事务，Python 执行面不直接写 Java 业务表。
 
 ### 3.2 文档处理流水线
 
@@ -815,6 +816,7 @@ MySQL / ES / Milvus / Neo4j → 使用 Helm Chart 或外部托管
 
 | 版本 | 日期 | 变更说明 |
 |---|---|---|
+| v1.4 | 2026-07-22 | 记录 v0.2 文本/OCR 解析包、可追溯分块与事件契约边界 |
 | v1.3 | 2026-07-22 | 记录 v0.2 OCR 实际部署边界、安全输入限制与 Provider 范围 |
 | v1.2 | 2026-07-22 | 接受 RFC-0002，增加 Java 聚合入口与文档控制平面边界 |
 | v1.1 | 2026-07-21 | 合并 Phase 1.5 实测通信、Milvus、MCP 与 SSE 决策 |
