@@ -6,6 +6,7 @@
 ## 模块设计
 
 - [Auth Database Design](auth-schema.md)
+- [File Upload Database Design](file-upload-schema.md)
 
 ## 待完成
 

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openeip.dev/contracts/events/document.file.uploaded.v1.schema.json",
+  "title": "document.file.uploaded v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "eventType", "eventVersion", "timestamp", "source", "context", "payload"],
+  "properties": {
+    "eventId": { "type": "string", "pattern": "^evt_[0-9a-f-]{36}$" },
+    "eventType": { "const": "document.file.uploaded" },
+    "eventVersion": { "const": "1.0" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["service", "instance"],
+      "properties": {
+        "service": { "const": "platform-document" },
+        "instance": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "userId", "traceId"],
+      "properties": {
+        "tenantId": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "userId": { "type": "string", "format": "uuid" },
+        "traceId": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileId", "contentType", "sizeBytes", "sha256"],
+      "properties": {
+        "fileId": { "type": "string", "format": "uuid" },
+        "contentType": { "type": "string", "minLength": 1, "maxLength": 127 },
+        "sizeBytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  }
+}
+

@@ -17,6 +17,7 @@
 ## 各模块子 SDD（对应模块开发时完成）
 
 - [x] [Auth SDD](auth-module.md)
+- [x] [File Upload SDD](file-upload-module.md)
 - [ ] Knowledge SDD
 - [ ] Workflow SDD
 - [ ] Connector SDD
