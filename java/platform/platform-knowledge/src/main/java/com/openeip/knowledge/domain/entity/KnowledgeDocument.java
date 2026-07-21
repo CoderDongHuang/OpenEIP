@@ -56,7 +56,9 @@ public class KnowledgeDocument {
   }
 
   public boolean transitionTo(ProcessingStatus target, Instant now) {
-    if (status == target) return false;
+    if (status == target) {
+      return false;
+    }
     boolean allowed =
         switch (status) {
           case PENDING_PARSE ->
@@ -67,7 +69,9 @@ public class KnowledgeDocument {
               target == ProcessingStatus.READY || target == ProcessingStatus.FAILED;
           case READY, FAILED -> false;
         };
-    if (!allowed) throw KnowledgeException.invalidTransition(status, target);
+    if (!allowed) {
+      throw KnowledgeException.invalidTransition(status, target);
+    }
     status = target;
     failureCode = null;
     updatedAt = now;

@@ -14,6 +14,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -34,6 +35,7 @@ public class KnowledgeBaseService {
   @SuppressFBWarnings(
       value = "EI_EXPOSE_REP2",
       justification = "Spring collaborators are shared services.")
+  @Autowired
   public KnowledgeBaseService(
       KnowledgeBaseRepository bases,
       KnowledgeBaseMemberRepository members,
@@ -80,8 +82,9 @@ public class KnowledgeBaseService {
 
   @Transactional(readOnly = true)
   public Page<BaseAccess> list(String userId, int page, int pageSize) {
-    if (page < 1 || pageSize < 1 || pageSize > 100)
+    if (page < 1 || pageSize < 1 || pageSize > 100) {
       throw KnowledgeException.invalid("Invalid page");
+    }
     return bases
         .findAccessible(
             MVP_TENANT,
@@ -112,7 +115,9 @@ public class KnowledgeBaseService {
   @Transactional
   public void delete(String userId, String baseId) {
     BaseAccess access = get(userId, baseId);
-    if (access.role() != MemberRole.OWNER) throw KnowledgeException.forbidden();
+    if (access.role() != MemberRole.OWNER) {
+      throw KnowledgeException.forbidden();
+    }
     access.base().delete(clock.instant());
   }
 
@@ -127,7 +132,9 @@ public class KnowledgeBaseService {
             : files
                 .findByIdAndTenantIdAndOwnerIdAndDeletedAtIsNull(documentId, MVP_TENANT, userId)
                 .isPresent();
-    if (!accessible) throw KnowledgeException.notFound();
+    if (!accessible) {
+      throw KnowledgeException.notFound();
+    }
     if (documents
         .findByTenantIdAndKnowledgeBaseIdAndDocumentId(MVP_TENANT, baseId, documentId)
         .isPresent()) {
@@ -179,7 +186,9 @@ public class KnowledgeBaseService {
   }
 
   private static void requireEditor(MemberRole role) {
-    if (!role.canEdit()) throw KnowledgeException.forbidden();
+    if (!role.canEdit()) {
+      throw KnowledgeException.forbidden();
+    }
   }
 
   private static String name(String value) {
@@ -191,18 +200,26 @@ public class KnowledgeBaseService {
 
   private static String description(String value) {
     String result = value == null ? "" : value.trim();
-    if (result.length() > 2000)
+    if (result.length() > 2000) {
       throw KnowledgeException.invalid("Description exceeds 2000 characters");
+    }
     return result;
   }
 
   static void validUuid(String value) {
+    if (value == null) {
+      throw KnowledgeException.invalid("Invalid resource identifier");
+    }
     try {
       UUID.fromString(value);
-    } catch (IllegalArgumentException | NullPointerException exception) {
+    } catch (IllegalArgumentException exception) {
       throw KnowledgeException.invalid("Invalid resource identifier");
     }
   }
 
+  @SuppressFBWarnings(
+      value = {"EI_EXPOSE_REP", "EI_EXPOSE_REP2"},
+      justification =
+          "The entity is transaction-scoped and never cached or exposed outside this module.")
   public record BaseAccess(KnowledgeBase base, MemberRole role) {}
 }

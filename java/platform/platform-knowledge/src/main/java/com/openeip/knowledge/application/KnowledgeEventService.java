@@ -11,6 +11,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class KnowledgeEventService {
   @SuppressFBWarnings(
       value = "EI_EXPOSE_REP2",
       justification = "Spring collaborators are shared services.")
+  @Autowired
   public KnowledgeEventService(
       KnowledgeDocumentRepository documents, ProcessedKnowledgeEventRepository events) {
     this(documents, events, Clock.systemUTC());
@@ -46,10 +48,14 @@ public class KnowledgeEventService {
       String eventId, String tenantId, String documentId, String payloadFingerprint) {
     String resource = valid(tenantId, eventId, documentId, payloadFingerprint, documentId);
     EventOutcome duplicate = duplicate(tenantId, eventId, PARSED, resource, payloadFingerprint);
-    if (duplicate != null) return duplicate;
+    if (duplicate != null) {
+      return duplicate;
+    }
     List<KnowledgeDocument> matches =
         documents.findAllByTenantIdAndDocumentId(tenantId, documentId);
-    if (matches.isEmpty()) throw KnowledgeException.notFound();
+    if (matches.isEmpty()) {
+      throw KnowledgeException.notFound();
+    }
     Instant now = clock.instant();
     boolean advanced = false;
     for (KnowledgeDocument document : matches) {
@@ -81,7 +87,9 @@ public class KnowledgeEventService {
     valid(tenantId, eventId, documentId, payloadFingerprint, resource);
     KnowledgeBaseService.validUuid(baseId);
     EventOutcome duplicate = duplicate(tenantId, eventId, EMBEDDED, resource, payloadFingerprint);
-    if (duplicate != null) return duplicate;
+    if (duplicate != null) {
+      return duplicate;
+    }
     Instant now = clock.instant();
     boolean advanced =
         document(tenantId, baseId, documentId).transitionTo(ProcessingStatus.READY, now);

@@ -53,8 +53,8 @@ public class KnowledgeBaseController {
 
   @GetMapping
   public ApiEnvelope<KnowledgeBasePageResponse> list(
-      @RequestParam(defaultValue = "1") @Min(1) int page,
-      @RequestParam(defaultValue = "20") @Min(1) @Max(100) int pageSize,
+      @RequestParam(name = "page", defaultValue = "1") @Min(1) int page,
+      @RequestParam(name = "pageSize", defaultValue = "20") @Min(1) @Max(100) int pageSize,
       Authentication authentication,
       HttpServletRequest request) {
     var data =
@@ -64,7 +64,9 @@ public class KnowledgeBaseController {
 
   @GetMapping("/{baseId}")
   public ApiEnvelope<KnowledgeBaseResponse> get(
-      @PathVariable String baseId, Authentication authentication, HttpServletRequest request) {
+      @PathVariable("baseId") String baseId,
+      Authentication authentication,
+      HttpServletRequest request) {
     return ApiEnvelope.success(
         KnowledgeBaseResponse.from(service.get(authentication.getName(), baseId)),
         RequestIdFilter.get(request));
@@ -72,7 +74,7 @@ public class KnowledgeBaseController {
 
   @PatchMapping("/{baseId}")
   public ApiEnvelope<KnowledgeBaseResponse> update(
-      @PathVariable String baseId,
+      @PathVariable("baseId") String baseId,
       @Valid @RequestBody KnowledgeBaseRequest body,
       Authentication authentication,
       HttpServletRequest request) {
@@ -83,14 +85,15 @@ public class KnowledgeBaseController {
   }
 
   @DeleteMapping("/{baseId}")
-  public ResponseEntity<Void> delete(@PathVariable String baseId, Authentication authentication) {
+  public ResponseEntity<Void> delete(
+      @PathVariable("baseId") String baseId, Authentication authentication) {
     service.delete(authentication.getName(), baseId);
     return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/{baseId}/documents")
   public ResponseEntity<ApiEnvelope<KnowledgeDocumentResponse>> attach(
-      @PathVariable String baseId,
+      @PathVariable("baseId") String baseId,
       @Valid @RequestBody AttachDocumentRequest body,
       Authentication authentication,
       HttpServletRequest request) {
@@ -105,7 +108,9 @@ public class KnowledgeBaseController {
 
   @GetMapping("/{baseId}/documents")
   public ApiEnvelope<List<KnowledgeDocumentResponse>> documents(
-      @PathVariable String baseId, Authentication authentication, HttpServletRequest request) {
+      @PathVariable("baseId") String baseId,
+      Authentication authentication,
+      HttpServletRequest request) {
     var data =
         service.listDocuments(authentication.getName(), baseId).stream()
             .map(KnowledgeDocumentResponse::from)
@@ -115,8 +120,8 @@ public class KnowledgeBaseController {
 
   @GetMapping("/{baseId}/documents/{documentId}")
   public ApiEnvelope<KnowledgeDocumentResponse> document(
-      @PathVariable String baseId,
-      @PathVariable String documentId,
+      @PathVariable("baseId") String baseId,
+      @PathVariable("documentId") String documentId,
       Authentication authentication,
       HttpServletRequest request) {
     return ApiEnvelope.success(
@@ -127,7 +132,9 @@ public class KnowledgeBaseController {
 
   @DeleteMapping("/{baseId}/documents/{documentId}")
   public ResponseEntity<Void> detach(
-      @PathVariable String baseId, @PathVariable String documentId, Authentication authentication) {
+      @PathVariable("baseId") String baseId,
+      @PathVariable("documentId") String documentId,
+      Authentication authentication) {
     service.detach(authentication.getName(), baseId, documentId);
     return ResponseEntity.noContent().build();
   }

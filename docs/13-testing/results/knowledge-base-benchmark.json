@@ -1,0 +1,11 @@
+{
+  "module" : "knowledge-base",
+  "operation" : "transactional parsed event transition",
+  "warmups" : 10,
+  "samples" : 1000,
+  "p50Ms" : 1.81,
+  "p95Ms" : 4.79,
+  "p99Ms" : 7.78,
+  "thresholdP99Ms" : 50,
+  "result" : "PASS"
+}

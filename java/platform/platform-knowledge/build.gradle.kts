@@ -23,6 +23,10 @@ tasks.register<Test>("knowledgeBenchmark") {
     description = "Runs the knowledge state transition benchmark."
     group = "verification"
     useJUnitPlatform { includeTags("benchmark") }
+    systemProperty(
+        "knowledgeBenchmarkOutput",
+        rootProject.layout.projectDirectory.file("../../docs/13-testing/results/knowledge-base-benchmark.json").asFile
+    )
     shouldRunAfter(tasks.test)
 }
 

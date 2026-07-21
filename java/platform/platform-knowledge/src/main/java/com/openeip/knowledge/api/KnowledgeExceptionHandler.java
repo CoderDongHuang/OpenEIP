@@ -4,6 +4,7 @@ import com.openeip.common.api.ApiEnvelope;
 import com.openeip.common.web.RequestIdFilter;
 import com.openeip.knowledge.shared.exception.KnowledgeException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,7 +28,11 @@ public class KnowledgeExceptionHandler {
         request);
   }
 
-  @ExceptionHandler({MethodArgumentNotValidException.class, HandlerMethodValidationException.class})
+  @ExceptionHandler({
+    MethodArgumentNotValidException.class,
+    HandlerMethodValidationException.class,
+    ConstraintViolationException.class
+  })
   public ResponseEntity<ApiEnvelope<Void>> invalid(
       Exception exception, HttpServletRequest request) {
     return error(400, "KNOW-V-001", "Invalid knowledge request", request);
