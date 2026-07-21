@@ -1,6 +1,6 @@
 # Enterprise AI Platform 产品需求文档 (PRD)
 
-> 文档版本：1.1 | 产品基线：v0.2.0 MVP (In Development) | 日期：2026-07-22 | 状态：Accepted
+> 文档版本：1.2 | 产品基线：v0.2.0 MVP (In Development) | 日期：2026-07-22 | 状态：Accepted
 >
 > 本文档是 OpenEIP 项目的唯一产品需求基线，所有功能开发必须依据本文档。
 
@@ -51,6 +51,20 @@
 
 MVP 默认对象存储适配器只支持单节点本地开发。生产 MinIO/S3、病毒查杀、大文件分片、
 断点续传以及 OCR/解析不属于 DOC-001～005 的范围。
+
+### 0.6 v0.2 OCR 需求
+
+| ID | 优先级 | 需求 | 验收标准 |
+|---|---|---|---|
+| OCR-001 | P0 | 安全图像输入 | 内部调用方提交 PNG/JPEG；服务校验凭据、租户/用户 UUID、实际容器与声明 MIME，并限制 5 MiB、10,000 像素边长和 2,000 万总像素 |
+| OCR-002 | P0 | 标准识别结果 | 返回页码、文本块、像素坐标、置信度、耗时、Provider 元数据与源内容 SHA-256，不返回图像、凭据或身份上下文 |
+| OCR-003 | P0 | 可替换执行边界 | OCR Provider 是 Python 模块内部端口；替换模型不改变版本化 API 和 `ocr-result` v1 Schema |
+| OCR-004 | P0 | 确定性 MVP | 默认 Provider 对文档化的 5x7 大写字母/数字高对比语料可复现识别；低置信字符显式返回 `?`，不得宣称通用语言精度 |
+| OCR-005 | P0 | 工程质量 | 覆盖率不少于 80%，完成 API/Schema Contract、安全审查、独立 OCR 基准、容器启动和 HIGH/CRITICAL 镜像扫描 |
+
+PaddleOCR、手写体、旋转、复杂版面、表格和生产语言准确率属于后续模型适配与真实语料评估，
+不属于 OCR-001～005 的完成声明。OCR 结果始终是不可信文档数据，下游不得把其中的文本当作
+LLM system/developer 指令执行。
 
 ---
 
@@ -483,5 +497,6 @@ Document Agent、SQL Agent、BI Agent、Search Agent、Workflow Agent
 
 | 版本 | 日期 | 变更说明 |
 |---|---|---|
+| v1.2 | 2026-07-22 | 增加 v0.2 OCR 输入、结果、Provider、安全和质量验收边界 |
 | v1.1 | 2026-07-22 | 增加 v0.2 文件上传用户价值、验收标准和范围边界 |
 | v1.0 | 2026-07-20 | 初始 Baseline 版本 |

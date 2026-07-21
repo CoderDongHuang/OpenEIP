@@ -1,6 +1,6 @@
 # Enterprise AI Platform 设计基线 (SDD Baseline)
 
-> 文档版本：1.2 | 产品基线：v0.2.0 MVP (In Development) | 日期：2026-07-22 | 状态：Accepted Technical Baseline
+> 文档版本：1.3 | 产品基线：v0.2.0 MVP (In Development) | 日期：2026-07-22 | 状态：Accepted Technical Baseline
 >
 > 本文档定义 OpenEIP 项目的全局设计规范。各模块的详细设计在各自子 SDD 中展开。
 
@@ -64,6 +64,15 @@ OpenEIP/
 - 二进制内容通过模块内部存储端口访问，API 参数和原始文件名不得作为对象路径。
 - 依据：[RFC-0002](../11-rfc/rfc-0002-document-control-plane.md) 和
   [ADR-0006](../12-adr/adr-0006-file-storage-consistency.md)。
+
+### 1.6 Python 内部 AI API 约束
+
+- Python AI API 使用应用工厂装配模块，业务 Provider 通过 Domain Port 注入，不在 Router 中硬编码模型调用。
+- Java/内部编排调用必须携带非空服务凭据、规范租户/用户 UUID 和安全请求 ID；未配置凭据时接口关闭失败。
+- 二进制输入在解码前后分别执行字节、容器、尺寸、像素和帧数限制；声明 MIME 不代替实际容器验证。
+- OCR/解析文本一律作为不可信数据，不得拼接进 system/developer Prompt 边界。
+- v0.2 OCR 详细契约见 [OCR Sub-SDD](ocr-module.md) 和
+  [OCR OpenAPI](../06-api/ocr-v1.openapi.yaml)。
 
 ---
 
@@ -530,6 +539,7 @@ ReAct (Reasoning + Acting) 模式：
 
 | 版本 | 日期 | 变更说明 |
 |---|---|---|
+| v1.3 | 2026-07-22 | 增加 Python 内部 AI API、OCR 输入资源限制和 Prompt 数据边界 |
 | v1.2 | 2026-07-22 | 增加 Java 模块组合、共享 Web 契约与文件存储边界 |
 | v1.1 | 2026-07-21 | 增加 Phase 1.5 后的 gRPC、Kafka、SSE、MCP 和 Milvus 约束 |
 | v1.0 | 2026-07-20 | 初始 Baseline 版本 |

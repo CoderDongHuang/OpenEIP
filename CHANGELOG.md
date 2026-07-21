@@ -7,6 +7,12 @@
 ## [Unreleased]
 
 ### Added
+- OCR Python 执行模块（Issue #45）
+  - 版本化内部 API、租户/用户身份上下文、固定时间服务凭据校验和标准结果 Schema
+  - PNG/JPEG 容器验证、5 MiB/尺寸/像素/帧限制与解压炸弹防护
+  - 可替换 Provider 端口和范围明确的确定性 5x7 栅格识别器
+  - 28 个测试、96.21% 指令覆盖率和完整 OCR 流水线基准
+  - Python 3.12.13/Debian 13.6 固定镜像及 CI 运行时扫描
 - File Upload 文档控制平面（Issue #44）
   - 认证用户的流式上传、列表、详情、下载和幂等删除
   - owner/admin 访问控制、10 MiB 限制、MIME/后缀校验、SHA-256 和安全对象键
@@ -27,6 +33,7 @@
 - Chromium 经 Nginx/FastAPI/OpenAI-compatible 上游的 SSE、错误、取消和重连验证
 
 ### Changed
+- CI 将 OCR Benchmark 与覆盖率探针隔离，并增加 Python 运行时镜像 HIGH/CRITICAL 扫描
 - Java 运行时使用 `platform-app` 聚合 Auth 与 Document 模块；共享响应信封和请求 ID 移入 `platform-common`
 - CI 对所有 PR base 运行，安全扫描改为展开聚合 Java 运行时
 - 接受 ADR-0002 和 ADR-0004；ADR-0003 以生产化前置条件接受
