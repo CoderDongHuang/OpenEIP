@@ -41,7 +41,7 @@ class KnowledgeKafkaEventListenerTest {
             org.mockito.ArgumentMatchers.eq(DOCUMENT),
             anyString());
 
-    listener.embeddingCompleted(embedding("knowledge.embedding.completed", TENANT));
+    listener.embeddingCompleted(embedding("embedding.job.completed", TENANT));
     verify(events)
         .processEmbeddingCompleted(
             org.mockito.ArgumentMatchers.eq(EVENT),
@@ -99,8 +99,9 @@ class KnowledgeKafkaEventListenerTest {
     return """
         {"eventId":"__EVENT__","eventType":"__TYPE__","eventVersion":1,
          "timestamp":"2026-07-22T00:00:00Z","source":"python-engine-embedding",
-         "tenantId":"__TENANT__","traceId":"trace-1","payload":{"knowledgeBaseId":"__BASE__",
-         "documentId":"__DOCUMENT__","chunkCount":1,"embeddingModel":"fixture","vectorDimension":8}}
+         "tenantId":"__TENANT__","traceId":"trace-1","payload":{"jobId":"__EVENT__",
+         "knowledgeBaseId":"__BASE__","documentId":"__DOCUMENT__","chunkCount":1,
+         "embeddingModel":"fixture","modelVersion":"1.0","vectorDimension":8}}
         """
         .replace("__EVENT__", EVENT)
         .replace("__TYPE__", type)
