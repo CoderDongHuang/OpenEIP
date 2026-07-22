@@ -24,6 +24,7 @@
 - [File Upload Test and Benchmark Plan](file-upload-test-plan.md)
 - [OCR Test and Benchmark Plan](ocr-test-plan.md)
 - [Document Parsing Test and Benchmark Plan](document-parsing-test-plan.md)
+- [Agent Test and Benchmark Plan](agent-test-plan.md)
 
 ## Auth 基线
 

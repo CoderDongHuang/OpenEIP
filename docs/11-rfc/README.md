@@ -9,6 +9,7 @@
 |---|---|---|
 | [RFC-0001](rfc-0001-foundation-architecture.md) | Foundation Architecture | Accepted (Bootstrap) |
 | [RFC-0002](rfc-0002-document-control-plane.md) | Document Control Plane | Accepted (Bootstrap) |
+| [RFC-0003](rfc-0003-agent-spi-v1.md) | Constrained Agent SPI v1 | Accepted (Bootstrap) |
 
 ## RFC 编号规则
 

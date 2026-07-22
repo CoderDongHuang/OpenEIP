@@ -72,6 +72,17 @@ class Settings(BaseSettings):
     chat_default_top_k: int = 5
     chat_max_top_k: int = 20
 
+    # Agent internal streaming API
+    agent_max_body_bytes: int = 32 * 1024
+    agent_default_max_steps: int = 4
+    agent_max_steps: int = 8
+    agent_total_timeout_seconds: float = 10.0
+    agent_tool_timeout_seconds: float = 2.0
+    agent_max_argument_bytes: int = 8 * 1024
+    agent_max_result_chars: int = 8000
+    agent_max_answer_chars: int = 8000
+    agent_answer_chunk_chars: int = 256
+
     # LLM
     llm_default_model: str = "gpt-4o"
     openai_api_key: str = ""

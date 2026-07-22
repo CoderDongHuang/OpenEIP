@@ -1,0 +1,18 @@
+{
+  "module": "agent",
+  "operation": "bounded Document tool execution and loop termination",
+  "warmups": 5,
+  "samples": 100,
+  "firstEventP50Ms": 0.039,
+  "firstEventP99Ms": 0.052,
+  "toolOverheadP50Ms": 0.028,
+  "toolOverheadP99Ms": 0.037,
+  "completionP50Ms": 0.099,
+  "completionP99Ms": 0.116,
+  "loopTerminationMs": 0.129,
+  "thresholdFirstEventP99Ms": 50,
+  "thresholdToolOverheadP99Ms": 100,
+  "thresholdCompletionP99Ms": 500,
+  "thresholdLoopTerminationMs": 100,
+  "result": "PASS"
+}

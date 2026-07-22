@@ -4,6 +4,16 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from engine_core.agent.api.router import build_agent_router
+from engine_core.agent.application.runtime import AgentPlanProvider, AgentStreamService, ConstrainedAgent
+from engine_core.agent.infrastructure.deterministic_provider import DeterministicAgentPlanProvider
+from engine_core.agent.infrastructure.tools import (
+    DocumentInspectTool,
+    KnowledgeSearchTool,
+    RegistryToolExecutor,
+    tool_definitions,
+)
+from engine_core.agent.spi import AgentLimits
 from engine_core.chat.api.router import build_chat_router
 from engine_core.chat.application.service import ChatService
 from engine_core.config import Settings
@@ -33,6 +43,7 @@ def create_app(
     embedding_provider: EmbeddingProvider | None = None,
     vector_repository: VectorRepository | None = None,
     answer_provider: AnswerProvider | None = None,
+    agent_plan_provider: AgentPlanProvider | None = None,
 ) -> FastAPI:
     """Create the AI engine with explicit settings for tests and deployments."""
     resolved = settings or Settings()
@@ -116,6 +127,34 @@ def create_app(
             max_body_bytes=resolved.chat_max_body_bytes,
             default_top_k=resolved.chat_default_top_k,
             max_top_k=resolved.chat_max_top_k,
+        )
+    )
+    agent_tools = (DocumentInspectTool(), KnowledgeSearchTool(rag_service))
+    agent_limits = AgentLimits(
+        max_steps=resolved.agent_max_steps,
+        total_timeout_seconds=resolved.agent_total_timeout_seconds,
+        tool_timeout_seconds=resolved.agent_tool_timeout_seconds,
+        max_argument_bytes=resolved.agent_max_argument_bytes,
+        max_result_chars=resolved.agent_max_result_chars,
+        max_answer_chars=resolved.agent_max_answer_chars,
+    )
+    agent_service = AgentStreamService(
+        agent=ConstrainedAgent(
+            agent_plan_provider or DeterministicAgentPlanProvider(),
+            tool_definitions(agent_tools),
+        ),
+        executor_factory=lambda emit, limits: RegistryToolExecutor(agent_tools, emit, limits),
+        limits=agent_limits,
+        answer_chunk_chars=resolved.agent_answer_chunk_chars,
+    )
+    application.state.agent_service = agent_service
+    application.include_router(
+        build_agent_router(
+            service=agent_service,
+            internal_token=internal_token,
+            max_body_bytes=resolved.agent_max_body_bytes,
+            default_max_steps=resolved.agent_default_max_steps,
+            max_steps=resolved.agent_max_steps,
         )
     )
     parsing_service = DocumentParsingService(
