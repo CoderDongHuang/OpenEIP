@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -205,6 +207,21 @@ class AuthServiceTest {
 
     assertCode(() -> authService.replaceUserRoles("missing", Set.of("ROLE_ADMIN")), "AUTH-E-005");
     assertCode(() -> authService.replaceUserRoles("user-1", Set.of("ROLE_UNKNOWN")), "AUTH-E-005");
+  }
+
+  @Test
+  void listsUsersNewestFirstAndPreventsSelfDisable() {
+    when(userRepository.findAllByOrderByCreatedAtDesc(any(Pageable.class)))
+        .thenReturn(new PageImpl<>(List.of(user)));
+    assertThat(authService.listUsers(1, 20).getContent()).containsExactly(user);
+
+    assertCode(() -> authService.setUserActive("user-1", "user-1", false), "AUTH-V-001");
+    verify(userRepository, never()).save(user);
+
+    when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
+    when(userRepository.save(user)).thenReturn(user);
+    assertThat(authService.setUserActive("admin-2", "user-1", false).isActive()).isFalse();
+    verify(userRepository).save(user);
   }
 
   private void stubIssuedTokens() {

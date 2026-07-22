@@ -3,6 +3,7 @@ package com.openeip.knowledge.api;
 import com.openeip.common.api.ApiEnvelope;
 import com.openeip.common.web.RequestIdFilter;
 import com.openeip.knowledge.shared.exception.KnowledgeException;
+import com.openeip.knowledge.shared.exception.KnowledgeIngestionException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -21,6 +22,16 @@ public class KnowledgeExceptionHandler {
   @ExceptionHandler(KnowledgeException.class)
   public ResponseEntity<ApiEnvelope<Void>> handle(
       KnowledgeException exception, HttpServletRequest request) {
+    return error(
+        exception.getHttpStatus().value(),
+        exception.getErrorCode(),
+        exception.getMessage(),
+        request);
+  }
+
+  @ExceptionHandler(KnowledgeIngestionException.class)
+  public ResponseEntity<ApiEnvelope<Void>> ingestion(
+      KnowledgeIngestionException exception, HttpServletRequest request) {
     return error(
         exception.getHttpStatus().value(),
         exception.getErrorCode(),

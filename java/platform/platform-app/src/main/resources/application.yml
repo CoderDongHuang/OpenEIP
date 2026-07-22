@@ -41,6 +41,10 @@ openeip:
     storage-root: ${DOCUMENT_STORAGE_ROOT:./data/files}
     max-size-bytes: ${DOCUMENT_MAX_SIZE_BYTES:10485760}
   knowledge:
+    ingestion:
+      python-url: ${KNOWLEDGE_INGESTION_PYTHON_URL:http://python:8000}
+      internal-token: ${OPENEIP_INTERNAL_API_TOKEN:}
+      external-tenant-id: ${KNOWLEDGE_EXTERNAL_TENANT_ID:11111111-1111-4111-8111-111111111111}
     kafka:
       enabled: ${KNOWLEDGE_KAFKA_ENABLED:false}
       external-tenant-id: ${KNOWLEDGE_EXTERNAL_TENANT_ID:11111111-1111-4111-8111-111111111111}

@@ -19,6 +19,8 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,6 +121,21 @@ public class AuthService {
   @Transactional(readOnly = true)
   public List<Role> listRoles() {
     return roleRepository.findAll();
+  }
+
+  @Transactional(readOnly = true)
+  public Page<User> listUsers(int page, int pageSize) {
+    return userRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page - 1, pageSize));
+  }
+
+  @Transactional
+  public User setUserActive(String actorId, String userId, boolean active) {
+    if (actorId.equals(userId) && !active) {
+      throw AuthException.validation("Administrators cannot disable their own account");
+    }
+    User user = userRepository.findById(userId).orElseThrow(() -> AuthException.notFound("User"));
+    user.setActive(active);
+    return userRepository.save(user);
   }
 
   @Transactional

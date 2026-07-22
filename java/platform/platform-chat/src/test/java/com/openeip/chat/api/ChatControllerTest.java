@@ -87,6 +87,19 @@ class ChatControllerTest {
   }
 
   @Test
+  void listsCurrentUsersSessions() {
+    ChatSession session = new ChatSession(SESSION, "default", USER, BASE, "Title", NOW);
+    when(sessions.list(USER)).thenReturn(List.of(session));
+
+    var response = controller.list(authentication, request);
+
+    assertThat(response.data()).hasSize(1);
+    assertThat(response.data().getFirst().sessionId()).isEqualTo(SESSION);
+    assertThat(response.data().getFirst().knowledgeBaseId()).isEqualTo(BASE);
+    verify(sessions).list(USER);
+  }
+
+  @Test
   void beginsStreamBeforeReturningRequiredSseHeaders() {
     var context = new StreamContext(SESSION, BASE, REQUEST, "question", 5);
     StreamingResponseBody body = output -> output.write('x');

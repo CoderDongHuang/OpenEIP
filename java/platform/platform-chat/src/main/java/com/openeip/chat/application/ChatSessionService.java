@@ -63,6 +63,11 @@ public class ChatSessionService {
   }
 
   @Transactional(readOnly = true)
+  public List<ChatSession> list(String userId) {
+    return sessions.findAllByTenantIdAndOwnerIdOrderByUpdatedAtDesc(MVP_TENANT, userId);
+  }
+
+  @Transactional(readOnly = true)
   public List<ChatMessage> history(String userId, String sessionId) {
     owned(userId, sessionId);
     return messages.findAllByTenantIdAndSessionIdAndOwnerIdOrderByMessageIndexAsc(

@@ -48,6 +48,14 @@ public class ChatController {
         .body(ApiEnvelope.success(ChatSessionResponse.from(session), RequestIdFilter.get(request)));
   }
 
+  @GetMapping
+  public ApiEnvelope<List<ChatSessionResponse>> list(
+      Authentication authentication, HttpServletRequest request) {
+    var data =
+        sessions.list(authentication.getName()).stream().map(ChatSessionResponse::from).toList();
+    return ApiEnvelope.success(data, RequestIdFilter.get(request));
+  }
+
   @GetMapping("/{sessionId}/messages")
   public ApiEnvelope<List<ChatMessageResponse>> history(
       @PathVariable("sessionId") String sessionId,

@@ -1,6 +1,7 @@
 package com.openeip.auth.api.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -122,6 +123,25 @@ class AuthControllerIntegrationTest {
         .andExpect(jsonPath("$.data.name").value(roleName));
 
     User target = userRepository.findByUsername(targetCredentials.username()).orElseThrow();
+    mockMvc
+        .perform(
+            get("/api/v1/auth/users")
+                .header("Authorization", "Bearer " + adminAccess)
+                .param("page", "1")
+                .param("pageSize", "20"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.items[0].password").doesNotExist())
+        .andExpect(jsonPath("$.data.total").isNumber());
+
+    mockMvc
+        .perform(
+            patch("/api/v1/auth/users/{id}/active", target.getId())
+                .header("Authorization", "Bearer " + adminAccess)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"active\":false}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.active").value(false));
+
     mockMvc
         .perform(
             put("/api/v1/auth/users/{id}/roles", target.getId())
