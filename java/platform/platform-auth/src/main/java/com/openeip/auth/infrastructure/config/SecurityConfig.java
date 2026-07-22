@@ -9,7 +9,7 @@ import com.openeip.auth.infrastructure.security.JsonAccessDeniedHandler;
 import com.openeip.auth.infrastructure.security.JsonAuthenticationEntryPoint;
 import com.openeip.auth.infrastructure.security.JwtAuthenticationFilter;
 import com.openeip.auth.infrastructure.web.ApiErrorWriter;
-import com.openeip.auth.infrastructure.web.RequestIdFilter;
+import com.openeip.common.web.RequestIdFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

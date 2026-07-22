@@ -1,4 +1,4 @@
-package com.openeip.auth.infrastructure.web;
+package com.openeip.common.web;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

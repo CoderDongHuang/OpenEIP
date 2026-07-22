@@ -1,6 +1,6 @@
 # Enterprise AI Platform 设计基线 (SDD Baseline)
 
-> 文档版本：1.1 | 产品基线：Unreleased (Phase 1.5) | 日期：2026-07-21 | 状态：Accepted Technical Baseline
+> 文档版本：1.2 | 产品基线：v0.2.0 MVP (In Development) | 日期：2026-07-22 | 状态：Accepted Technical Baseline
 >
 > 本文档定义 OpenEIP 项目的全局设计规范。各模块的详细设计在各自子 SDD 中展开。
 
@@ -55,6 +55,15 @@ OpenEIP/
 - Milvus 仅是 Phase 3 候选组件，真实语料和容量验证完成前不得加入默认 Compose Profile。
 
 依据：[ADR-0004](../12-adr/adr-0004-spike-validation-decisions.md)。
+
+### 1.5 Java 模块组合约束
+
+- `platform-app` 是 Java 控制面的唯一可部署组合入口，负责统一扫描、配置和 Migration。
+- `platform-auth`、`platform-document` 等业务模块保持独立 Gradle 模块并可独立测试，不拆成独立网络服务。
+- 公共响应信封和请求 ID Filter 位于 `platform-common`；业务模块不得复制全局 Web 契约。
+- 二进制内容通过模块内部存储端口访问，API 参数和原始文件名不得作为对象路径。
+- 依据：[RFC-0002](../11-rfc/rfc-0002-document-control-plane.md) 和
+  [ADR-0006](../12-adr/adr-0006-file-storage-consistency.md)。
 
 ---
 
@@ -521,5 +530,6 @@ ReAct (Reasoning + Acting) 模式：
 
 | 版本 | 日期 | 变更说明 |
 |---|---|---|
+| v1.2 | 2026-07-22 | 增加 Java 模块组合、共享 Web 契约与文件存储边界 |
 | v1.1 | 2026-07-21 | 增加 Phase 1.5 后的 gRPC、Kafka、SSE、MCP 和 Milvus 约束 |
 | v1.0 | 2026-07-20 | 初始 Baseline 版本 |

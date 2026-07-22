@@ -24,10 +24,13 @@ deploy/
 docker compose up --build
 ```
 
-启动后访问 <http://localhost:3000>。Compose 会同时启动 Auth 所需的 MySQL；Kafka、向量库等在对应模块开发时加入。
+启动后访问 <http://localhost:3000>。Compose 会同时启动 Java 控制面所需的 MySQL，并由
+`platform-app` 聚合 `platform-auth` 与 `platform-document`。上传的原始文件保存在
+`document-files` volume；该本地适配器只用于单节点 MVP，生产部署需替换为受管对象存储。
+Kafka、向量库等在对应模块开发时加入。
 
 该 Compose 仅用于本地开发。MySQL 使用本地凭据，并显式设置
-`JWT_ALLOW_EPHEMERAL_KEY=true`，因此 Auth 容器重启后已有 Token 会失效。
+`JWT_ALLOW_EPHEMERAL_KEY=true`，因此 Java 容器重启后已有 Token 会失效。
 
 生产部署必须通过 Secret Manager 注入 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`、
 `JWT_PRIVATE_KEY_BASE64` 和 `JWT_PUBLIC_KEY_BASE64`，并保持

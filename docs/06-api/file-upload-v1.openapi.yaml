@@ -1,0 +1,214 @@
+openapi: 3.1.0
+info:
+  title: OpenEIP File Upload API
+  version: 1.0.0
+  description: Secure raw-file ingestion and owner-scoped retrieval for the v0.2 document control plane.
+servers:
+  - url: /
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/documents/files:
+    post:
+      operationId: uploadFile
+      summary: Upload one raw document
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: File persisted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '413':
+          $ref: '#/components/responses/TooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+    get:
+      operationId: listFiles
+      summary: List accessible files
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Page of file metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilePageEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/documents/files/{fileId}:
+    parameters:
+      - $ref: '#/components/parameters/FileId'
+    get:
+      operationId: getFile
+      summary: Read accessible file metadata
+      responses:
+        '200':
+          description: File metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteFile
+      summary: Idempotently delete an accessible file
+      responses:
+        '204':
+          description: Deleted or already absent
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/documents/files/{fileId}/content:
+    parameters:
+      - $ref: '#/components/parameters/FileId'
+    get:
+      operationId: downloadFile
+      summary: Stream accessible file content
+      responses:
+        '200':
+          description: Raw file content
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    FileId:
+      name: fileId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: pageSize
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    FileMetadata:
+      type: object
+      additionalProperties: false
+      required: [id, originalName, contentType, sizeBytes, sha256, status, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        originalName: { type: string, maxLength: 255 }
+        contentType: { type: string }
+        sizeBytes: { type: integer, format: int64, minimum: 1 }
+        sha256: { type: string, pattern: '^[0-9a-f]{64}$' }
+        status: { type: string, enum: [READY] }
+        createdAt: { type: string, format: date-time }
+    PageData:
+      type: object
+      required: [items, page, pageSize, total, totalPages]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/FileMetadata' }
+        page: { type: integer }
+        pageSize: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
+    FileEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/FileMetadata' }
+    FilePageEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/PageData' }
+    EnvelopeBase:
+      type: object
+      required: [code, message, requestId, timestamp]
+      properties:
+        code:
+          oneOf: [{ type: integer }, { type: string }]
+        message: { type: string }
+        requestId: { type: string }
+        timestamp: { type: string, format: date-time }
+    ErrorEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data: { type: 'null' }
+  responses:
+    BadRequest:
+      description: Invalid multipart request, filename, or file content
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    Unauthorized:
+      description: Missing or invalid access token
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    NotFound:
+      description: File is absent or inaccessible
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    TooLarge:
+      description: File exceeds the configured byte limit
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    UnsupportedMediaType:
+      description: Media type or suffix is not in the MVP allowlist
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+

@@ -1,8 +1,8 @@
 package com.openeip.auth.api.advice;
 
-import com.openeip.auth.api.dto.response.ApiEnvelope;
-import com.openeip.auth.infrastructure.web.RequestIdFilter;
 import com.openeip.auth.shared.exception.AuthException;
+import com.openeip.common.api.ApiEnvelope;
+import com.openeip.common.web.RequestIdFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;

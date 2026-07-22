@@ -1,7 +1,8 @@
 package com.openeip.auth.infrastructure.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openeip.auth.api.dto.response.ApiEnvelope;
+import com.openeip.common.api.ApiEnvelope;
+import com.openeip.common.web.RequestIdFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

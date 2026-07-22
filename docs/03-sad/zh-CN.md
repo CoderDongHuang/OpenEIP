@@ -1,6 +1,6 @@
 # Enterprise AI Platform 软件架构设计说明书 (SAD)
 
-> 文档版本：1.1 | 产品基线：Unreleased (Phase 1.5) | 日期：2026-07-21 | 状态：Accepted Technical Baseline
+> 文档版本：1.2 | 产品基线：v0.2.0 MVP (In Development) | 日期：2026-07-22 | 状态：Accepted Technical Baseline
 >
 > 本文档是 OpenEIP 项目的唯一软件架构基线，所有模块设计和开发必须依据本文档。
 
@@ -148,6 +148,9 @@ com.openeip.<module>/
 
 ```
 java/
+├── platform-app/           ← Java 平台唯一部署与模块组合入口
+│   功能：组合业务模块、统一配置、Migration 和健康检查
+│
 ├── platform-gateway/       ← API Gateway
 │   功能：路由转发、限流、认证、请求日志
 │   技术：Spring Cloud Gateway
@@ -155,6 +158,10 @@ java/
 ├── platform-auth/          ← 认证授权模块
 │   功能：登录、JWT、RBAC、OAuth2/OIDC、SSO
 │   技术：Spring Security + OAuth2
+│
+├── platform-document/      ← 文档控制平面
+│   功能：文件元数据、对象存储端口、所有者访问控制和生命周期
+│   技术：Spring MVC + Data JPA + 可替换 ObjectStorage
 │
 ├── platform-connector/     ← 连接器管理模块
 │   功能：Connector SPI、连接生命周期管理、元数据同步
@@ -173,7 +180,7 @@ java/
 │   技术：Elasticsearch Client
 │
 └── platform-common/        ← 共享模块
-    功能：通用工具类、异常定义、Event Schema
+    功能：统一响应信封、请求 ID、通用工具和异常定义
 ```
 
 ### 2.3 Java ↔ Python 通信
@@ -803,5 +810,6 @@ MySQL / ES / Milvus / Neo4j → 使用 Helm Chart 或外部托管
 
 | 版本 | 日期 | 变更说明 |
 |---|---|---|
+| v1.2 | 2026-07-22 | 接受 RFC-0002，增加 Java 聚合入口与文档控制平面边界 |
 | v1.1 | 2026-07-21 | 合并 Phase 1.5 实测通信、Milvus、MCP 与 SSE 决策 |
 | v1.0 | 2026-07-20 | 初始 Baseline 版本 |
