@@ -1,5 +1,6 @@
 """Application configuration via environment variables."""
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings
 
 
@@ -30,6 +31,13 @@ class Settings(BaseSettings):
 
     # Redis
     redis_url: str = "redis://localhost:6379/0"
+
+    # OCR internal API
+    ocr_internal_token: SecretStr = SecretStr("")
+    ocr_max_body_bytes: int = 5 * 1024 * 1024
+    ocr_max_width: int = 10_000
+    ocr_max_height: int = 10_000
+    ocr_max_pixels: int = 20_000_000
 
     # LLM
     llm_default_model: str = "gpt-4o"

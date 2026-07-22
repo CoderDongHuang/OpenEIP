@@ -67,6 +67,8 @@ jobs:
         run: ruff format --check --config python/pyproject.toml spike
       - name: Mypy
         run: mypy engine-core/src
+      - name: OCR Benchmark
+        run: pytest -m benchmark --no-cov
       - name: Unit Test
         run: pytest --cov-report=xml
       - name: Dependency Audit
@@ -153,7 +155,9 @@ jobs:
           java/platform/gradlew --no-daemon -p java/platform :platform-app:bootJar
           mkdir -p /tmp/openeip-platform-runtime
           cd /tmp/openeip-platform-runtime
-          jar -xf "$(find "$GITHUB_WORKSPACE/java/platform/platform-app/build/libs" -name '*.jar' -print -quit)"
+          jar -xf "$(find "$GITHUB_WORKSPACE/java/platform/platform-app/build/libs" -name '*.jar' ! -name '*-plain.jar' -print -quit)"
+      - name: Build Python engine runtime
+        run: docker build -f deploy/docker/Dockerfile.python -t openeip-python:ci python
       - name: Scan repository
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -169,6 +173,15 @@ jobs:
         with:
           scan-type: rootfs
           scan-ref: /tmp/openeip-platform-runtime
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+      - name: Scan Python engine runtime
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          scan-ref: openeip-python:ci
           scanners: vuln
           severity: HIGH,CRITICAL
           ignore-unfixed: true
