@@ -1,59 +1,42 @@
 # 13-testing（测试规范）
 
-> 性能测试、安全测试、LLM 评估、混沌测试、Benchmark。
-> 在 MVP 开发阶段逐步建立。
+> v0.2 MVP 使用模块级 Unit/Integration/Contract、可复现 Benchmark、依赖审计和运行时扫描；
+> 发布候选还必须通过真实 Compose 边界的整栈冒烟。
 
-## Foundation 状态
+## 强制门禁
 
-- [x] Foundation 单元测试与 80% 覆盖率门禁
-- [x] Java/Python/Frontend/Website 构建门禁
-- [x] 仓库安全与错误配置扫描
-- [ ] 集成测试规范
-- [ ] 契约测试规范
-- [ ] 性能测试方案（JMeter / k6）
-- [ ] 安全测试方案（SAST / DAST）
-- [ ] LLM 评估方案（RAGAS / 自定义评估）
-- [ ] 混沌测试方案
-- [ ] Benchmark 方案与基线
+- [x] Java/Python 指令覆盖率至少 80%
+- [x] Java Checkstyle、SpotBugs、Spotless 与 Python Ruff、Mypy
+- [x] API、数据库、事件、Migration 和 SPI Contract 测试
+- [x] 九个模块的可复现 Benchmark 与机器可读结果
+- [x] npm/pip 依赖审计和 Trivy 仓库/Java/Python Runtime 扫描
+- [x] `v0.2.0-alpha` 发布分支整栈 Compose 冒烟
+- [ ] 真实模型质量评估、DAST、混沌、多节点恢复和容量测试（后续版本）
 
-未勾选项目随业务模块和 Phase 1.5 Spike 建立，不伪造无业务代码阶段的性能基线。
+确定性 Provider Benchmark 只验证协议、边界、生命周期和性能回归，不代表真实 OCR、Embedding、
+LLM 或 Agent 质量。生产模型、Milvus 容量和多节点故障测试必须在进入对应发布范围前补充。
 
-## 模块计划
+## 模块计划与证据
 
-- [Auth Test and Benchmark Plan](auth-test-plan.md)
-- [File Upload Test and Benchmark Plan](file-upload-test-plan.md)
-- [OCR Test and Benchmark Plan](ocr-test-plan.md)
-- [Document Parsing Test and Benchmark Plan](document-parsing-test-plan.md)
-- [Agent Test and Benchmark Plan](agent-test-plan.md)
+| 模块 | 测试计划 | Benchmark 证据 | 已验证基线 |
+|---|---|---|---|
+| Auth | [Plan](auth-test-plan.md) | [Result](results/auth-benchmark.json) | 31 tests，96.33%，登录 P99 337.51 ms |
+| File Upload | [Plan](file-upload-test-plan.md) | [Result](results/file-upload-benchmark.json) | 29 tests，94.84%，1 MiB P99 5.60 ms |
+| OCR | [Plan](ocr-test-plan.md) | [Result](results/ocr-benchmark.json) | 受限栅格流水线 P99 24.07 ms |
+| Document Parsing | [Plan](document-parsing-test-plan.md) | [Result](results/document-parsing-benchmark.json) | 1 MiB/1,172 chunks P99 60.63 ms |
+| Knowledge Base | [Plan](knowledge-base-test-plan.md) | [Result](results/knowledge-base-benchmark.json) | 92.85%，状态转换 P99 7.78 ms |
+| Embedding | [Plan](embedding-test-plan.md) | [Result](results/embedding-benchmark.json) | 97.91%，32-text batch P99 1.359 ms |
+| RAG | [Plan](rag-test-plan.md) | [Result](results/rag-benchmark.json) | 98.11%，1,000-record P99 6.449 ms |
+| Chat | [Plan](chat-test-plan.md) | [Result](results/chat-benchmark.json) | Java 95.28%，首 Token P99 5.762 ms |
+| Agent | [Plan](agent-test-plan.md) | [Result](results/agent-benchmark.json) | Python 93.62% / Java 94.18%，完成 P99 0.116 ms |
 
-## Auth 基线
+最终合并快照必须重新运行全量门禁；上表的模块开发数据不能替代发布候选结果。
 
-- [x] 31 个 Unit / H2 Integration / MySQL Contract / Migration Rollback 测试
-- [x] 指令覆盖率 96.33%
-- [x] BCrypt 12 登录 P99 337.51ms（阈值 500ms）
-- [x] Trivy 仓库与 75 个 Boot JAR 运行时依赖扫描
-- [Auth Benchmark Evidence](results/auth-benchmark.json)
+## v0.2.0-alpha 发布候选结果
 
-## File Upload 基线
-
-- [x] 29 个 Unit / H2 Integration / MySQL / API / Event / Rollback 测试
-- [x] 指令覆盖率 94.84%
-- [x] 1 MiB 本地对象存储 P99 5.60ms（阈值 250ms）
-- [x] Trivy 仓库与 75 个聚合 Boot JAR 运行时依赖扫描
-- [File Upload Benchmark Evidence](results/file-upload-benchmark.json)
-
-## OCR 基线
-
-- [x] 27 个 Unit / FastAPI Integration / API / Result Contract / Security 测试
-- [x] Python 指令覆盖率 96.21%
-- [x] 确定性 OCR 完整流水线 P99 24.07ms（阈值 100ms）
-- [x] Trivy 仓库与 Python Debian 13.6 运行时 HIGH/CRITICAL 扫描为 0
-- [OCR Benchmark Evidence](results/ocr-benchmark.json)
-
-## Document Parsing MVP 子集基线
-
-- [x] 32 个 Unit / FastAPI Integration / OCR Input / Result / Event Contract / Security 测试
-- [x] 全部 Python 指令覆盖率 97.52%
-- [x] 1 MiB UTF-8 解析与 1,172 块生成 P99 60.63ms（阈值 250ms）
-- [x] Trivy 提交快照与 Debian 13.6 Python 运行时 HIGH/CRITICAL 为 0
-- [Document Parsing Benchmark Evidence](results/document-parsing-benchmark.json)
+- Java `clean check build`、两个 Java Spike 编译和全部静态/覆盖率门禁通过。
+- Python 161 个非 Benchmark 测试和 6 个 Benchmark 通过，总指令覆盖率 97.00%。
+- Frontend 12 个测试、生产构建和依赖 HIGH 门禁通过；Website 类型检查与构建通过。
+- Compose 构建的 Gateway、Java、Python、Frontend、MySQL 五个服务全部健康。
+- `scripts/release_smoke.py` 通过认证、文件、OCR、解析、知识库、Embedding、RAG、Chat、Agent
+  和资源清理的真实 HTTP/SSE 边界。
