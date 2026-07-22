@@ -1,6 +1,6 @@
 FROM eclipse-temurin:21-jdk-alpine@sha256:1ff763083f2993d57d0bf374ab10bb3e2cb873af6c13a04458ebbd3e0337dc76 AS builder
 
-ARG GRADLE_DISTRIBUTION_URL=https://services.gradle.org/distributions/gradle-8.12.1-bin.zip
+ARG GRADLE_DISTRIBUTION_URL=https://services.gradle.org/distributions/gradle-8.14.5-bin.zip
 ARG MAVEN_REPOSITORY_URL=
 WORKDIR /workspace
 COPY gradlew gradlew.bat settings.gradle.kts build.gradle.kts gradle.properties ./
@@ -9,6 +9,8 @@ COPY config/ config/
 COPY platform-common/ platform-common/
 COPY platform-auth/ platform-auth/
 COPY platform-document/ platform-document/
+COPY platform-knowledge/ platform-knowledge/
+COPY platform-chat/ platform-chat/
 COPY platform-app/ platform-app/
 RUN --mount=type=cache,target=/root/.gradle \
     sed -i 's/\r$//' gradlew \

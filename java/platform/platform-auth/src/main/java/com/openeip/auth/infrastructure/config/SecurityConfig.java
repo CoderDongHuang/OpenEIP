@@ -10,6 +10,7 @@ import com.openeip.auth.infrastructure.security.JsonAuthenticationEntryPoint;
 import com.openeip.auth.infrastructure.security.JwtAuthenticationFilter;
 import com.openeip.auth.infrastructure.web.ApiErrorWriter;
 import com.openeip.common.web.RequestIdFilter;
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -49,6 +50,8 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             requests ->
                 requests
+                    .dispatcherTypeMatchers(DispatcherType.ASYNC)
+                    .permitAll()
                     .requestMatchers(
                         "/api/v1/auth/register",
                         "/api/v1/auth/login",

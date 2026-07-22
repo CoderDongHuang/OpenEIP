@@ -47,6 +47,10 @@ openeip:
       parsed-topic: ${KNOWLEDGE_PARSED_TOPIC:document.lifecycle.parsed.v1}
       embedding-topic: ${KNOWLEDGE_EMBEDDING_TOPIC:embedding.job.completed.v1}
       group-id: ${KNOWLEDGE_KAFKA_GROUP_ID:openeip-knowledge-v1}
+  chat:
+    python-url: ${CHAT_PYTHON_URL:http://python:8000}
+    internal-token: ${OPENEIP_INTERNAL_API_TOKEN:}
+    external-tenant-id: ${CHAT_EXTERNAL_TENANT_ID:11111111-1111-4111-8111-111111111111}
 
 logging:
   level:

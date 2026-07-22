@@ -5,5 +5,6 @@ include(
     "platform-common",
     "platform-auth",
     "platform-document",
-    "platform-knowledge"
+    "platform-knowledge",
+    "platform-chat"
 )

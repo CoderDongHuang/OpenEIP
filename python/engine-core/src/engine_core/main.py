@@ -4,6 +4,8 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from engine_core.chat.api.router import build_chat_router
+from engine_core.chat.application.service import ChatService
 from engine_core.config import Settings
 from engine_core.embedding.api.router import build_embedding_router
 from engine_core.embedding.application.service import EmbeddingService
@@ -101,6 +103,19 @@ def create_app(
             max_body_bytes=resolved.rag_max_body_bytes,
             default_top_k=resolved.rag_default_top_k,
             max_top_k=resolved.rag_max_top_k,
+        )
+    )
+    application.include_router(
+        build_chat_router(
+            service=ChatService(
+                rag_service,
+                max_message_chars=resolved.chat_max_message_chars,
+                token_chunk_chars=resolved.chat_token_chunk_chars,
+            ),
+            internal_token=internal_token,
+            max_body_bytes=resolved.chat_max_body_bytes,
+            default_top_k=resolved.chat_default_top_k,
+            max_top_k=resolved.chat_max_top_k,
         )
     )
     parsing_service = DocumentParsingService(

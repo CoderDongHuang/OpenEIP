@@ -1,0 +1,125 @@
+openapi: 3.1.0
+info:
+  title: OpenEIP Chat API
+  version: 1.0.0
+paths:
+  /api/v1/chat/sessions:
+    post:
+      operationId: createChatSession
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSession' }
+      responses:
+        '201': { description: Created session }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/chat/sessions/{sessionId}/messages:
+    get:
+      operationId: getChatHistory
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: sessionId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Ordered complete message history }
+        '401': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/chat/sessions/{sessionId}/messages:stream:
+    post:
+      operationId: streamChatMessage
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: sessionId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StreamMessage' }
+      responses:
+        '200':
+          description: SSE events named token, done, or error
+          headers:
+            Cache-Control: { schema: { type: string, const: 'no-cache, no-transform' } }
+            X-Accel-Buffering: { schema: { type: string, const: 'no' } }
+          content:
+            text/event-stream:
+              schema: { type: string }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/internal/chat/messages:stream:
+    post:
+      operationId: streamInternalChatMessage
+      parameters:
+        - { $ref: '#/components/parameters/InternalToken' }
+        - { $ref: '#/components/parameters/TenantId' }
+        - { $ref: '#/components/parameters/UserId' }
+        - { $ref: '#/components/parameters/SessionId' }
+        - { $ref: '#/components/parameters/RequestId' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InternalStreamMessage' }
+      responses:
+        '200': { description: Internal SSE stream using the same event contract }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '413': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    InternalToken: { name: X-OpenEIP-Internal-Token, in: header, required: true, schema: { type: string } }
+    TenantId: { name: X-Tenant-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    UserId: { name: X-User-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    SessionId: { name: X-Session-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    RequestId: { name: X-Request-Id, in: header, required: true, schema: { type: string, maxLength: 128 } }
+  schemas:
+    CreateSession:
+      type: object
+      additionalProperties: false
+      required: [knowledgeBaseId]
+      properties:
+        knowledgeBaseId: { type: string, format: uuid }
+        title: { type: string, maxLength: 120, default: New conversation }
+    StreamMessage:
+      type: object
+      additionalProperties: false
+      required: [message]
+      properties:
+        message: { type: string, minLength: 1, maxLength: 4000 }
+        topK: { type: integer, minimum: 1, maximum: 20, default: 5 }
+    InternalStreamMessage:
+      type: object
+      additionalProperties: false
+      required: [knowledgeBaseId, message]
+      properties:
+        knowledgeBaseId: { type: string, format: uuid }
+        message: { type: string, minLength: 1, maxLength: 4000 }
+        topK: { type: integer, minimum: 1, maximum: 20, default: 5 }
+    TokenEvent:
+      type: object
+      additionalProperties: false
+      required: [requestId, sessionId, sequence, token]
+      properties:
+        requestId: { type: string }
+        sessionId: { type: string, format: uuid }
+        sequence: { type: integer, minimum: 0 }
+        token: { type: string, minLength: 1, maxLength: 1024 }
+    DoneEvent:
+      type: object
+      additionalProperties: false
+      required: [requestId, sessionId, finishReason, citations]
+      properties:
+        requestId: { type: string }
+        sessionId: { type: string, format: uuid }
+        finishReason: { type: string, enum: [stop] }
+        citations: { type: array, maxItems: 20, items: { type: object } }
+  responses:
+    Error:
+      description: Stable error envelope without prompt, message, token, key, or provider details
+      content: { application/json: { schema: { type: object } } }

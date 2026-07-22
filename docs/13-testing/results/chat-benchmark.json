@@ -1,0 +1,18 @@
+{
+  "module": "chat",
+  "operation": "1,000-record RAG query to bounded deterministic SSE completion",
+  "recordCount": 1000,
+  "warmups": 5,
+  "samples": 100,
+  "concurrentStreams": 20,
+  "firstTokenP50Ms": 3.938,
+  "firstTokenP95Ms": 4.872,
+  "firstTokenP99Ms": 5.762,
+  "completionP50Ms": 3.956,
+  "completionP95Ms": 4.895,
+  "completionP99Ms": 5.782,
+  "concurrentBatchMs": 97.687,
+  "thresholdFirstTokenP99Ms": 100,
+  "thresholdCompletionP99Ms": 500,
+  "result": "PASS"
+}
