@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-07-22T09:30:00Z",
+  "environment": "Windows 11, Docker Desktop, localhost Compose gateway",
+  "ingestion": {
+    "sampleCount": 10,
+    "inputBytes": 1024,
+    "thresholdP99Ms": 500,
+    "minMs": 60.67,
+    "p50Ms": 70.98,
+    "p95Ms": 214.6,
+    "p99Ms": 214.6,
+    "maxMs": 214.6,
+    "samplesMs": [60.67, 65.16, 68.78, 68.9, 70.98, 81.08, 86.51, 94.21, 109.94, 214.6]
+  },
+  "bundle": {
+    "thresholdLargestAssetGzipKiB": 150,
+    "largestAssetGzipKiB": 142.62,
+    "thresholdFeatureRouteGzipKiB": 75,
+    "largestFeatureRouteGzipKiB": 18.32
+  },
+  "result": "passed"
+}

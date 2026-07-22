@@ -96,6 +96,8 @@ jobs:
         run: npm run lint
       - name: Prettier
         run: npm run format:check
+      - name: Unit Test and Coverage
+        run: npm test
       - name: Build
         run: npm run build
 
