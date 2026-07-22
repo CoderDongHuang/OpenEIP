@@ -58,6 +58,7 @@ class VectorRecord:
     knowledge_base_id: str
     document_id: str
     chunk_id: str
+    text: str
     source_sha256: str
     model: str
     model_version: str
@@ -70,5 +71,6 @@ class VectorSearchResult:
 
     document_id: str
     chunk_id: str
+    text: str
     score: float
     source_sha256: str
