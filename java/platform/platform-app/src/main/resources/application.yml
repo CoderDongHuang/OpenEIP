@@ -40,6 +40,13 @@ openeip:
   document:
     storage-root: ${DOCUMENT_STORAGE_ROOT:./data/files}
     max-size-bytes: ${DOCUMENT_MAX_SIZE_BYTES:10485760}
+  knowledge:
+    kafka:
+      enabled: ${KNOWLEDGE_KAFKA_ENABLED:false}
+      external-tenant-id: ${KNOWLEDGE_EXTERNAL_TENANT_ID:11111111-1111-4111-8111-111111111111}
+      parsed-topic: ${KNOWLEDGE_PARSED_TOPIC:document.lifecycle.parsed.v1}
+      embedding-topic: ${KNOWLEDGE_EMBEDDING_TOPIC:knowledge.embedding.completed.v1}
+      group-id: ${KNOWLEDGE_KAFKA_GROUP_ID:openeip-knowledge-v1}
 
 logging:
   level:
@@ -55,4 +62,3 @@ management:
     health:
       probes:
         enabled: true
-
