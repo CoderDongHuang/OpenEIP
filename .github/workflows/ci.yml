@@ -155,7 +155,7 @@ jobs:
           java/platform/gradlew --no-daemon -p java/platform :platform-app:bootJar
           mkdir -p /tmp/openeip-platform-runtime
           cd /tmp/openeip-platform-runtime
-          jar -xf "$(find "$GITHUB_WORKSPACE/java/platform/platform-app/build/libs" -name '*.jar' -print -quit)"
+          jar -xf "$(find "$GITHUB_WORKSPACE/java/platform/platform-app/build/libs" -name '*.jar' ! -name '*-plain.jar' -print -quit)"
       - name: Build Python engine runtime
         run: docker build -f deploy/docker/Dockerfile.python -t openeip-python:ci python
       - name: Scan repository

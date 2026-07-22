@@ -42,7 +42,7 @@ v1.0 ──→ LTS                 规划中
 | Phase 0：Repository Bootstrap | 已完成 | 基础文件、CI、官网和仓库骨架可构建 |
 | Phase 1：Architecture Baseline | 已完成 | PRD/SAD/SDD 与脚手架通过本地发布验证；首次 PR 需再通过 CI |
 | Phase 1.5：Technical Validation | 已完成 | 5 个 Spike 已形成可复现数据，ADR-0004 已接受 |
-| Phase 2：MVP Development | 开发中 | Auth 已合并；File Upload Draft PR 的六项 CI 通过；OCR 已通过本地 Quality Gate，等待堆叠 PR/Review |
+| Phase 2：MVP Development | 开发中 | Auth 与 File Upload 已合并；OCR 已通过 Quality Gate，等待 Review |
 
 ## LTS 策略
 
