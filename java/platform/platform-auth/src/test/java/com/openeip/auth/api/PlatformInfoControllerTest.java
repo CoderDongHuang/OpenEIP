@@ -22,6 +22,6 @@ class PlatformInfoControllerTest {
         .perform(get("/api/v1/platform/info"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value("OpenEIP Platform"))
-        .andExpect(jsonPath("$.version").value("0.1.0-alpha"));
+        .andExpect(jsonPath("$.version").value("0.2.0-alpha"));
   }
 }

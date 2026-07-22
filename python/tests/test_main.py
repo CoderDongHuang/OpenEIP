@@ -9,6 +9,6 @@ async def test_health_check() -> None:
 
     assert response == {
         "status": "healthy",
-        "version": "0.1.0-alpha",
+        "version": "0.2.0-alpha",
         "service": "openeip-ai-engine",
     }

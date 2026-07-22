@@ -3,19 +3,19 @@
 > Open Enterprise Intelligence Platform
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.1.0--alpha-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-v0.2.0--alpha-orange.svg)](CHANGELOG.md)
 
-OpenEIP 是一个面向企业 AI 场景的开源平台项目。当前 `v0.1.0-alpha` 是 Foundation 版本，交付工程治理、产品与架构基线，以及可构建的 Java、Python、Frontend 和文档站脚手架。
+OpenEIP 是一个面向企业 AI 场景的开源平台项目。当前 `v0.2.0-alpha` 是 MVP 预发布版本，交付认证授权、文件控制面、受限文档处理、知识库、Embedding、RAG、流式 Chat 和约束 Agent。
 
-RAG、Agent、Workflow、Connector、Marketplace 等业务能力属于后续路线版本，当前版本尚未提供。
+该版本用于单节点内部验证。OCR、Embedding、RAG 和 Agent 默认使用确定性 Provider，向量数据位于进程内存，文件存储使用本地 Volume；真实模型、Milvus、Kafka 生产链路、多机部署和高可用不属于本次发布承诺。
 
 ## 当前交付
 
 - OpenEIP Engineering Process、RFC、ADR、版本与发布治理
-- PRD、SAD、SDD Foundation 基线
-- Java 21 + Spring Boot 健康服务
-- Python 3.12 + FastAPI 健康服务
-- React + Vite 前端壳
+- PRD、SAD、SDD 及模块级设计、API、数据库和 SPI 契约
+- Java 21 + Spring Boot：Auth/RBAC、文件、知识库、Chat 与 Agent 网关
+- Python 3.12 + FastAPI：OCR、解析、Embedding、RAG、Chat 与 Agent Runtime
+- React + Vite 登录和知识库 Chat 工作区
 - Docusaurus 文档站
 - Docker Compose 本地运行入口
 - GitHub Actions 构建、测试、格式和安全检查
@@ -56,7 +56,7 @@ Browser -> Gateway -> Java Platform -> Python AI Engine
                          \------ Event Bus --/
 ```
 
-数据库、Kafka、向量存储和插件运行时需通过 Phase 1.5 Spike 后才会进入默认部署。
+默认部署包含 MySQL；Kafka、Milvus、远程 MCP 和真实模型 Provider 已完成技术验证，但将在后续版本通过生产化设计后进入默认部署。
 
 ## 项目结构
 
