@@ -33,11 +33,18 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
 
     # OCR internal API
+    internal_api_token: SecretStr = SecretStr("")
     ocr_internal_token: SecretStr = SecretStr("")
     ocr_max_body_bytes: int = 5 * 1024 * 1024
     ocr_max_width: int = 10_000
     ocr_max_height: int = 10_000
     ocr_max_pixels: int = 20_000_000
+
+    # Document parsing internal API
+    parsing_max_body_bytes: int = 2 * 1024 * 1024
+    parsing_chunk_size: int = 1000
+    parsing_chunk_overlap: int = 100
+    parsing_max_chunks: int = 10_000
 
     # LLM
     llm_default_model: str = "gpt-4o"
@@ -45,3 +52,7 @@ class Settings(BaseSettings):
     openai_base_url: str = "https://api.openai.com/v1"
 
     model_config = {"env_prefix": "OPENEIP_", "env_file": ".env"}
+
+    def internal_api_secret(self) -> str:
+        """Return the generic internal credential with the OCR-era setting as migration fallback."""
+        return self.internal_api_token.get_secret_value() or self.ocr_internal_token.get_secret_value()

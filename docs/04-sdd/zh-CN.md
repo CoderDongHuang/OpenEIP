@@ -1,6 +1,6 @@
 # Enterprise AI Platform 设计基线 (SDD Baseline)
 
-> 文档版本：1.3 | 产品基线：v0.2.0 MVP (In Development) | 日期：2026-07-22 | 状态：Accepted Technical Baseline
+> 文档版本：1.4 | 产品基线：v0.2.0 MVP (In Development) | 日期：2026-07-22 | 状态：Accepted Technical Baseline
 >
 > 本文档定义 OpenEIP 项目的全局设计规范。各模块的详细设计在各自子 SDD 中展开。
 
@@ -73,6 +73,8 @@ OpenEIP/
 - OCR/解析文本一律作为不可信数据，不得拼接进 system/developer Prompt 边界。
 - v0.2 OCR 详细契约见 [OCR Sub-SDD](ocr-module.md) 和
   [OCR OpenAPI](../06-api/ocr-v1.openapi.yaml)。
+- v0.2 解析结果必须是规范化文本的可验证切片；事件只携带标识、哈希、计数和幂等键。
+  详细契约见 [Document Parsing Sub-SDD](document-parsing-module.md)。
 
 ---
 
@@ -539,6 +541,7 @@ ReAct (Reasoning + Acting) 模式：
 
 | 版本 | 日期 | 变更说明 |
 |---|---|---|
+| v1.4 | 2026-07-22 | 增加解析结果切片可追溯性、重放键与无原文事件约束 |
 | v1.3 | 2026-07-22 | 增加 Python 内部 AI API、OCR 输入资源限制和 Prompt 数据边界 |
 | v1.2 | 2026-07-22 | 增加 Java 模块组合、共享 Web 契约与文件存储边界 |
 | v1.1 | 2026-07-21 | 增加 Phase 1.5 后的 gRPC、Kafka、SSE、MCP 和 Milvus 约束 |

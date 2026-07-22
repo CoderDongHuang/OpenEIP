@@ -7,6 +7,11 @@
 ## [Unreleased]
 
 ### Added
+- Document Parsing MVP 子集（Issue #46）
+  - 严格 UTF-8 与 `ocr-result.v1` 输入、NFC/换行规范化和可配置重叠分块
+  - 字符区间、页码、顺序、SHA-256、确定性 Chunk ID 与解析幂等键
+  - `document-parsed-result` 和 `document.lifecycle.parsed` v1 Schema（事件不含原文）
+  - 32 个解析测试、全量 Python 97.52% 指令覆盖率和 1 MiB 吞吐基准
 - OCR Python 执行模块（Issue #45）
   - 版本化内部 API、租户/用户身份上下文、固定时间服务凭据校验和标准结果 Schema
   - PNG/JPEG 容器验证、5 MiB/尺寸/像素/帧限制与解压炸弹防护

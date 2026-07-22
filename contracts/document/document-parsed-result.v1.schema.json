@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openeip.dev/contracts/document/document-parsed-result.v1.schema.json",
+  "title": "OpenEIP Parsed Document Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["documentId", "sourceType", "sourceSha256", "normalizedTextSha256", "charCount", "chunkCount", "chunks", "parser", "durationMs", "idempotencyKey"],
+  "properties": {
+    "documentId": { "type": "string", "format": "uuid" },
+    "sourceType": { "enum": ["TEXT", "OCR"] },
+    "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "normalizedTextSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "charCount": { "type": "integer", "minimum": 0 },
+    "chunkCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+    "chunks": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["chunkId", "index", "text", "startChar", "endChar", "pages", "sha256"],
+        "properties": {
+          "chunkId": { "type": "string", "pattern": "^chk_[a-f0-9]{32}$" },
+          "index": { "type": "integer", "minimum": 0 },
+          "text": { "type": "string" },
+          "startChar": { "type": "integer", "minimum": 0 },
+          "endChar": { "type": "integer", "minimum": 0 },
+          "pages": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "uniqueItems": true },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "parser": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "chunkSize", "overlap"],
+      "properties": {
+        "name": { "const": "openeip-text-parser" },
+        "version": { "type": "string" },
+        "chunkSize": { "type": "integer", "minimum": 1 },
+        "overlap": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "durationMs": { "type": "number", "minimum": 0 },
+    "idempotencyKey": { "type": "string", "pattern": "^parse_[a-f0-9]{48}$" }
+  }
+}
+

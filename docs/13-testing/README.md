@@ -23,6 +23,7 @@
 - [Auth Test and Benchmark Plan](auth-test-plan.md)
 - [File Upload Test and Benchmark Plan](file-upload-test-plan.md)
 - [OCR Test and Benchmark Plan](ocr-test-plan.md)
+- [Document Parsing Test and Benchmark Plan](document-parsing-test-plan.md)
 
 ## Auth 基线
 
@@ -47,3 +48,11 @@
 - [x] 确定性 OCR 完整流水线 P99 24.07ms（阈值 100ms）
 - [x] Trivy 仓库与 Python Debian 13.6 运行时 HIGH/CRITICAL 扫描为 0
 - [OCR Benchmark Evidence](results/ocr-benchmark.json)
+
+## Document Parsing MVP 子集基线
+
+- [x] 32 个 Unit / FastAPI Integration / OCR Input / Result / Event Contract / Security 测试
+- [x] 全部 Python 指令覆盖率 97.52%
+- [x] 1 MiB UTF-8 解析与 1,172 块生成 P99 60.63ms（阈值 250ms）
+- [x] Trivy 提交快照与 Debian 13.6 Python 运行时 HIGH/CRITICAL 为 0
+- [Document Parsing Benchmark Evidence](results/document-parsing-benchmark.json)

@@ -74,7 +74,7 @@ services:
     expose:
       - "8000"
     environment:
-      OPENEIP_OCR_INTERNAL_TOKEN: ${OPENEIP_OCR_INTERNAL_TOKEN:-local-openeip-internal-token}
+      OPENEIP_INTERNAL_API_TOKEN: ${OPENEIP_INTERNAL_API_TOKEN:-local-openeip-internal-token}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s
