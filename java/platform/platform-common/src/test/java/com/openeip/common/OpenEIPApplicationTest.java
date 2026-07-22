@@ -9,6 +9,6 @@ class OpenEIPApplicationTest {
   @Test
   void exposesFoundationMetadata() {
     assertThat(OpenEIPApplication.NAME).isEqualTo("OpenEIP Platform");
-    assertThat(OpenEIPApplication.VERSION).isEqualTo("0.1.0-alpha");
+    assertThat(OpenEIPApplication.VERSION).isEqualTo("0.2.0-alpha");
   }
 }

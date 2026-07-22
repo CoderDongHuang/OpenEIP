@@ -7,4 +7,5 @@
 
 | 版本 | 日期 | 说明 |
 |---|---|---|
-| [v0.1.0-alpha](v0.1.0-alpha-checklist.md) | 待标签发布 | Foundation，已通过本地发布验证 |
+| [v0.2.0-alpha](v0.2.0-alpha-checklist.md) | 发布准备中 | MVP，等待整栈验收与发布 PR 审核 |
+| [v0.1.0-alpha](v0.1.0-alpha-checklist.md) | 2026-07-21 | Foundation，已发布 |

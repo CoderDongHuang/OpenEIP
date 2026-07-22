@@ -1,6 +1,6 @@
 [project]
 name = "openeip-engine"
-version = "0.1.0a0"
+version = "0.2.0a0"
 description = "OpenEIP Python AI Engine — Agent, RAG, LLM, Document Processing"
 requires-python = ">=3.12"
 license = "Apache-2.0"

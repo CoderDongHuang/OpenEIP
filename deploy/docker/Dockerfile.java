@@ -27,7 +27,9 @@ FROM eclipse-temurin:21-jre-alpine@sha256:3f08b13888f595cc49edabea7250ba69499ba2
 
 RUN apk add --no-cache wget \
     && addgroup -S openeip \
-    && adduser -S openeip -G openeip
+    && adduser -S openeip -G openeip \
+    && mkdir -p /app/data/files \
+    && chown -R openeip:openeip /app
 WORKDIR /app
 COPY --from=builder /workspace/platform-app/build/libs/*.jar app.jar
 USER openeip

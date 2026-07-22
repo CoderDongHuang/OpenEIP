@@ -417,6 +417,10 @@ v1.0.0-alpha → beta → rc1 → v1.0.0    LTS
                                     SSO / LDAP / K8S / 对象存储 / 安全合规 / 24 个月支持
 ```
 
+上述箭头表示晋升为 stable 时的成熟度路径，不要求每个 Alpha 都必须晋升。预发布列车可以被终止，
+或由下一 MINOR 承接，但必须同步 Roadmap、Changelog 和 Release 记录；任何已发布标签不得移动或重用。
+`v0.1.0-alpha` 的 Foundation 能力由 `v0.2.0-alpha` 承接，不追补没有独立验证价值的旧阶段标签。
+
 ### LTS 策略
 
 - 每年发布一个 LTS 版本
