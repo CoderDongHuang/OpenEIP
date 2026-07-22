@@ -65,6 +65,13 @@ class Settings(BaseSettings):
     rag_default_top_k: int = 5
     rag_max_top_k: int = 20
 
+    # Chat internal streaming API
+    chat_max_body_bytes: int = 32 * 1024
+    chat_max_message_chars: int = 4000
+    chat_token_chunk_chars: int = 64
+    chat_default_top_k: int = 5
+    chat_max_top_k: int = 20
+
     # LLM
     llm_default_model: str = "gpt-4o"
     openai_api_key: str = ""

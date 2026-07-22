@@ -22,7 +22,7 @@ services:
       context: ../../java/platform
       dockerfile: ../../deploy/docker/Dockerfile.java
       args:
-        GRADLE_DISTRIBUTION_URL: ${GRADLE_DISTRIBUTION_URL:-https://services.gradle.org/distributions/gradle-8.12.1-bin.zip}
+        GRADLE_DISTRIBUTION_URL: ${GRADLE_DISTRIBUTION_URL:-https://services.gradle.org/distributions/gradle-8.14.5-bin.zip}
         MAVEN_REPOSITORY_URL: ${MAVEN_REPOSITORY_URL:-}
     environment:
       SERVER_PORT: "8080"
@@ -31,8 +31,12 @@ services:
       DB_PASSWORD: local-openeip-password
       JWT_ALLOW_EPHEMERAL_KEY: "true"
       DOCUMENT_STORAGE_ROOT: /app/data/files
+      CHAT_PYTHON_URL: http://python:8000
+      OPENEIP_INTERNAL_API_TOKEN: ${OPENEIP_INTERNAL_API_TOKEN:-local-openeip-internal-token}
     depends_on:
       mysql:
+        condition: service_healthy
+      python:
         condition: service_healthy
     expose:
       - "8080"

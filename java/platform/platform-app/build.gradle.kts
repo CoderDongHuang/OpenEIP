@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":platform-auth"))
     implementation(project(":platform-document"))
     implementation(project(":platform-knowledge"))
+    implementation(project(":platform-chat"))
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("com.mysql:mysql-connector-j")
