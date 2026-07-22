@@ -21,7 +21,7 @@
 - [ ] Knowledge SDD
 - [ ] Workflow SDD
 - [ ] Connector SDD
-- [ ] Agent SDD
+- [x] [Agent SDD](agent-module.md)
 - [ ] BI SDD
 - [ ] Governance SDD
 - [ ] Marketplace SDD

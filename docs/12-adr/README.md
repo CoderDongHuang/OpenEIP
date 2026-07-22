@@ -13,6 +13,7 @@
 | [ADR-0004](adr-0004-spike-validation-decisions.md) | Phase 1.5 Spike 验证结论与后续决策 | Accepted |
 | [ADR-0005](adr-0005-auth-token-security.md) | Auth Token 安全策略 | Accepted |
 | [ADR-0006](adr-0006-file-storage-consistency.md) | File Storage Consistency and Security Boundary | Accepted |
+| [ADR-0007](adr-0007-agent-runtime-safety-memory.md) | Agent Runtime Safety and Memory | Accepted |
 
 ## ADR 编号规则
 

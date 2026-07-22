@@ -1,0 +1,90 @@
+openapi: 3.1.0
+info:
+  title: OpenEIP Agent API
+  version: 1.0.0
+paths:
+  /api/v1/agents:
+    get:
+      operationId: listAgents
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Available bounded Agents and immutable tool definitions }
+        '401': { $ref: '#/components/responses/Error' }
+  /api/v1/agents/{agentId}/executions:stream:
+    post:
+      operationId: streamAgentExecution
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: agentId, in: path, required: true, schema: { type: string, maxLength: 128 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExecuteAgent' }
+      responses:
+        '200':
+          description: Sanitized bounded Agent SSE execution
+          headers:
+            Cache-Control: { schema: { type: string, const: 'no-cache, no-transform' } }
+            X-Accel-Buffering: { schema: { type: string, const: 'no' } }
+          content: { text/event-stream: { schema: { type: string } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/internal/agents/{agentId}/executions:stream:
+    post:
+      operationId: streamInternalAgentExecution
+      parameters:
+        - { $ref: '#/components/parameters/InternalToken' }
+        - { $ref: '#/components/parameters/TenantId' }
+        - { $ref: '#/components/parameters/UserId' }
+        - { $ref: '#/components/parameters/ExecutionId' }
+        - { $ref: '#/components/parameters/RequestId' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InternalExecuteAgent' }
+      responses:
+        '200': { description: Internal SSE stream using the same event contract }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '413': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    InternalToken: { name: X-OpenEIP-Internal-Token, in: header, required: true, schema: { type: string } }
+    TenantId: { name: X-Tenant-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    UserId: { name: X-User-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    ExecutionId: { name: X-Execution-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    RequestId: { name: X-Request-Id, in: header, required: true, schema: { type: string, format: uuid } }
+  schemas:
+    ExecuteAgent:
+      type: object
+      additionalProperties: false
+      required: [input, allowedTools]
+      properties:
+        input: { type: string, minLength: 1, maxLength: 4000 }
+        knowledgeBaseId: { type: string, format: uuid }
+        allowedTools:
+          type: array
+          minItems: 1
+          maxItems: 2
+          uniqueItems: true
+          items: { type: string, enum: [document.inspect, knowledge.search] }
+        maxSteps: { type: integer, minimum: 1, maximum: 8, default: 4 }
+    InternalExecuteAgent:
+      allOf:
+        - { $ref: '#/components/schemas/ExecuteAgent' }
+    AgentEvent:
+      type: object
+      additionalProperties: false
+      required: [requestId, executionId]
+      properties:
+        requestId: { type: string, format: uuid }
+        executionId: { type: string, format: uuid }
+  responses:
+    Error:
+      description: Stable error envelope without thought, prompt, tool arguments, secret, or traceback
+      content: { application/json: { schema: { type: object } } }

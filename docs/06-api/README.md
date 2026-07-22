@@ -7,6 +7,7 @@
 
 - [Auth API v1 OpenAPI](auth-v1.openapi.yaml)
 - [File Upload API v1 OpenAPI](file-upload-v1.openapi.yaml)
+- [Agent API v1 OpenAPI](agent-v1.openapi.yaml)
 
 ## 待完成
 

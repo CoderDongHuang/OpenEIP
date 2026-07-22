@@ -2,6 +2,11 @@
 
 > 所有 Agent 的设计说明书。在对应 Agent 开发时完成。
 
+## Runtime 基线
+
+- [Constrained Agent v1](constrained-agent-v1.md)
+- [Agent v1 Threat Model](agent-threat-model.md)
+
 ## 待设计
 
 - [ ] Document Agent
