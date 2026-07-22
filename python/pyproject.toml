@@ -50,6 +50,7 @@ knowledge = [
 agent = [
     "langgraph>=0.2.0",
     "pydantic-ai>=0.1.0",
+    "mcp==1.28.1",
 ]
 
 llm = [
