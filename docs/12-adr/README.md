@@ -14,6 +14,7 @@
 | [ADR-0005](adr-0005-auth-token-security.md) | Auth Token 安全策略 | Accepted |
 | [ADR-0006](adr-0006-file-storage-consistency.md) | File Storage Consistency and Security Boundary | Accepted |
 | [ADR-0007](adr-0007-agent-runtime-safety-memory.md) | Agent Runtime Safety and Memory | Accepted |
+| [ADR-0008](adr-0008-synchronous-ingestion-orchestration.md) | Synchronous Ingestion Orchestration for the Single-Node MVP | Accepted |
 
 ## ADR 编号规则
 

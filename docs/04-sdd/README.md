@@ -22,6 +22,7 @@
 - [ ] Workflow SDD
 - [ ] Connector SDD
 - [x] [Agent SDD](agent-module.md)
+- [x] [Operational Frontend Workspace SDD](operational-frontend-module.md)
 - [ ] BI SDD
 - [ ] Governance SDD
 - [ ] Marketplace SDD

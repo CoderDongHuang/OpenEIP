@@ -8,6 +8,8 @@
 - [Auth API v1 OpenAPI](auth-v1.openapi.yaml)
 - [File Upload API v1 OpenAPI](file-upload-v1.openapi.yaml)
 - [Agent API v1 OpenAPI](agent-v1.openapi.yaml)
+- [Knowledge Base and Processing API v1 OpenAPI](knowledge-base-v1.openapi.yaml)
+- [Chat API v1 OpenAPI](chat-v1.openapi.yaml)
 
 ## 待完成
 
