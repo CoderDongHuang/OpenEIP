@@ -91,6 +91,15 @@ public class KnowledgeDocument {
     updatedAt = now;
   }
 
+  public void resetForRetry(Instant now) {
+    if (status != ProcessingStatus.FAILED && status != ProcessingStatus.READY) {
+      throw KnowledgeException.conflict("Only failed or ready documents can be rebuilt");
+    }
+    status = ProcessingStatus.PENDING_PARSE;
+    failureCode = null;
+    updatedAt = now;
+  }
+
   public boolean isAtOrBeyondParsed() {
     return Set.of(
             ProcessingStatus.PARSED, ProcessingStatus.PENDING_EMBEDDING, ProcessingStatus.READY)

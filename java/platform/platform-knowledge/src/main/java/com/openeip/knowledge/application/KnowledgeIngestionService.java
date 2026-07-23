@@ -42,7 +42,7 @@ public class KnowledgeIngestionService {
 
   public IngestionResult process(
       String userId, boolean administrator, String knowledgeBaseId, String documentId) {
-    KnowledgeDocument document = bases.getDocument(userId, knowledgeBaseId, documentId);
+    KnowledgeDocument document = bases.getEditableDocument(userId, knowledgeBaseId, documentId);
     if (document.getStatus() == ProcessingStatus.READY) {
       return new IngestionResult(document, "ready", 0, 0);
     }
@@ -80,6 +80,12 @@ public class KnowledgeIngestionService {
       fail(knowledgeBaseId, documentId, exception.getFailureCode());
       throw exception;
     }
+  }
+
+  public IngestionResult retry(
+      String userId, boolean administrator, String knowledgeBaseId, String documentId) {
+    bases.resetDocumentForRetry(userId, knowledgeBaseId, documentId);
+    return process(userId, administrator, knowledgeBaseId, documentId);
   }
 
   private DocumentContent content(String userId, boolean administrator, String documentId) {
