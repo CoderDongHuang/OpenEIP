@@ -8,10 +8,11 @@ current user stay visible without consuming a marketing-style hero area.
 
 ## Views
 
-- Overview: resource counts, processing health, and direct next actions.
-- Documents: upload command, scan-friendly metadata table, download, and confirmed deletion.
-- Knowledge: master/detail layout, create/edit commands, attached documents, status, and processing.
-- Chat: knowledge-base selector, session title, transcript, citations, composer, cancel, and retry.
+- Overview: resource counts, attached-document processing health, completion ratio, and direct next actions.
+- Documents: upload command, processability labels, scan-friendly metadata table, download, and confirmed deletion.
+- Knowledge: master/detail layout, create/edit commands, attached documents, readable status, initial processing,
+  failed-document retry, and READY vector rebuild after a single-node engine restart.
+- Chat: knowledge-base selector, session title, transcript, citations, composer, cancel, and restore-last-question recovery.
 - Agent: catalog selector, tool checkboxes, bounded step control, input, run/cancel, and event timeline.
 - Access: current identity; registration is available from the unauthenticated screen. Admin-only role
   controls render only when the authenticated permissions allow them.
@@ -21,6 +22,10 @@ current user stay visible without consuming a marketing-style hero area.
 Tables collapse to metadata lists below 768 px. Commands use icons with tooltips. Inputs have visible
 labels, streaming/status regions use `aria-live`, keyboard navigation is preserved, and fixed controls
 have stable dimensions. Destructive operations require a named confirmation dialog.
+
+PDF is labeled “Stored only” before attachment and in document status because v0.2 does not parse PDF.
+Raw processing enums are translated into operational labels such as “Ready to process”, “Searchable”,
+and “Needs attention”. Recovery actions remain explicit and never run automatically after an error.
 
 ## Security
 

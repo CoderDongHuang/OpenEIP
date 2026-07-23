@@ -1,6 +1,6 @@
 # Knowledge Base Module Design (Sub-SDD)
 
-> Version: 1.0 | Date: 2026-07-22 | Status: Approved for Implementation
+> Version: 1.1 | Date: 2026-07-23 | Status: Implemented
 > Issue: [#47](https://github.com/CoderDongHuang/OpenEIP/issues/47) | RFC: [RFC-0002](../11-rfc/rfc-0002-document-control-plane.md) | ADR: [ADR-0002](../12-adr/adr-0002-communication-boundaries.md)
 
 ## 1. Responsibilities and Boundaries
@@ -28,6 +28,8 @@ The source contract is [knowledge-base-v1.openapi.yaml](../06-api/knowledge-base
 | POST | `/api/v1/knowledge/bases/{baseId}/documents` | EDITOR |
 | GET | `/api/v1/knowledge/bases/{baseId}/documents` | member |
 | GET/DELETE | `/api/v1/knowledge/bases/{baseId}/documents/{documentId}` | member / EDITOR |
+| POST | `/api/v1/knowledge/bases/{baseId}/documents/{documentId}/processing` | EDITOR |
+| POST | `/api/v1/knowledge/bases/{baseId}/documents/{documentId}/processing/retry` | EDITOR |
 
 Names are trimmed, 1-120 characters, and unique per tenant and owner. Descriptions are at most 2,000
 characters. Lists use one-based pages and a maximum page size of 100.
@@ -44,6 +46,13 @@ An attach starts at `PENDING_PARSE`. Parsed events advance to `PARSED`; scheduli
 to `PENDING_EMBEDDING`; embedding-completed advances to `READY`. Repeating the current state is
 idempotent. Other transitions are rejected and rolled back. `FAILED` retains only a bounded diagnostic
 code and retry count, never source text or credentials.
+
+The first processing command accepts an attached document that has not reached a terminal state.
+`retry` is an explicit recovery command for `FAILED` and `READY`: it resets the persisted state to
+`PENDING_PARSE`, clears only the current failure code, preserves the bounded retry counter, and rebuilds
+the document. Rebuilding `READY` is required in the v0.2 single-node profile because vector data is held
+in Python process memory and can be lost on restart. Both commands require `OWNER` or `EDITOR`; a
+`VIEWER` cannot trigger storage reads, parsing, or embedding through the API.
 
 ## 5. Events and Delivery
 
@@ -66,7 +75,8 @@ delivery, which remain producer responsibilities.
 
 ## 7. Quality and Compatibility
 
-Tests cover the state machine, access matrix, API envelope, MySQL constraints, rollback, event replay,
+Tests cover the state machine, access matrix, processing authorization, retry/rebuild, API envelope,
+MySQL constraints, rollback, event replay,
 and a 1,000-transition benchmark. Instruction coverage must be at least 80% and P99 transition latency
 must stay below 50 ms on the in-memory contract fixture. Changes are additive: one Gradle module, four
 tables, API paths, and an event Schema; no existing API or public SPI changes.

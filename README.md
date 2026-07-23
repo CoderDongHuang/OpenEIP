@@ -15,7 +15,7 @@ OpenEIP 是一个面向企业 AI 场景的开源平台项目。当前 `v0.2.0-al
 - PRD、SAD、SDD 及模块级设计、API、数据库和 SPI 契约
 - Java 21 + Spring Boot：Auth/RBAC、文件、知识库、Chat 与 Agent 网关
 - Python 3.12 + FastAPI：OCR、解析、Embedding、RAG、Chat 与 Agent Runtime
-- React + Vite 登录和知识库 Chat 工作区
+- React + Vite 六页操作工作台：Overview、Documents、Knowledge、Chat、Agents 与 Access
 - Docusaurus 文档站
 - Docker Compose 本地运行入口
 - GitHub Actions 构建、测试、格式和安全检查
@@ -56,7 +56,10 @@ Browser -> Gateway -> Java Platform -> Python AI Engine
                          \------ Event Bus --/
 ```
 
-默认部署包含 MySQL；Kafka、Milvus、远程 MCP 和真实模型 Provider 已完成技术验证，但将在后续版本通过生产化设计后进入默认部署。
+默认部署包含基于官方 8.4.10 LTS、digest 固定并移除非运行时管理工具的 hardened MySQL 镜像；Kafka、Milvus、远程 MCP 和真实模型 Provider 已完成技术验证，但将在后续版本通过生产化设计后进入默认部署。
+
+v0.2 中 TXT 与 PNG/JPEG 可进入受限处理链路；PDF 仅支持安全存储和下载。向量数据位于
+Python 进程内存，服务重启后可在 Knowledge 页对已就绪文档执行“重建向量”。
 
 ## 项目结构
 
