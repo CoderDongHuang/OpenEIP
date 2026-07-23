@@ -4,6 +4,18 @@ info:
   version: 1.0.0
 paths:
   /api/v1/chat/sessions:
+    get:
+      operationId: listChatSessions
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Current user's sessions ordered by most recently updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Session' }
+        '401': { $ref: '#/components/responses/Error' }
     post:
       operationId: createChatSession
       security: [{ bearerAuth: [] }]
@@ -79,6 +91,16 @@ components:
     SessionId: { name: X-Session-Id, in: header, required: true, schema: { type: string, format: uuid } }
     RequestId: { name: X-Request-Id, in: header, required: true, schema: { type: string, maxLength: 128 } }
   schemas:
+    Session:
+      type: object
+      additionalProperties: false
+      required: [sessionId, knowledgeBaseId, title, createdAt, updatedAt]
+      properties:
+        sessionId: { type: string, format: uuid }
+        knowledgeBaseId: { type: string, format: uuid }
+        title: { type: string, maxLength: 120 }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
     CreateSession:
       type: object
       additionalProperties: false

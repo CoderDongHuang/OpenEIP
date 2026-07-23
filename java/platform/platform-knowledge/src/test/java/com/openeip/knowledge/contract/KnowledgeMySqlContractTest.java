@@ -108,7 +108,8 @@ class KnowledgeMySqlContractTest {
                 "/api/v1/knowledge/bases",
                 "/api/v1/knowledge/bases/{baseId}",
                 "/api/v1/knowledge/bases/{baseId}/documents",
-                "/api/v1/knowledge/bases/{baseId}/documents/{documentId}"));
+                "/api/v1/knowledge/bases/{baseId}/documents/{documentId}",
+                "/api/v1/knowledge/bases/{baseId}/documents/{documentId}/processing"));
     JsonNode event =
         new ObjectMapper()
             .readTree(

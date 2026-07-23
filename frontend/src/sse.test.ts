@@ -1,11 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { SseParser } from './sse';
+import { SseParser, streamMessage } from './sse';
 
 const request = '11111111-1111-4111-8111-111111111111';
 const session = '22222222-2222-4222-8222-222222222222';
 
 describe('SseParser', () => {
+  afterEach(() => vi.unstubAllGlobals());
   it('parses arbitrarily fragmented LF and CRLF frames', () => {
     const parser = new SseParser();
     const stream =
@@ -73,5 +74,36 @@ describe('SseParser', () => {
       citations: [citation, citation],
     })}\n\n`;
     expect(() => new SseParser().push(frame)).toThrow('Duplicate citation');
+  });
+
+  it('streams ordered events through the public Chat API', async () => {
+    const stream =
+      `event: token\ndata: {"requestId":"${request}","sessionId":"${session}","sequence":0,"token":"answer"}\n\n` +
+      `event: done\ndata: {"requestId":"${request}","sessionId":"${session}","finishReason":"stop","citations":[]}\n\n`;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(stream, { headers: { 'Content-Type': 'text/event-stream' } })),
+    );
+    const events: string[] = [];
+    await streamMessage('token', session, 'question', new AbortController().signal, (event) =>
+      events.push(event.event),
+    );
+    expect(events).toEqual(['token', 'done']);
+  });
+
+  it('rejects non-stream responses and missing terminal events', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: 'Unavailable', code: 'CHAT-S-001' }), { status: 503 }),
+      )
+      .mockResolvedValueOnce(new Response('event: token\ndata: {}\n\n', { headers: { 'Content-Type': 'text/plain' } }));
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(
+      streamMessage('token', session, 'q', new AbortController().signal, () => undefined),
+    ).rejects.toMatchObject({ status: 503 });
+    await expect(streamMessage('token', session, 'q', new AbortController().signal, () => undefined)).rejects.toThrow(
+      'media type',
+    );
   });
 });

@@ -2,6 +2,7 @@ package com.openeip.chat.domain.repository;
 
 import com.openeip.chat.domain.entity.ChatSession;
 import jakarta.persistence.LockModeType;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -10,6 +11,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface ChatSessionRepository extends JpaRepository<ChatSession, String> {
   Optional<ChatSession> findByIdAndTenantIdAndOwnerId(String id, String tenantId, String ownerId);
+
+  List<ChatSession> findAllByTenantIdAndOwnerIdOrderByUpdatedAtDesc(
+      String tenantId, String ownerId);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query(

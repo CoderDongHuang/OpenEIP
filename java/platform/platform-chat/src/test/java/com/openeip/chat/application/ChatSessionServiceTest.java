@@ -79,6 +79,16 @@ class ChatSessionServiceTest {
   }
 
   @Test
+  void listsOnlyOwnedSessionsInRepositoryOrder() {
+    ChatSession session = session();
+    when(sessions.findAllByTenantIdAndOwnerIdOrderByUpdatedAtDesc("default", USER))
+        .thenReturn(List.of(session));
+
+    assertThat(service.list(USER)).containsExactly(session);
+    verify(sessions).findAllByTenantIdAndOwnerIdOrderByUpdatedAtDesc("default", USER);
+  }
+
+  @Test
   void beginRechecksMembershipPersistsUserMessageAndRejectsConcurrentStream() {
     ChatSession session = session();
     when(sessions.findOwnedForUpdate(SESSION, "default", USER)).thenReturn(Optional.of(session));

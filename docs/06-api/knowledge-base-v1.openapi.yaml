@@ -81,6 +81,32 @@ paths:
       responses:
         '204': { description: Detached }
         '403': { $ref: '#/components/responses/Error' }
+  /api/v1/knowledge/bases/{baseId}/documents/{documentId}/processing:
+    parameters:
+      - { $ref: '#/components/parameters/BaseId' }
+      - { $ref: '#/components/parameters/DocumentId' }
+    post:
+      operationId: processKnowledgeDocument
+      description: >-
+        Authorize and synchronously process one attached text or image document through the bounded
+        single-node OCR/parsing/embedding pipeline. Internal service credentials are deployment-owned.
+      responses:
+        '200':
+          description: Document is ready or was already ready
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/Envelope' }
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ProcessingData' }
+        '400': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '415': { $ref: '#/components/responses/Error' }
+        '503': { $ref: '#/components/responses/Error' }
 components:
   securitySchemes:
     bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
@@ -122,6 +148,17 @@ components:
         failureCode: { type: [string, 'null'], maxLength: 64 }
         retryCount: { type: integer, minimum: 0, maximum: 3 }
         createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    ProcessingData:
+      type: object
+      additionalProperties: false
+      required: [documentId, status, sourceType, chunkCount, vectorCount, updatedAt]
+      properties:
+        documentId: { type: string, format: uuid }
+        status: { type: string, const: READY }
+        sourceType: { type: string, enum: [text, ocr, ready] }
+        chunkCount: { type: integer, minimum: 0, maximum: 10000 }
+        vectorCount: { type: integer, minimum: 0, maximum: 10000 }
         updatedAt: { type: string, format: date-time }
     Envelope:
       type: object

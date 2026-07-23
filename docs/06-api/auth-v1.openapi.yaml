@@ -144,6 +144,44 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+  /auth/users:
+    get:
+      tags: [RBAC]
+      operationId: listUsers
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      responses:
+        '200':
+          description: Newest-first administrative user page without credentials
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminUserPageEnvelope' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /auth/users/{id}/active:
+    patch:
+      tags: [RBAC]
+      operationId: setUserActive
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateUserStatusRequest' }
+      responses:
+        '200':
+          description: Updated administrative account view
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminUserEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
 components:
   securitySchemes:
     bearerAuth:
@@ -229,6 +267,12 @@ components:
           uniqueItems: true
           maxItems: 20
           items: { type: string, pattern: '^ROLE_[A-Z0-9_]{2,59}$' }
+    UpdateUserStatusRequest:
+      type: object
+      additionalProperties: false
+      required: [active]
+      properties:
+        active: { type: boolean }
     TokenPair:
       type: object
       required: [accessToken, refreshToken, expiresIn, tokenType]
@@ -252,6 +296,31 @@ components:
           type: array
           uniqueItems: true
           items: { type: string }
+    AdminUser:
+      type: object
+      additionalProperties: false
+      required: [id, username, email, active, roles, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        username: { type: string }
+        email: { type: string, format: email }
+        active: { type: boolean }
+        roles:
+          type: array
+          uniqueItems: true
+          items: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    AdminUserPage:
+      type: object
+      additionalProperties: false
+      required: [items, page, pageSize, total, totalPages]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/AdminUser' } }
+        page: { type: integer, minimum: 1 }
+        pageSize: { type: integer, minimum: 1, maximum: 100 }
+        total: { type: integer, format: int64, minimum: 0 }
+        totalPages: { type: integer, minimum: 0 }
     Role:
       type: object
       required: [id, name, permissions]
@@ -284,6 +353,18 @@ components:
         - type: object
           properties:
             data: { $ref: '#/components/schemas/User' }
+    AdminUserEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          properties:
+            data: { $ref: '#/components/schemas/AdminUser' }
+    AdminUserPageEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          properties:
+            data: { $ref: '#/components/schemas/AdminUserPage' }
     RoleEnvelope:
       allOf:
         - $ref: '#/components/schemas/SuccessEnvelope'

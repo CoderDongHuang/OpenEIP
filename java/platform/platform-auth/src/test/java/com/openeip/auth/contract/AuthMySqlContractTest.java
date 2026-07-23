@@ -174,12 +174,14 @@ class AuthMySqlContractTest {
             "/auth/me#get",
             "/auth/roles#get",
             "/auth/roles#post",
-            "/auth/users/{id}/roles#put");
+            "/auth/users/{id}/roles#put",
+            "/auth/users#get",
+            "/auth/users/{id}/active#patch");
     for (String operation : operations) {
       String[] parts = operation.split("#");
       assertThat(paths.path(parts[0]).has(parts[1])).as(operation).isTrue();
     }
-    assertThat(paths.size()).isEqualTo(6);
+    assertThat(paths.size()).isEqualTo(8);
   }
 
   private static Path findRepositoryRoot() {
