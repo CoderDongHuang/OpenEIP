@@ -216,6 +216,12 @@ export const processKnowledgeDocument = (token: string, baseId: string, document
     { method: 'POST' },
     token,
   );
+export const retryKnowledgeDocument = (token: string, baseId: string, documentId: string) =>
+  request<ProcessingResult>(
+    `/api/v1/knowledge/bases/${encodeURIComponent(baseId)}/documents/${encodeURIComponent(documentId)}/processing/retry`,
+    { method: 'POST' },
+    token,
+  );
 
 export const listSessions = (token: string) => request<ChatSession[]>('/api/v1/chat/sessions', {}, token);
 export const createSession = (token: string, knowledgeBaseId: string, title: string) =>

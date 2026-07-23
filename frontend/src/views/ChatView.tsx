@@ -4,6 +4,7 @@ import {
   ReloadOutlined,
   SendOutlined,
   StopOutlined,
+  UndoOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Alert, Avatar, Button, Empty, Form, Input, List, Modal, Select, Spin, Tag, Tooltip, Typography } from 'antd';
@@ -37,6 +38,7 @@ export function ChatView({ token }: { token: string }) {
   const [streaming, setStreaming] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [retryContent, setRetryContent] = useState('');
   const [newOpen, setNewOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
@@ -90,6 +92,7 @@ export function ChatView({ token }: { token: string }) {
       },
     ]);
     setDraft('');
+    setRetryContent('');
     setError('');
     setStreaming(true);
     const controller = new AbortController();
@@ -112,6 +115,7 @@ export function ChatView({ token }: { token: string }) {
       });
       await loadCatalog();
     } catch (reason) {
+      setRetryContent(content);
       if (!(reason instanceof DOMException && reason.name === 'AbortError')) setError(errorMessage(reason));
       setMessages((current) =>
         current.map((item) => (item.messageId === assistantId ? { ...item, pending: false } : item)),
@@ -165,6 +169,22 @@ export function ChatView({ token }: { token: string }) {
           </Tooltip>
         </div>
         {error && <Alert type="error" message={error} showIcon closable onClose={() => setError('')} />}
+        {retryContent && !streaming && (
+          <div className="recovery-bar">
+            <Text type="secondary">The last question was not completed.</Text>
+            <Button
+              size="small"
+              icon={<UndoOutlined />}
+              onClick={() => {
+                setDraft(retryContent);
+                setRetryContent('');
+                setError('');
+              }}
+            >
+              Restore question
+            </Button>
+          </div>
+        )}
         <div className="transcript" ref={transcriptRef} aria-live="polite">
           {loading ? (
             <Spin />

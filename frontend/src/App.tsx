@@ -9,7 +9,21 @@ import {
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Alert, Button, ConfigProvider, Drawer, Form, Input, Layout, Menu, Space, Spin, Tabs, Typography } from 'antd';
+import {
+  Alert,
+  Button,
+  ConfigProvider,
+  Drawer,
+  Form,
+  Input,
+  Layout,
+  Menu,
+  Space,
+  Spin,
+  Tabs,
+  Tooltip,
+  Typography,
+} from 'antd';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
@@ -81,7 +95,16 @@ function App() {
   return (
     <ConfigProvider
       theme={{
-        token: { colorPrimary: '#18745a', borderRadius: 6, colorBgLayout: '#f4f6f7' },
+        token: {
+          colorPrimary: '#18745a',
+          colorInfo: '#18745a',
+          borderRadius: 6,
+          colorBgLayout: '#f3f5f4',
+          colorText: '#1c2421',
+          colorTextSecondary: '#5d6a65',
+          controlHeight: 38,
+          fontSize: 14,
+        },
         components: { Layout: { headerBg: '#171b1d', siderBg: '#202629' }, Menu: { darkItemBg: '#202629' } },
       }}
     >
@@ -113,10 +136,21 @@ function Workspace({ token, user, onLogout }: { token: string; user: CurrentUser
     <Layout className="app-shell">
       <Sider className="desktop-sider" width={228}>
         <div className="brand-lockup">
-          <span className="brand-signal" />
-          <strong>OpenEIP</strong>
+          <span className="brand-symbol">O</span>
+          <span>
+            <strong>OpenEIP</strong>
+            <small>Enterprise AI</small>
+          </span>
         </div>
+        <span className="navigation-label">Workspace</span>
         {menu}
+        <div className="sider-release">
+          <span className="release-dot" />
+          <span>
+            <strong>v0.2 alpha</strong>
+            <small>Single-node profile</small>
+          </span>
+        </div>
       </Sider>
       <Layout>
         <Header className="app-header">
@@ -131,11 +165,12 @@ function Workspace({ token, user, onLogout }: { token: string; user: CurrentUser
             <Title level={2}>{pageTitle}</Title>
           </Space>
           <Space size="middle">
-            <span className="account">
-              <UserOutlined />
+            <Button className="account" type="text" icon={<UserOutlined />} onClick={() => navigate('/users')}>
               <Text>{user.username}</Text>
-            </span>
-            <Button type="text" danger icon={<LogoutOutlined />} onClick={onLogout} aria-label="Log out" />
+            </Button>
+            <Tooltip title="Log out">
+              <Button type="text" danger icon={<LogoutOutlined />} onClick={onLogout} aria-label="Log out" />
+            </Tooltip>
           </Space>
         </Header>
         <Content className="page-content">
@@ -254,9 +289,46 @@ function AuthView({ onLogin }: { onLogin: (username: string, password: string) =
         />
       </section>
       <aside className="login-context">
-        <div>
-          <DatabaseOutlined />
-          <h2>From source files to grounded answers.</h2>
+        <div className="login-story">
+          <span className="login-kicker">Open enterprise intelligence platform</span>
+          <h2>From governed source files to grounded answers.</h2>
+          <p>One focused workspace for knowledge preparation, streaming chat, and bounded agent execution.</p>
+          <div className="login-visual" aria-hidden="true">
+            <div className="visual-topbar">
+              <span />
+              <i />
+              <i />
+              <i />
+            </div>
+            <div className="visual-body">
+              <div className="visual-rail">
+                <b />
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="visual-content">
+                <div className="visual-title" />
+                <div className="visual-metrics">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <div className="visual-panel">
+                  <div>
+                    <b /> <span />
+                  </div>
+                  <div>
+                    <b /> <span />
+                  </div>
+                  <div>
+                    <b /> <span />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </aside>
     </div>
