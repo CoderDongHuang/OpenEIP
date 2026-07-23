@@ -1,5 +1,5 @@
 import { DeleteOutlined, DownloadOutlined, FileAddOutlined, ReloadOutlined, UploadOutlined } from '@ant-design/icons';
-import { Alert, Button, Modal, Space, Table, Tag, Tooltip, Typography, Upload, message } from 'antd';
+import { Alert, Button, List, Modal, Space, Table, Tag, Tooltip, Typography, Upload, message } from 'antd';
 import type { UploadProps } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -49,13 +49,15 @@ export function DocumentsView({ token }: { token: string }) {
       <section className="page-toolbar">
         <div>
           <Title level={3}>Documents</Title>
-          <Paragraph type="secondary">Raw source files available to your knowledge bases.</Paragraph>
+          <Paragraph type="secondary">
+            Upload TXT, PNG, or JPEG for processing. PDF is stored and downloadable only in v0.2.
+          </Paragraph>
         </div>
         <Space>
           <Tooltip title="Refresh">
             <Button icon={<ReloadOutlined />} onClick={() => void load()} aria-label="Refresh" />
           </Tooltip>
-          <Upload customRequest={upload} showUploadList={false} accept=".txt,.md,.png,.jpg,.jpeg,.pdf" multiple={false}>
+          <Upload customRequest={upload} showUploadList={false} accept=".txt,.png,.jpg,.jpeg,.pdf" multiple={false}>
             <Button type="primary" icon={<UploadOutlined />} loading={uploading}>
               Upload
             </Button>
@@ -64,11 +66,11 @@ export function DocumentsView({ token }: { token: string }) {
       </section>
       {error && <Alert type="error" message={error} showIcon closable onClose={() => setError('')} />}
       <Table
+        className="desktop-record-table"
         rowKey="id"
         loading={loading}
         dataSource={files}
         pagination={{ pageSize: 20, showSizeChanger: false }}
-        scroll={{ x: 820 }}
         locale={{
           emptyText: (
             <div className="empty-action">
@@ -91,7 +93,15 @@ export function DocumentsView({ token }: { token: string }) {
           },
           { title: 'Type', dataIndex: 'contentType', key: 'type', responsive: ['md'] },
           { title: 'Size', dataIndex: 'sizeBytes', key: 'size', render: formatBytes },
-          { title: 'Status', dataIndex: 'status', key: 'status', render: (value) => <Tag color="green">{value}</Tag> },
+          {
+            title: 'Availability',
+            key: 'status',
+            render: (_, file) => (
+              <Tag color={file.contentType === 'application/pdf' ? 'gold' : 'green'}>
+                {file.contentType === 'application/pdf' ? 'Stored only' : 'Processable'}
+              </Tag>
+            ),
+          },
           { title: 'Uploaded', dataIndex: 'createdAt', key: 'date', render: formatDate, responsive: ['lg'] },
           {
             title: '',
@@ -132,6 +142,57 @@ export function DocumentsView({ token }: { token: string }) {
             ),
           },
         ]}
+      />
+      <List
+        className="mobile-record-list"
+        dataSource={files}
+        locale={{ emptyText: 'No documents uploaded' }}
+        renderItem={(file) => (
+          <List.Item
+            actions={[
+              <Button
+                key="download"
+                type="text"
+                icon={<DownloadOutlined />}
+                onClick={() => void downloadFile(token, file).catch((reason) => setError(errorMessage(reason)))}
+                aria-label="Download"
+              />,
+              <Button
+                key="delete"
+                type="text"
+                danger
+                icon={<DeleteOutlined />}
+                aria-label="Delete"
+                onClick={() =>
+                  Modal.confirm({
+                    title: `Delete ${file.originalName}?`,
+                    content: 'Knowledge-base attachments must be removed first.',
+                    okText: 'Delete',
+                    okButtonProps: { danger: true },
+                    onOk: async () => {
+                      await deleteFile(token, file.id);
+                      await load();
+                    },
+                  })
+                }
+              />,
+            ]}
+          >
+            <List.Item.Meta
+              title={file.originalName}
+              description={
+                <Space direction="vertical" size={2}>
+                  <Text type="secondary">
+                    {formatBytes(file.sizeBytes)} / {formatDate(file.createdAt)}
+                  </Text>
+                  <Tag color={file.contentType === 'application/pdf' ? 'gold' : 'green'}>
+                    {file.contentType === 'application/pdf' ? 'Stored only' : 'Processable'}
+                  </Tag>
+                </Space>
+              }
+            />
+          </List.Item>
+        )}
       />
     </div>
   );

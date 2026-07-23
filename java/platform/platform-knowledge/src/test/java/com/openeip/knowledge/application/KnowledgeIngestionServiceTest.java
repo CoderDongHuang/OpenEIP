@@ -55,7 +55,8 @@ class KnowledgeIngestionServiceTest {
     ready.transitionTo(ProcessingStatus.PARSED, NOW);
     ready.transitionTo(ProcessingStatus.PENDING_EMBEDDING, NOW);
     ready.transitionTo(ProcessingStatus.READY, NOW);
-    when(bases.getDocument(USER, BASE, DOCUMENT)).thenReturn(pending, ready);
+    when(bases.getEditableDocument(USER, BASE, DOCUMENT)).thenReturn(pending);
+    when(bases.getDocument(USER, BASE, DOCUMENT)).thenReturn(ready);
     when(files.open(USER, false, DOCUMENT))
         .thenReturn(
             new DocumentFileService.Download(
@@ -81,7 +82,7 @@ class KnowledgeIngestionServiceTest {
 
   @Test
   void rejectsStoredContentDigestMismatchAndMarksStableFailure() {
-    when(bases.getDocument(USER, BASE, DOCUMENT)).thenReturn(document());
+    when(bases.getEditableDocument(USER, BASE, DOCUMENT)).thenReturn(document());
     when(files.open(USER, false, DOCUMENT))
         .thenReturn(
             new DocumentFileService.Download(
@@ -93,6 +94,34 @@ class KnowledgeIngestionServiceTest {
     verify(gateway, never())
         .parse(anyString(), anyString(), anyString(), org.mockito.ArgumentMatchers.any());
     verify(events).markFailed("default", BASE, DOCUMENT, "INGEST.STORAGE");
+  }
+
+  @Test
+  void resetsThenReprocessesFailedOrStaleReadyDocuments() {
+    KnowledgeDocument pending = document();
+    KnowledgeDocument ready = document();
+    ready.transitionTo(ProcessingStatus.PARSED, NOW);
+    ready.transitionTo(ProcessingStatus.PENDING_EMBEDDING, NOW);
+    ready.transitionTo(ProcessingStatus.READY, NOW);
+    when(bases.getEditableDocument(USER, BASE, DOCUMENT)).thenReturn(pending);
+    when(bases.getDocument(USER, BASE, DOCUMENT)).thenReturn(ready);
+    when(files.open(USER, false, DOCUMENT))
+        .thenReturn(
+            new DocumentFileService.Download(
+                file(sha256(CONTENT)), new ByteArrayInputStream(CONTENT)));
+    ParsedDocument parsed =
+        new ParsedDocument(
+            "text",
+            "a".repeat(64),
+            List.of(new ParsedChunk("chk_" + "b".repeat(32), "source", "c".repeat(64))));
+    when(gateway.parse(USER, DOCUMENT, "text/plain", CONTENT)).thenReturn(parsed);
+    when(gateway.embed(USER, BASE, DOCUMENT, parsed.chunks())).thenReturn(1);
+
+    var result = service.retry(USER, false, BASE, DOCUMENT);
+
+    verify(bases).resetDocumentForRetry(USER, BASE, DOCUMENT);
+    verify(bases).getEditableDocument(USER, BASE, DOCUMENT);
+    assertThat(result.document().getStatus()).isEqualTo(ProcessingStatus.READY);
   }
 
   private static KnowledgeDocument document() {

@@ -6,6 +6,21 @@
 
 ## [Unreleased]
 
+### Added
+- 知识文档显式重试/重建 API 与界面操作，可从失败状态恢复，也可在 Python 进程重启后重建
+  v0.2 内存向量数据（Issue #63）。
+- Overview 知识处理健康度、普通用户身份摘要、Chat 中断问题恢复和移动端元数据列表。
+
+### Changed
+- Compose 数据库基线升级到 digest 固定的 MySQL 8.4.10 hardened 镜像，移除运行时不需要的 MySQL Shell 和有漏洞的旧 `gosu`，并将 Gradle 默认下载地址切换为官方直连端点。
+- React 工作台统一为克制的企业操作界面，优化登录、导航、状态文案、响应式布局、焦点与低动效模式。
+- Documents 和 Knowledge 在操作前明确标识 PDF 为 v0.2 “仅存储”，避免误导为可解析来源。
+
+### Fixed
+- 知识处理 API 现在要求 `OWNER` 或 `EDITOR`，不再允许 `VIEWER` 绕过界面直接触发处理。
+- 失败知识文档不再只能解除关联；已就绪但内存向量丢失的文档也不再缺少恢复入口。
+- Access 页不再向普通用户显示无后续动作的 403 页面。
+
 ## [0.2.0-alpha] - 2026-07-22
 
 ### Added

@@ -126,6 +126,28 @@ export function AgentView({ token }: { token: string }) {
                 </Text>
                 <Paragraph>{selected.description}</Paragraph>
               </div>
+              <Form.Item label="Task" required>
+                <Input.TextArea
+                  value={input}
+                  onChange={(event) => setInput(event.target.value)}
+                  maxLength={4000}
+                  rows={5}
+                  placeholder="Describe the task for the Agent"
+                />
+              </Form.Item>
+              <Form.Item label="Knowledge base" required={requiresBase}>
+                <Select
+                  allowClear
+                  value={baseId}
+                  placeholder={requiresBase ? 'Required for knowledge.search' : 'Optional'}
+                  options={bases.map((base) => ({ value: base.id, label: base.name }))}
+                  onChange={setBaseId}
+                />
+              </Form.Item>
+              <div className="advanced-heading">
+                <Text strong>Execution controls</Text>
+                <Text type="secondary">Bound the tools and runtime before execution.</Text>
+              </div>
               <Form.Item label="Allowed tools" required>
                 <Checkbox.Group
                   value={tools}
@@ -142,26 +164,8 @@ export function AgentView({ token }: { token: string }) {
                   ))}
                 </Checkbox.Group>
               </Form.Item>
-              <Form.Item label="Knowledge base" required={requiresBase}>
-                <Select
-                  allowClear
-                  value={baseId}
-                  placeholder={requiresBase ? 'Required for knowledge.search' : 'Optional'}
-                  options={bases.map((base) => ({ value: base.id, label: base.name }))}
-                  onChange={setBaseId}
-                />
-              </Form.Item>
               <Form.Item label="Maximum steps">
                 <InputNumber min={1} max={8} value={maxSteps} onChange={(value) => setMaxSteps(value || 1)} />
-              </Form.Item>
-              <Form.Item label="Task" required>
-                <Input.TextArea
-                  value={input}
-                  onChange={(event) => setInput(event.target.value)}
-                  maxLength={4000}
-                  rows={6}
-                  placeholder="Describe the task for the Agent"
-                />
               </Form.Item>
               {running ? (
                 <Button danger icon={<StopOutlined />} onClick={() => abortRef.current?.abort()} block>

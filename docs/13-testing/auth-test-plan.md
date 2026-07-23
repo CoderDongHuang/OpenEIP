@@ -26,7 +26,7 @@
 ## 验证结果（2026-07-22）
 
 - 31 个测试通过，JaCoCo 指令覆盖率 96.33%。
-- MySQL 8.4.4 空库 migration、5 个外键、唯一约束、完整 Auth Contract、refresh replay 和 rollback 通过。
+- MySQL 8.4.10 空库 migration、5 个外键、唯一约束、完整 Auth Contract、refresh replay 和 rollback 通过。
 - 登录基准: P50 242.65ms、P95 319.58ms、P99 337.51ms，低于 500ms 门禁。
 - Checkstyle、Spotless、SpotBugs 与 Trivy 仓库/运行时依赖扫描通过。
 - 机器可读结果: [`results/auth-benchmark.json`](results/auth-benchmark.json)。

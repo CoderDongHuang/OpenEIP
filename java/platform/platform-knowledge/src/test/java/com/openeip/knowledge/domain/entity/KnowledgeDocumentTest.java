@@ -55,6 +55,31 @@ class KnowledgeDocumentTest {
   }
 
   @Test
+  void rebuildsFailedAndReadyDocumentsWithoutDiscardingRetryHistory() {
+    KnowledgeDocument failed = document();
+    failed.fail("OCR_TIMEOUT", NOW.plusSeconds(1));
+    failed.resetForRetry(NOW.plusSeconds(2));
+    assertThat(failed.getStatus()).isEqualTo(ProcessingStatus.PENDING_PARSE);
+    assertThat(failed.getFailureCode()).isNull();
+    assertThat(failed.getRetryCount()).isOne();
+
+    KnowledgeDocument ready = document();
+    ready.transitionTo(ProcessingStatus.PARSED, NOW.plusSeconds(1));
+    ready.transitionTo(ProcessingStatus.PENDING_EMBEDDING, NOW.plusSeconds(2));
+    ready.transitionTo(ProcessingStatus.READY, NOW.plusSeconds(3));
+    ready.resetForRetry(NOW.plusSeconds(4));
+    assertThat(ready.getStatus()).isEqualTo(ProcessingStatus.PENDING_PARSE);
+    assertThat(ready.getUpdatedAt()).isEqualTo(NOW.plusSeconds(4));
+  }
+
+  @Test
+  void rejectsRebuildWhileInitialProcessingIsInProgress() {
+    assertThatThrownBy(() -> document().resetForRetry(NOW.plusSeconds(1)))
+        .isInstanceOf(KnowledgeException.class)
+        .hasMessageContaining("failed or ready");
+  }
+
+  @Test
   void exposesStableIdentityFields() {
     KnowledgeDocument document = document();
     assertThat(document.getId()).isEqualTo("11111111-1111-1111-1111-111111111111");

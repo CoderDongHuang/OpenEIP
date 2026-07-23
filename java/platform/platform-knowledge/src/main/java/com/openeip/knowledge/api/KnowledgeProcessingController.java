@@ -37,6 +37,18 @@ public class KnowledgeProcessingController {
         KnowledgeProcessingResponse.from(result), RequestIdFilter.get(request));
   }
 
+  @PostMapping("/{baseId}/documents/{documentId}/processing/retry")
+  public ApiEnvelope<KnowledgeProcessingResponse> retry(
+      @PathVariable("baseId") String baseId,
+      @PathVariable("documentId") String documentId,
+      Authentication authentication,
+      HttpServletRequest request) {
+    var result =
+        service.retry(authentication.getName(), isAdmin(authentication), baseId, documentId);
+    return ApiEnvelope.success(
+        KnowledgeProcessingResponse.from(result), RequestIdFilter.get(request));
+  }
+
   private static boolean isAdmin(Authentication authentication) {
     return authentication.getAuthorities().stream()
         .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));

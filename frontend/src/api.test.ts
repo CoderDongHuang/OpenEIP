@@ -34,12 +34,13 @@ describe('API client', () => {
       api.listKnowledgeDocuments(token, 'base'),
       api.attachKnowledgeDocument(token, 'base', 'document'),
       api.processKnowledgeDocument(token, 'base', 'document'),
+      api.retryKnowledgeDocument(token, 'base', 'document'),
       api.listSessions(token),
       api.createSession(token, 'base', 'Title'),
       api.getHistory(token, 'session'),
       api.listAgents(token),
     ]);
-    expect(fetchMock).toHaveBeenCalledTimes(18);
+    expect(fetchMock).toHaveBeenCalledTimes(19);
     const authenticated = requests.filter(
       (call) =>
         String(call[0]).includes('/api/v1/') &&

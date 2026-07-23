@@ -107,6 +107,33 @@ paths:
         '409': { $ref: '#/components/responses/Error' }
         '415': { $ref: '#/components/responses/Error' }
         '503': { $ref: '#/components/responses/Error' }
+  /api/v1/knowledge/bases/{baseId}/documents/{documentId}/processing/retry:
+    parameters:
+      - { $ref: '#/components/parameters/BaseId' }
+      - { $ref: '#/components/parameters/DocumentId' }
+    post:
+      operationId: retryKnowledgeDocumentProcessing
+      description: >-
+        Reset a FAILED document, or rebuild a READY document whose single-node in-memory vectors may
+        have been lost after an engine restart, then run the bounded processing pipeline again.
+        OWNER or EDITOR membership is required.
+      responses:
+        '200':
+          description: Document was rebuilt and is ready
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/Envelope' }
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ProcessingData' }
+        '400': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '415': { $ref: '#/components/responses/Error' }
+        '503': { $ref: '#/components/responses/Error' }
 components:
   securitySchemes:
     bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }

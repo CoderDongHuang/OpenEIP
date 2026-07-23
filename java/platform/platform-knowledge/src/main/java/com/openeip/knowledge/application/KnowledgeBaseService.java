@@ -157,6 +157,20 @@ public class KnowledgeBaseService {
     return document(baseId, documentId);
   }
 
+  @Transactional(readOnly = true)
+  public KnowledgeDocument getEditableDocument(String userId, String baseId, String documentId) {
+    BaseAccess access = get(userId, baseId);
+    requireEditor(access.role());
+    return document(baseId, documentId);
+  }
+
+  @Transactional
+  public KnowledgeDocument resetDocumentForRetry(String userId, String baseId, String documentId) {
+    KnowledgeDocument document = getEditableDocument(userId, baseId, documentId);
+    document.resetForRetry(clock.instant());
+    return document;
+  }
+
   @Transactional
   public void detach(String userId, String baseId, String documentId) {
     BaseAccess access = get(userId, baseId);
