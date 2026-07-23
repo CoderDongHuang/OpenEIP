@@ -32,7 +32,7 @@ class ChatMySqlContractTest {
   static final MySQLContainer<?> MYSQL =
       new MySQLContainer<>(
               DockerImageName.parse(
-                      "mysql:8.4.4@sha256:23818b7d7de427096ab1427b2e3d9d5e14a5b933f9a4431a482d6414bc879091")
+                      "mysql:8.4.10@sha256:5700b0892591a760c4caef7a0024c887afd46317d73dd420801706e661c4db56")
                   .asCompatibleSubstituteFor("mysql"))
           .withDatabaseName("openeip_chat_contract")
           .withUsername("openeip")

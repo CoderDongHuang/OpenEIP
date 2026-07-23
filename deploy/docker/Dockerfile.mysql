@@ -1,0 +1,24 @@
+ARG MYSQL_IMAGE=mysql:8.4.10@sha256:5700b0892591a760c4caef7a0024c887afd46317d73dd420801706e661c4db56
+FROM ${MYSQL_IMAGE} AS sanitized
+
+# mysqlsh is not used by the server runtime. The base image's gosu binary is
+# replaced with a minimal wrapper around the patched coreutils privilege drop.
+RUN rpm -e mysql-shell
+
+COPY --chmod=0755 mysql-user-switch /usr/local/bin/gosu
+
+# Flatten the sanitized filesystem so removed tools are absent from both the
+# runtime and the image history inspected by vulnerability scanners.
+FROM scratch
+COPY --from=sanitized / /
+
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    MYSQL_MAJOR=8.4 \
+    MYSQL_VERSION=8.4.10-1.el9
+
+WORKDIR /
+VOLUME /var/lib/mysql
+EXPOSE 3306 33060
+USER mysql
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["mysqld"]

@@ -22,7 +22,7 @@ services:
       context: ../../java/platform
       dockerfile: ../../deploy/docker/Dockerfile.java
       args:
-        GRADLE_DISTRIBUTION_URL: ${GRADLE_DISTRIBUTION_URL:-https://services.gradle.org/distributions/gradle-8.14.5-bin.zip}
+        GRADLE_DISTRIBUTION_URL: ${GRADLE_DISTRIBUTION_URL:-https://downloads.gradle.org/distributions/gradle-8.14.5-bin.zip}
         MAVEN_REPOSITORY_URL: ${MAVEN_REPOSITORY_URL:-}
     environment:
       SERVER_PORT: "8080"
@@ -53,7 +53,12 @@ services:
       - openeip
 
   mysql:
-    image: mysql:8.4.4@sha256:23818b7d7de427096ab1427b2e3d9d5e14a5b933f9a4431a482d6414bc879091
+    image: openeip-mysql:8.4.10-hardened
+    build:
+      context: ../docker
+      dockerfile: Dockerfile.mysql
+      args:
+        MYSQL_IMAGE: mysql:8.4.10@sha256:5700b0892591a760c4caef7a0024c887afd46317d73dd420801706e661c4db56
     environment:
       MYSQL_DATABASE: openeip
       MYSQL_USER: openeip

@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+if [ "$#" -lt 2 ]; then
+  echo "usage: gosu USER COMMAND [ARG...]" >&2
+  exit 64
+fi
+
+user="$1"
+shift
+
+case "$user" in
+  *:*) userspec="$user" ;;
+  *) userspec="$user:$user" ;;
+esac
+
+exec chroot --userspec="$userspec" / "$@"
