@@ -11,7 +11,7 @@
 | Partial dual write | Milvus write precedes Elasticsearch; index failure triggers scoped vector deletion | Compensation unit test | Passed |
 | Production fallback to test adapters | Production startup rejects deterministic embedding and memory repositories | Configuration/startup test | Passed |
 | Browser content injection | Excerpts and citations use React text rendering; no raw HTML path was added | Source review and frontend tests | Passed |
-| Vulnerable dependency or embedded secret | pip-audit, npm high-level audit, and Trivy vulnerability/misconfiguration/secret scan | Python clean; npm no HIGH/CRITICAL; Trivy 586-file snapshot clean | Passed |
+| Vulnerable dependency or embedded secret | pip-audit, npm audit, and Trivy vulnerability/misconfiguration/secret scan | Python clean; npm clean after React Router 7.18.1 upgrade; Trivy 586-file snapshot clean | Passed |
 
 ## Residual Risk
 
@@ -19,7 +19,5 @@
   durable outbox and automatic reconciliation remain required before stable release.
 - Elasticsearch has security disabled in the single-node development Compose. It is container-network
   scoped and the optional host mapping is loopback-only; production must add network and engine auth.
-- npm reports two MODERATE React Router advisories. No HIGH or CRITICAL issue is present under the OEP
-  gate; the router upgrade will be handled with dedicated compatibility testing.
 - External embedding quality, provider availability, multi-node recovery and capacity behavior are not
   established by deterministic alpha benchmarks.
