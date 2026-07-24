@@ -28,7 +28,7 @@ def _result(answer: str = "grounded answer") -> RagResult:
         answer,
         "fixture",
         "1",
-        (RagCitation("doc", "chunk", "a" * 64, 1.0),),
+        (RagCitation("doc", "chunk", "a" * 64, 1.0, "grounded excerpt", (1, 2), 0, 17),),
         1,
         1.0,
     )
@@ -53,7 +53,18 @@ async def test_stream_emits_ordered_bounded_tokens_and_done_citations() -> None:
     assert [item["sequence"] for item in token_data] == [0, 1, 2]
     assert "".join(str(item["token"]) for item in token_data) == "abcdefghij"
     done = json.loads(events[-1].splitlines()[1][6:])
-    assert done["citations"][0]["chunkId"] == "chunk"
+    assert done["citations"] == [
+        {
+            "documentId": "doc",
+            "chunkId": "chunk",
+            "sourceSha256": "a" * 64,
+            "score": 1.0,
+            "excerpt": "grounded excerpt",
+            "pages": [1, 2],
+            "startChar": 0,
+            "endChar": 17,
+        }
+    ]
     assert rag.calls == [("tenant", "base", "question", 5)]
 
 

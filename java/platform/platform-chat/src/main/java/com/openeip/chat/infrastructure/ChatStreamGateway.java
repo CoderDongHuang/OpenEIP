@@ -204,22 +204,53 @@ public class ChatStreamGateway {
   private static boolean validCitations(JsonNode citations) {
     Set<String> chunkIds = new HashSet<>();
     for (JsonNode citation : citations) {
-      if (!citation.isObject() || citation.size() != 4) {
+      if (!citation.isObject() || citation.size() != 8) {
         return false;
       }
       String documentId = optionalText(citation, "documentId");
       String chunkId = optionalText(citation, "chunkId");
       String sourceSha256 = optionalText(citation, "sourceSha256");
+      String excerpt = optionalText(citation, "excerpt");
       JsonNode scoreNode = citation.get("score");
+      JsonNode pagesNode = citation.get("pages");
+      JsonNode startCharNode = citation.get("startChar");
+      JsonNode endCharNode = citation.get("endChar");
       if (!UUID_PATTERN.matcher(documentId).matches()
           || !CHUNK_ID_PATTERN.matcher(chunkId).matches()
           || !SHA256_PATTERN.matcher(sourceSha256).matches()
           || scoreNode == null
-          || !scoreNode.isNumber()) {
+          || !scoreNode.isNumber()
+          || excerpt.length() > 500
+          || pagesNode == null
+          || !pagesNode.isArray()
+          || pagesNode.size() > 100
+          || startCharNode == null
+          || !startCharNode.isIntegralNumber()
+          || !startCharNode.canConvertToInt()
+          || endCharNode == null
+          || !endCharNode.isIntegralNumber()
+          || !endCharNode.canConvertToInt()) {
         return false;
       }
       double score = scoreNode.doubleValue();
-      if (!Double.isFinite(score) || score < -1 || score > 1 || !chunkIds.add(chunkId)) {
+      int startChar = startCharNode.intValue();
+      int endChar = endCharNode.intValue();
+      if (!Double.isFinite(score)
+          || score < -1
+          || score > 1
+          || startChar < 0
+          || endChar <= startChar
+          || !validPages(pagesNode)
+          || !chunkIds.add(chunkId)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static boolean validPages(JsonNode pages) {
+    for (JsonNode page : pages) {
+      if (!page.isIntegralNumber() || !page.canConvertToInt() || page.intValue() < 1) {
         return false;
       }
     }

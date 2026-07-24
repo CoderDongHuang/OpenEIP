@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+## [0.3.0-alpha] - 2026-07-24
+
 ### Added
 - v0.3 Knowledge：PDF、DOCX、PPTX、XLSX 的受限解析与页/范围级来源追踪（Issue #65）。
 - OpenAI-compatible Embedding、Milvus 持久向量检索、Elasticsearch 全文检索和确定性 RRF 混合排序。
