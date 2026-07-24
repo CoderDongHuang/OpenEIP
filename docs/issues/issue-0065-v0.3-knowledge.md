@@ -23,7 +23,7 @@ and frontend. Acceptance criteria and exclusions are canonical in the GitHub Iss
 | 11 Security Review | `issue-0065-security-review.md` | Complete |
 | 12 Quality Gate | `issue-0065-quality-gate.md` | Complete |
 | 13 Docs Update | API, SDD, storage, UI, testing, release and project metadata | Complete |
-| 14 Pull Request | Draft PR [#66](https://github.com/CoderDongHuang/OpenEIP/pull/66) | Complete |
+| 14 Pull Request | Implementation PR [#66](https://github.com/CoderDongHuang/OpenEIP/pull/66) and release PR [#68](https://github.com/CoderDongHuang/OpenEIP/pull/68) | Complete |
 | 15 Code Review | Independent release authorization: `WriteBigBug` merged security PR #67 after the review request | Complete |
-| 16 Merge | PR #66 (`4fabb74`) and release hardening PR #67 (`9b7b4e8`) merged | Complete |
-| 17 Release | Milestone-only; no tag or release exists yet | Pending |
+| 16 Merge | PR #66 (`4fabb74`), release hardening PR #67 (`9b7b4e8`), and release PR #68 (`5ff6cd3`) merged | Complete |
+| 17 Release | `v0.3.0-alpha` GitHub Pre-release and three attested GHCR images; workflow `30089638826` | Complete |
