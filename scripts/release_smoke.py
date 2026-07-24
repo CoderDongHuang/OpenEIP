@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the v0.2 release smoke flow through the public gateway."""
+"""Run the v0.3 release smoke flow through the public gateway."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from typing import Any
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-EXPECTED_VERSION = "0.2.0-alpha"
+EXPECTED_VERSION = "0.3.0-alpha"
 DEFAULT_TENANT_ID = "11111111-1111-4111-8111-111111111111"
 OCR_FIXTURE = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAXAAAAAkCAAAAAC1Gj62AAABGUlEQVR4nO2a0QrDIAxFdez/"
@@ -168,7 +168,7 @@ def run(client: SmokeClient) -> None:
     unique = uuid.uuid4().hex[:12]
     username = f"release_{unique}"
     password = "Release-Smoke-2026!"
-    text = b"OpenEIP release smoke verifies grounded retrieval across the complete MVP boundary."
+    text = b"OpenEIP release smoke verifies grounded retrieval across the complete Knowledge boundary."
 
     root = client.request("GET", "/")
     if b"OpenEIP" not in root.body:
@@ -224,7 +224,7 @@ def run(client: SmokeClient) -> None:
         client.json_request(
             "POST",
             "/api/v1/knowledge/bases",
-            {"name": f"Release smoke {unique}", "description": "v0.2 release verification"},
+            {"name": f"Release smoke {unique}", "description": "v0.3 release verification"},
             token=token,
             expected=(201,),
         )
@@ -273,7 +273,15 @@ def run(client: SmokeClient) -> None:
         "knowledgeBaseId": knowledge_base_id,
         "documentId": document_id,
         "chunks": [
-            {"chunkId": chunk["chunkId"], "text": chunk["text"], "sourceSha256": chunk["sha256"]} for chunk in chunks
+            {
+                "chunkId": chunk["chunkId"],
+                "text": chunk["text"],
+                "sourceSha256": chunk["sha256"],
+                "pages": chunk["pages"],
+                "startChar": chunk["startChar"],
+                "endChar": chunk["endChar"],
+            }
+            for chunk in chunks
         ],
     }
     embedded = require_envelope(
@@ -377,7 +385,7 @@ def main() -> int:
     except (AssertionError, OSError, ValueError, KeyError, json.JSONDecodeError) as error:
         print(f"FAIL: {error}", file=sys.stderr)
         return 1
-    print("PASS: v0.2.0-alpha full-stack release smoke", flush=True)
+    print("PASS: v0.3.0-alpha full-stack release smoke", flush=True)
     return 0
 
 

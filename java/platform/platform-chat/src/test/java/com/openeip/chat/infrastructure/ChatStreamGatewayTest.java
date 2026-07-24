@@ -59,12 +59,13 @@ class ChatStreamGatewayTest {
 
   @Test
   void validatesAndForwardsTokensThenPersistsCompleteAssistant() throws Exception {
-    response.set(token(0, "safe\\ntext") + done());
+    response.set(token(0, "safe\\ntext") + doneWithCitations(validCitation()));
     ByteArrayOutputStream output = new ByteArrayOutputStream();
     gateway("token").open(USER, context()).writeTo(output);
 
     String result = output.toString(StandardCharsets.UTF_8);
     assertThat(result).contains("event: token", "event: done").doesNotContain("event: error");
+    assertThat(result).contains("\"excerpt\":\"grounded excerpt\"", "\"pages\":[1,2]");
     assertThat(result.lines().filter(line -> line.startsWith("data: "))).hasSize(2);
     verify(sessions).complete(USER, SESSION, REQUEST, "safe\ntext");
     assertThat(receivedBody.get()).contains("\"knowledgeBaseId\":\"" + BASE + "\"");
@@ -90,17 +91,17 @@ class ChatStreamGatewayTest {
 
   @Test
   void rejectsMalformedOrDuplicateCitations() throws Exception {
-    String valid =
-        "{\"documentId\":\""
-            + USER
-            + "\",\"chunkId\":\"chk_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\","
-            + "\"sourceSha256\":\""
-            + "a".repeat(64)
-            + "\",\"score\":0.9}";
+    String valid = validCitation();
     for (String invalid :
         new String[] {
           valid.replace("chk_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bad"),
           valid.replace("\"score\":0.9", "\"score\":2"),
+          valid.replace(
+              "\"excerpt\":\"grounded excerpt\"", "\"excerpt\":\"" + "x".repeat(501) + "\""),
+          valid.replace("\"pages\":[1,2]", "\"pages\":[0]"),
+          valid.replace("\"pages\":[1,2]", "\"pages\":[1.5]"),
+          valid.replace("\"startChar\":0", "\"startChar\":-1"),
+          valid.replace("\"endChar\":17", "\"endChar\":0"),
           valid.substring(0, valid.length() - 1) + ",\"unexpected\":true}",
           valid + "," + valid
         }) {
@@ -109,7 +110,7 @@ class ChatStreamGatewayTest {
       gateway("token").open(USER, context()).writeTo(output);
       assertThat(output.toString(StandardCharsets.UTF_8)).contains("event: error");
     }
-    verify(sessions, org.mockito.Mockito.atLeast(4)).cancel(USER, SESSION, REQUEST);
+    verify(sessions, org.mockito.Mockito.atLeast(9)).cancel(USER, SESSION, REQUEST);
   }
 
   @Test
@@ -183,5 +184,15 @@ class ChatStreamGatewayTest {
         + "\",\"finishReason\":\"stop\",\"citations\":["
         + citations
         + "]}\n\n";
+  }
+
+  private static String validCitation() {
+    return "{\"documentId\":\""
+        + USER
+        + "\",\"chunkId\":\"chk_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\","
+        + "\"sourceSha256\":\""
+        + "a".repeat(64)
+        + "\",\"score\":0.9,\"excerpt\":\"grounded excerpt\",\"pages\":[1,2],"
+        + "\"startChar\":0,\"endChar\":17}";
   }
 }

@@ -44,12 +44,19 @@ components:
     Citation:
       type: object
       additionalProperties: false
-      required: [documentId, chunkId, sourceSha256, score]
+      required: [documentId, chunkId, sourceSha256, score, excerpt, pages, startChar, endChar]
       properties:
         documentId: { type: string, format: uuid }
-        chunkId: { type: string }
+        chunkId: { type: string, pattern: '^chk_[a-f0-9]{32}$' }
         sourceSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
         score: { type: number, minimum: -1, maximum: 1 }
+        excerpt: { type: string, maxLength: 500 }
+        pages:
+          type: array
+          maxItems: 100
+          items: { type: integer, minimum: 1 }
+        startChar: { type: integer, minimum: 0 }
+        endChar: { type: integer, minimum: 1 }
     RagData:
       type: object
       additionalProperties: false
