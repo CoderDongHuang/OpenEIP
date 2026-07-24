@@ -9,6 +9,10 @@ class SourceType(StrEnum):
 
     TEXT = "TEXT"
     OCR = "OCR"
+    PDF = "PDF"
+    DOCX = "DOCX"
+    PPTX = "PPTX"
+    XLSX = "XLSX"
 
 
 @dataclass(frozen=True)

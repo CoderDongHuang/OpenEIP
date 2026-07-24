@@ -35,12 +35,15 @@ describe('API client', () => {
       api.attachKnowledgeDocument(token, 'base', 'document'),
       api.processKnowledgeDocument(token, 'base', 'document'),
       api.retryKnowledgeDocument(token, 'base', 'document'),
+      api.searchKnowledge(token, 'base', 'invoice', 'HYBRID'),
       api.listSessions(token),
       api.createSession(token, 'base', 'Title'),
       api.getHistory(token, 'session'),
       api.listAgents(token),
     ]);
-    expect(fetchMock).toHaveBeenCalledTimes(19);
+    expect(fetchMock).toHaveBeenCalledTimes(20);
+    const search = requests.find((call) => String(call[0]).endsWith('/knowledge/bases/base/search'));
+    expect(search?.[1]?.body).toBe(JSON.stringify({ query: 'invoice', mode: 'HYBRID', topK: 10 }));
     const authenticated = requests.filter(
       (call) =>
         String(call[0]).includes('/api/v1/') &&

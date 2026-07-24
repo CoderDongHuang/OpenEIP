@@ -19,6 +19,14 @@ paths:
         content:
           text/plain:
             schema: { type: string, contentMediaType: 'text/plain; charset=utf-8' }
+          application/pdf:
+            schema: { type: string, contentEncoding: base64 }
+          application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+            schema: { type: string, contentEncoding: base64 }
+          application/vnd.openxmlformats-officedocument.presentationml.presentation:
+            schema: { type: string, contentEncoding: base64 }
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema: { type: string, contentEncoding: base64 }
           application/vnd.openeip.ocr-result.v1+json:
             schema:
               $ref: '../../contracts/ocr/ocr-result.v1.schema.json'
@@ -67,4 +75,3 @@ components:
               data: { type: 'null' }
               requestId: { type: string }
               timestamp: { type: string, format: date-time }
-

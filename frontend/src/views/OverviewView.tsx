@@ -27,28 +27,22 @@ export function OverviewView({ token, user }: { token: string; user: CurrentUser
     searchable: number;
     attention: number;
     processing: number;
-    processable: number;
-    storedOnly: number;
+    attached: number;
   }>();
   const [error, setError] = useState('');
   useEffect(() => {
     Promise.all([listFiles(token), listKnowledgeBases(token), listSessions(token), listAgents(token)])
       .then(async ([files, bases, sessions, agents]) => {
         const documents = (await Promise.all(bases.items.map((base) => listKnowledgeDocuments(token, base.id)))).flat();
-        const storedOnlyIds = new Set(
-          files.items.filter((file) => file.contentType === 'application/pdf').map((file) => file.id),
-        );
-        const processable = documents.filter((document) => !storedOnlyIds.has(document.documentId));
         setCounts({
           files: files.total,
           bases: bases.total,
           sessions: sessions.length,
           agents: agents.length,
-          searchable: processable.filter((document) => document.status === 'READY').length,
-          attention: processable.filter((document) => document.status === 'FAILED').length,
-          processing: processable.filter((document) => !['READY', 'FAILED'].includes(document.status)).length,
-          processable: processable.length,
-          storedOnly: documents.length - processable.length,
+          searchable: documents.filter((document) => document.status === 'READY').length,
+          attention: documents.filter((document) => document.status === 'FAILED').length,
+          processing: documents.filter((document) => !['READY', 'FAILED'].includes(document.status)).length,
+          attached: documents.length,
         });
       })
       .catch((reason) => setError(errorMessage(reason)));
@@ -91,7 +85,7 @@ export function OverviewView({ token, user }: { token: string; user: CurrentUser
             <Progress
               type="circle"
               size={58}
-              percent={counts.processable ? Math.round((counts.searchable / counts.processable) * 100) : 0}
+              percent={counts.attached ? Math.round((counts.searchable / counts.attached) * 100) : 0}
               strokeColor="#18745a"
             />
           </div>
@@ -113,8 +107,8 @@ export function OverviewView({ token, user }: { token: string; user: CurrentUser
             </div>
             <div>
               <InboxOutlined />
-              <span>Stored only</span>
-              <strong>{counts.storedOnly}</strong>
+              <span>Attached sources</span>
+              <strong>{counts.attached}</strong>
             </div>
           </div>
         </section>

@@ -12,7 +12,7 @@ class DocumentParsingService:
     """Create bounded traceable chunks from one validated source."""
 
     name = "openeip-text-parser"
-    version = "1.0.0"
+    version = "2.0.0"
 
     def __init__(self, decoder: DocumentInputDecoder, chunk_size: int, overlap: int, max_chunks: int) -> None:
         if chunk_size < 1 or overlap < 0 or overlap >= chunk_size or max_chunks < 1:

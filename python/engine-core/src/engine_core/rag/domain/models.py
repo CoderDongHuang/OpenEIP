@@ -12,6 +12,9 @@ class RagContext:
     text: str
     source_sha256: str
     score: float
+    pages: tuple[int, ...] = ()
+    start_char: int = 0
+    end_char: int = 0
 
 
 @dataclass(frozen=True)
@@ -32,6 +35,10 @@ class RagCitation:
     chunk_id: str
     source_sha256: str
     score: float
+    excerpt: str = ""
+    pages: tuple[int, ...] = ()
+    start_char: int = 0
+    end_char: int = 0
 
 
 @dataclass(frozen=True)

@@ -13,12 +13,17 @@ import org.springframework.util.StringUtils;
 public class FileUploadPolicy {
 
   private static final Map<String, String> SUFFIX_TYPES =
-      Map.of(
-          "txt", "text/plain",
-          "pdf", "application/pdf",
-          "png", "image/png",
-          "jpg", "image/jpeg",
-          "jpeg", "image/jpeg");
+      Map.ofEntries(
+          Map.entry("txt", "text/plain"),
+          Map.entry("pdf", "application/pdf"),
+          Map.entry(
+              "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+          Map.entry(
+              "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
+          Map.entry("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+          Map.entry("png", "image/png"),
+          Map.entry("jpg", "image/jpeg"),
+          Map.entry("jpeg", "image/jpeg"));
 
   public UploadDescriptor validate(
       String originalFilename, String declaredContentType, long declaredSize, long maxBytes) {

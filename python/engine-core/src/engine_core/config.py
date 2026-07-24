@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Global application settings."""
 
-    version: str = "0.2.0-alpha"
+    version: str = "0.3.0-alpha"
 
     # Server
     host: str = "0.0.0.0"
@@ -25,9 +25,14 @@ class Settings(BaseSettings):
     # Milvus
     milvus_host: str = "localhost"
     milvus_port: int = 19530
+    milvus_uri: str = "http://localhost:19530"
+    milvus_token: SecretStr = SecretStr("")
+    milvus_collection: str = "openeip_chunks_v1"
 
     # Elasticsearch
     es_host: str = "http://localhost:9200"
+    es_api_key: SecretStr = SecretStr("")
+    es_chunk_index: str = "openeip-chunks-v1"
 
     # Redis
     redis_url: str = "redis://localhost:6379/0"
@@ -41,7 +46,7 @@ class Settings(BaseSettings):
     ocr_max_pixels: int = 20_000_000
 
     # Document parsing internal API
-    parsing_max_body_bytes: int = 2 * 1024 * 1024
+    parsing_max_body_bytes: int = 10 * 1024 * 1024
     parsing_chunk_size: int = 1000
     parsing_chunk_overlap: int = 100
     parsing_max_chunks: int = 10_000
@@ -51,6 +56,7 @@ class Settings(BaseSettings):
     embedding_provider: str = "deterministic"
     embedding_repository_backend: str = "memory"
     embedding_dimension: int = 64
+    embedding_model: str = "text-embedding-3-small"
     embedding_max_body_bytes: int = 128 * 1024
     embedding_max_batch_size: int = 32
     embedding_max_text_chars: int = 8192

@@ -48,6 +48,10 @@ describe('SseParser', () => {
       chunkId: `chk_${'a'.repeat(32)}`,
       sourceSha256: 'a'.repeat(64),
       score: 0.9,
+      excerpt: 'bounded source text',
+      pages: [1],
+      startChar: 0,
+      endChar: 19,
       unexpected: true,
     },
   ])('rejects malformed citation data', (citation) => {
@@ -66,6 +70,10 @@ describe('SseParser', () => {
       chunkId: `chk_${'a'.repeat(32)}`,
       sourceSha256: 'a'.repeat(64),
       score: 0.9,
+      excerpt: 'bounded source text',
+      pages: [1],
+      startChar: 0,
+      endChar: 19,
     };
     const frame = `event: done\ndata: ${JSON.stringify({
       requestId: request,

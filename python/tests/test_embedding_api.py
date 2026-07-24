@@ -114,7 +114,7 @@ def test_production_rejects_memory_repository_and_requires_explicit_adapters() -
     with pytest.raises(ValueError, match="provider"):
         create_app(Settings(embedding_provider="external"))
     with pytest.raises(ValueError, match="repository"):
-        create_app(Settings(embedding_repository_backend="milvus"))
+        create_app(Settings(embedding_repository_backend="unsupported"))
 
 
 def test_runtime_openapi_source_and_event_contract_are_synchronized() -> None:

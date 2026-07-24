@@ -12,6 +12,12 @@ from engine_core.parsing.shared.errors import DocumentParsingError
 
 TEXT_MEDIA_TYPE = "text/plain"
 OCR_MEDIA_TYPE = "application/vnd.openeip.ocr-result.v1+json"
+PDF_MEDIA_TYPE = "application/pdf"
+OFFICE_MEDIA_TYPES = {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": SourceType.DOCX,
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": SourceType.PPTX,
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": SourceType.XLSX,
+}
 
 
 class _DuplicateKeyError(ValueError):
@@ -80,11 +86,19 @@ class DocumentInputDecoder:
             if parameters:
                 raise DocumentParsingError("DOC-V-004", "OCR media type does not accept parameters", 415)
             return self._decode_ocr(content)
+        if media_type == PDF_MEDIA_TYPE and not parameters:
+            from engine_core.parsing.infrastructure.office_decoder import decode_pdf
+
+            return decode_pdf(content)
+        if media_type in OFFICE_MEDIA_TYPES and not parameters:
+            from engine_core.parsing.infrastructure.office_decoder import decode_ooxml
+
+            return decode_ooxml(content, OFFICE_MEDIA_TYPES[media_type])
         raise DocumentParsingError("DOC-V-004", "Unsupported document media type", 415)
 
     def _decode_text(self, content: bytes) -> NormalizedDocument:
         text = _strict_utf8(content)
-        normalized = _normalize_text(text)
+        normalized = normalize_text(text)
         return NormalizedDocument(
             source_type=SourceType.TEXT,
             source_sha256=sha256(content).hexdigest(),
@@ -108,7 +122,7 @@ class DocumentInputDecoder:
         spans: list[PageSpan] = []
         offset = 0
         for block in result.blocks:
-            normalized_block = _normalize_text(block.text, allow_empty=True)
+            normalized_block = normalize_text(block.text, allow_empty=True)
             if not normalized_block:
                 continue
             if parts:
@@ -149,7 +163,7 @@ def _strict_utf8(content: bytes) -> str:
         raise DocumentParsingError("DOC-V-006", "Document is not valid UTF-8", 400) from error
 
 
-def _normalize_text(text: str, *, allow_empty: bool = False) -> str:
+def normalize_text(text: str, *, allow_empty: bool = False) -> str:
     normalized = unicodedata.normalize("NFC", text.replace("\r\n", "\n").replace("\r", "\n"))
     for character in normalized:
         if unicodedata.category(character) == "Cc" and character not in {"\n", "\t"}:

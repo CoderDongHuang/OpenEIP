@@ -9,7 +9,7 @@ v0.1 ──→ Foundation          已发布 alpha
 v0.2 ──→ MVP                 alpha 已发布，修订中
          登录 / RBAC / 文件上传 / OCR / 知识库 / RAG / Chat / Agent
 
-v0.3 ──→ Knowledge           规划中
+v0.3 ──→ Knowledge           alpha 开发中
          文档解析 / Embedding / 全文检索 / 向量检索 / Citation
 
 v0.4 ──→ Workflow            规划中
@@ -43,6 +43,7 @@ v1.0 ──→ LTS                 规划中
 | Phase 1：Architecture Baseline | 已完成 | PRD/SAD/SDD 与脚手架通过本地发布验证；首次 PR 需再通过 CI |
 | Phase 1.5：Technical Validation | 已完成 | 5 个 Spike 已形成可复现数据，ADR-0004 已接受 |
 | Phase 2：MVP Development | alpha 已发布，修订中 | `v0.2.0-alpha` 已于 2026-07-22 发布；Issue #63 正在补齐恢复路径、权限校验、工作台体验与发布证据 |
+| Phase 3：Knowledge | 开发中 | Issue #65 按 OEP 17 步交付文档解析、生产 Embedding、全文/向量/混合检索与 Citation |
 
 ## 当前发布边界
 

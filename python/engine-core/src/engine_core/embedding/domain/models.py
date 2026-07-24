@@ -10,6 +10,9 @@ class EmbeddingChunk:
     chunk_id: str
     text: str
     source_sha256: str
+    pages: tuple[int, ...] = ()
+    start_char: int = 0
+    end_char: int = 0
 
 
 @dataclass(frozen=True)
@@ -63,6 +66,9 @@ class VectorRecord:
     model: str
     model_version: str
     vector: tuple[float, ...]
+    pages: tuple[int, ...] = ()
+    start_char: int = 0
+    end_char: int = 0
 
 
 @dataclass(frozen=True)
@@ -74,3 +80,6 @@ class VectorSearchResult:
     text: str
     score: float
     source_sha256: str
+    pages: tuple[int, ...] = ()
+    start_char: int = 0
+    end_char: int = 0

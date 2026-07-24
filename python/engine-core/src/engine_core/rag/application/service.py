@@ -46,7 +46,12 @@ class RagService:
         query_vector = batch[0]
         self._validate_vector(query_vector)
         try:
-            matches = self._repository.search(tenant_id, knowledge_base_id, query_vector, top_k)
+            hybrid_search = getattr(self._repository, "search_hybrid", None)
+            matches = (
+                hybrid_search(tenant_id, knowledge_base_id, question, query_vector, top_k)
+                if hybrid_search is not None
+                else self._repository.search(tenant_id, knowledge_base_id, query_vector, top_k)
+            )
         except Exception as exception:
             raise RagError("RAG-S-001", "RAG provider is unavailable", 503) from exception
         prompt, contexts = self._prompt_builder.build(question, matches)
@@ -74,6 +79,10 @@ class RagService:
                 chunk_id,
                 by_chunk[chunk_id].source_sha256,
                 by_chunk[chunk_id].score,
+                by_chunk[chunk_id].text[:500],
+                by_chunk[chunk_id].pages,
+                by_chunk[chunk_id].start_char,
+                by_chunk[chunk_id].end_char,
             )
             for chunk_id in provider_answer.cited_chunk_ids
         )

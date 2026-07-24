@@ -1,6 +1,6 @@
 # Document Parsing Module Design (Sub-SDD)
 
-> Version: 1.0 | Date: 2026-07-22 | Status: Approved for Implementation
+> Version: 2.0 | Date: 2026-07-24 | Status: Implemented for v0.3
 > Issue: [#46](https://github.com/CoderDongHuang/OpenEIP/issues/46)
 
 ## 1. Responsibilities and Boundaries
@@ -9,9 +9,9 @@
 bounded traceable chunks, and produces a deterministic parsed-result contract. It does not read object
 storage, authorize a file, persist knowledge records, generate embeddings, or publish Kafka messages.
 
-The parser/chunker ports are internal Python boundaries, not public Plugin SPIs. PDF and Office format
-parsers, semantic chunking, tables, layout reconstruction, and production extraction accuracy remain
-v0.3 work.
+The parser/chunker ports are internal Python boundaries, not public Plugin SPIs. v0.3 adds bounded PDF,
+DOCX, PPTX, and XLSX adapters with page/slide/sheet attribution. Semantic chunking, complex table/layout
+reconstruction, macros, encrypted files, and handwritten OCR remain out of scope.
 
 ## 2. API and Input Contract
 
@@ -72,4 +72,3 @@ not be claimed by the parser.
 
 This module adds a Python API and two Schemas. It changes no Auth/File Upload/OCR API, database
 migration, SDK, or public Plugin SPI. Existing OCR results remain valid input without transformation.
-

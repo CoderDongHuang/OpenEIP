@@ -42,6 +42,9 @@ class PromptBuilder:
                 text,
                 match.source_sha256,
                 match.score,
+                match.pages,
+                match.start_char,
+                match.end_char,
             )
             contexts.append(context)
             blocks.append(

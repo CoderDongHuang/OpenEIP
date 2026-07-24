@@ -1,0 +1,16 @@
+{
+  "module": "rag",
+  "operation": "deterministic embed, 1,000-record scoped search, prompt, answer, citation verify",
+  "dimension": 64,
+  "recordCount": 1000,
+  "topK": 5,
+  "warmups": 5,
+  "samples": 100,
+  "p50Ms": 5.06,
+  "p95Ms": 7.181,
+  "p99Ms": 8.662,
+  "queriesPerSecondAtP50": 197.62,
+  "top1ExactMatch": true,
+  "thresholdP99Ms": 50,
+  "result": "PASS"
+}
