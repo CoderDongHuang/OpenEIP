@@ -1,0 +1,392 @@
+openapi: 3.1.0
+info:
+  title: OpenEIP Workflow API
+  version: 1.0.0
+  description: Tenant-scoped Workflow definition, execution, trigger, approval, retry, and event APIs.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+paths:
+  /workflows:
+    get:
+      operationId: listWorkflows
+      parameters: [{ $ref: '#/components/parameters/Page' }, { $ref: '#/components/parameters/Size' }]
+      responses:
+        '200': { $ref: '#/components/responses/WorkflowPage' }
+        '401': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: createWorkflow
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateWorkflow' } } }
+      responses:
+        '201': { $ref: '#/components/responses/Workflow' }
+        '400': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /workflows/{workflowId}:
+    parameters: [{ $ref: '#/components/parameters/WorkflowId' }]
+    get:
+      operationId: getWorkflow
+      responses:
+        '200': { $ref: '#/components/responses/Workflow' }
+        '404': { $ref: '#/components/responses/Error' }
+    patch:
+      operationId: updateWorkflowDraft
+      parameters: [{ $ref: '#/components/parameters/IfMatch' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/UpdateWorkflow' } } }
+      responses:
+        '200': { $ref: '#/components/responses/Workflow' }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+    delete:
+      operationId: deleteWorkflow
+      responses:
+        '204': { description: Soft deleted }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /workflows/{workflowId}/validate:
+    post:
+      operationId: validateWorkflowDraft
+      parameters: [{ $ref: '#/components/parameters/WorkflowId' }]
+      responses:
+        '200': { $ref: '#/components/responses/Validation' }
+        '404': { $ref: '#/components/responses/Error' }
+  /workflows/{workflowId}/publish:
+    post:
+      operationId: publishWorkflow
+      parameters: [{ $ref: '#/components/parameters/WorkflowId' }, { $ref: '#/components/parameters/IfMatch' }]
+      responses:
+        '201': { $ref: '#/components/responses/Version' }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /workflows/{workflowId}/versions:
+    get:
+      operationId: listWorkflowVersions
+      parameters: [{ $ref: '#/components/parameters/WorkflowId' }]
+      responses:
+        '200': { $ref: '#/components/responses/VersionList' }
+        '404': { $ref: '#/components/responses/Error' }
+  /workflows/{workflowId}/versions/{version}/restore:
+    post:
+      operationId: restoreWorkflowVersion
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+        - { name: version, in: path, required: true, schema: { type: integer, minimum: 1 } }
+      responses:
+        '200': { $ref: '#/components/responses/Workflow' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /workflows/{workflowId}/executions:
+    get:
+      operationId: listWorkflowExecutions
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200': { $ref: '#/components/responses/ExecutionPage' }
+        '404': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: triggerWorkflowExecution
+      parameters: [{ $ref: '#/components/parameters/WorkflowId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/TriggerExecution' } } }
+      responses:
+        '202': { $ref: '#/components/responses/Execution' }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /workflow-executions/{executionId}:
+    get:
+      operationId: getWorkflowExecution
+      parameters: [{ $ref: '#/components/parameters/ExecutionId' }]
+      responses:
+        '200': { $ref: '#/components/responses/Execution' }
+        '404': { $ref: '#/components/responses/Error' }
+  /workflow-executions/{executionId}/cancel:
+    post:
+      operationId: cancelWorkflowExecution
+      parameters: [{ $ref: '#/components/parameters/ExecutionId' }]
+      responses:
+        '202': { $ref: '#/components/responses/Execution' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /workflow-executions/{executionId}/nodes/{nodeId}/retry:
+    post:
+      operationId: retryWorkflowNode
+      parameters:
+        - $ref: '#/components/parameters/ExecutionId'
+        - { name: nodeId, in: path, required: true, schema: { $ref: '#/components/schemas/NodeId' } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202': { $ref: '#/components/responses/Execution' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /workflow-executions/{executionId}/events:
+    get:
+      operationId: listWorkflowExecutionEvents
+      parameters:
+        - $ref: '#/components/parameters/ExecutionId'
+        - { name: after, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+      responses:
+        '200': { $ref: '#/components/responses/EventList' }
+        '404': { $ref: '#/components/responses/Error' }
+  /workflow-executions/{executionId}/events:stream:
+    get:
+      operationId: streamWorkflowExecutionEvents
+      parameters:
+        - $ref: '#/components/parameters/ExecutionId'
+        - { name: Last-Event-ID, in: header, schema: { type: integer, minimum: 0 } }
+      responses:
+        '200':
+          description: Ordered SSE execution events and heartbeats
+          content: { text/event-stream: { schema: { type: string } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /workflow-approvals/{approvalId}/decisions:
+    post:
+      operationId: decideWorkflowApproval
+      parameters:
+        - { name: approvalId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ApprovalDecision' } } }
+      responses:
+        '200': { $ref: '#/components/responses/Execution' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /workflows/{workflowId}/triggers:
+    get:
+      operationId: listWorkflowTriggers
+      parameters: [{ $ref: '#/components/parameters/WorkflowId' }]
+      responses:
+        '200': { $ref: '#/components/responses/TriggerList' }
+        '404': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: createWorkflowTrigger
+      parameters: [{ $ref: '#/components/parameters/WorkflowId' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateTrigger' } } }
+      responses:
+        '201': { $ref: '#/components/responses/Trigger' }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /workflow-hooks/{hookId}:
+    post:
+      operationId: invokeWorkflowWebhook
+      security: []
+      parameters:
+        - { name: hookId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: X-Workflow-Hook-Secret, in: header, required: true, schema: { type: string, minLength: 32, maxLength: 128 } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, maxProperties: 100, additionalProperties: true } } }
+      responses:
+        '202': { $ref: '#/components/responses/Execution' }
+        '401': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '413': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    WorkflowId: { name: workflowId, in: path, required: true, schema: { type: string, format: uuid } }
+    ExecutionId: { name: executionId, in: path, required: true, schema: { type: string, format: uuid } }
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    Size: { name: size, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+    IfMatch: { name: If-Match, in: header, required: true, schema: { type: integer, minimum: 0 } }
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, pattern: '^[A-Za-z0-9._:-]{1,128}$' } }
+  schemas:
+    NodeId: { type: string, pattern: '^[A-Za-z][A-Za-z0-9_-]{0,63}$' }
+    CreateWorkflow:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        description: { type: string, maxLength: 2000, default: '' }
+    UpdateWorkflow:
+      type: object
+      additionalProperties: false
+      required: [name, description, graph]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        description: { type: string, maxLength: 2000 }
+        graph: { $ref: '#/components/schemas/WorkflowGraph' }
+    WorkflowGraph:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, nodes, edges]
+      properties:
+        schemaVersion: { type: integer, const: 1 }
+        nodes: { type: array, minItems: 2, maxItems: 100, items: { $ref: '#/components/schemas/WorkflowNode' } }
+        edges: { type: array, minItems: 1, maxItems: 200, items: { $ref: '#/components/schemas/WorkflowEdge' } }
+    WorkflowNode:
+      type: object
+      additionalProperties: false
+      required: [id, type, schemaVersion, position, config]
+      properties:
+        id: { $ref: '#/components/schemas/NodeId' }
+        type: { type: string, enum: [START, END, LLM, AGENT, TOOL, CONDITION, LOOP, APPROVAL, DELAY, WEBHOOK] }
+        schemaVersion: { type: integer, const: 1 }
+        position:
+          type: object
+          additionalProperties: false
+          required: [x, y]
+          properties:
+            x: { type: number, minimum: -100000, maximum: 100000 }
+            y: { type: number, minimum: -100000, maximum: 100000 }
+        config: { type: object, maxProperties: 50, additionalProperties: true }
+    WorkflowEdge:
+      type: object
+      additionalProperties: false
+      required: [id, source, sourcePort, target, targetPort]
+      properties:
+        id: { $ref: '#/components/schemas/NodeId' }
+        source: { $ref: '#/components/schemas/NodeId' }
+        sourcePort: { type: string, pattern: '^[A-Za-z][A-Za-z0-9_-]{0,31}$' }
+        target: { $ref: '#/components/schemas/NodeId' }
+        targetPort: { type: string, pattern: '^[A-Za-z][A-Za-z0-9_-]{0,31}$' }
+    Workflow:
+      type: object
+      additionalProperties: false
+      required: [id, name, description, role, status, draftRevision, graph, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        role: { type: string, enum: [OWNER, EDITOR, RUNNER, APPROVER, VIEWER] }
+        status: { type: string, enum: [DRAFT, PUBLISHED, ARCHIVED] }
+        draftRevision: { type: integer, minimum: 0 }
+        publishedVersion: { type: [integer, 'null'], minimum: 1 }
+        graph: { $ref: '#/components/schemas/WorkflowGraph' }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    WorkflowVersion:
+      type: object
+      additionalProperties: false
+      required: [workflowId, version, graphSha256, graph, publishedBy, publishedAt]
+      properties:
+        workflowId: { type: string, format: uuid }
+        version: { type: integer, minimum: 1 }
+        graphSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+        graph: { $ref: '#/components/schemas/WorkflowGraph' }
+        publishedBy: { type: string, format: uuid }
+        publishedAt: { type: string, format: date-time }
+    TriggerExecution:
+      type: object
+      additionalProperties: false
+      properties:
+        input: { type: object, maxProperties: 100, additionalProperties: true, default: {} }
+    WorkflowExecution:
+      type: object
+      additionalProperties: false
+      required: [id, workflowId, workflowVersion, status, triggerType, currentSequence, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        workflowId: { type: string, format: uuid }
+        workflowVersion: { type: integer, minimum: 1 }
+        status: { type: string, enum: [QUEUED, RUNNING, WAITING_APPROVAL, WAITING_DELAY, RETRY_WAIT, CANCELLING, SUCCEEDED, FAILED, CANCELLED] }
+        triggerType: { type: string, enum: [MANUAL, WEBHOOK, CRON, EVENT] }
+        currentSequence: { type: integer, minimum: 0 }
+        failureCode: { type: [string, 'null'], pattern: '^WF-[A-Z]-[0-9]{3}$' }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        completedAt: { type: [string, 'null'], format: date-time }
+    ExecutionEvent:
+      type: object
+      additionalProperties: false
+      required: [executionId, sequence, type, occurredAt, data]
+      properties:
+        executionId: { type: string, format: uuid }
+        sequence: { type: integer, minimum: 1 }
+        type: { type: string, pattern: '^workflow\.[a-z.]+$' }
+        nodeId: { type: [string, 'null'], maxLength: 64 }
+        occurredAt: { type: string, format: date-time }
+        data: { type: object, maxProperties: 20, additionalProperties: true }
+    ApprovalDecision:
+      type: object
+      additionalProperties: false
+      required: [decision]
+      properties:
+        decision: { type: string, enum: [APPROVE, REJECT] }
+        comment: { type: string, maxLength: 1000, default: '' }
+    CreateTrigger:
+      type: object
+      additionalProperties: false
+      required: [type, enabled, config]
+      properties:
+        type: { type: string, enum: [WEBHOOK, CRON, EVENT] }
+        enabled: { type: boolean }
+        config: { type: object, maxProperties: 20, additionalProperties: true }
+    WorkflowTrigger:
+      type: object
+      additionalProperties: false
+      required: [id, workflowId, type, enabled, config, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        workflowId: { type: string, format: uuid }
+        type: { type: string, enum: [WEBHOOK, CRON, EVENT] }
+        enabled: { type: boolean }
+        config: { type: object, maxProperties: 20, additionalProperties: true }
+        secret: { type: string, minLength: 32, maxLength: 128, writeOnly: true }
+        createdAt: { type: string, format: date-time }
+    ValidationResult:
+      type: object
+      additionalProperties: false
+      required: [valid, errors]
+      properties:
+        valid: { type: boolean }
+        errors:
+          type: array
+          maxItems: 200
+          items:
+            type: object
+            additionalProperties: false
+            required: [code, message]
+            properties:
+              code: { type: string, pattern: '^WF-V-[0-9]{3}$' }
+              nodeId: { type: [string, 'null'], maxLength: 64 }
+              message: { type: string, maxLength: 200 }
+    SuccessEnvelope:
+      type: object
+      required: [code, message, data, requestId, timestamp]
+      properties:
+        code: { type: integer, const: 0 }
+        message: { type: string, const: success }
+        data: {}
+        requestId: { type: string, maxLength: 128 }
+        timestamp: { type: string, format: date-time }
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [code, message, data, requestId, timestamp]
+      properties:
+        code: { type: string, pattern: '^WF-[A-Z]-[0-9]{3}$' }
+        message: { type: string, maxLength: 200 }
+        data: { type: 'null' }
+        requestId: { type: string, maxLength: 128 }
+        timestamp: { type: string, format: date-time }
+  responses:
+    Workflow: { description: Workflow, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessEnvelope' } } } }
+    WorkflowPage: { description: Workflow page, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessEnvelope' } } } }
+    Version: { description: Immutable version, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessEnvelope' } } } }
+    VersionList: { description: Immutable versions, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessEnvelope' } } } }
+    Validation: { description: Validation result, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessEnvelope' } } } }
+    Execution: { description: Workflow execution, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessEnvelope' } } } }
+    ExecutionPage: { description: Execution page, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessEnvelope' } } } }
+    EventList: { description: Ordered sanitized events, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessEnvelope' } } } }
+    Trigger: { description: Trigger with one-time webhook secret when applicable, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessEnvelope' } } } }
+    TriggerList: { description: Triggers without secrets, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessEnvelope' } } } }
+    Error:
+      description: Stable error without secrets, raw trigger data, node output, SQL, or provider details
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } } }

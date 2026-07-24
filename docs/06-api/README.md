@@ -10,6 +10,7 @@
 - [Agent API v1 OpenAPI](agent-v1.openapi.yaml)
 - [Knowledge Base and Processing API v1 OpenAPI](knowledge-base-v1.openapi.yaml)
 - [Chat API v1 OpenAPI](chat-v1.openapi.yaml)
+- [Workflow API v1 OpenAPI](workflow-v1.openapi.yaml)
 
 ## 待完成
 

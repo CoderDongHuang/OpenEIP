@@ -7,6 +7,7 @@
 
 - [Auth Database Design](auth-schema.md)
 - [File Upload Database Design](file-upload-schema.md)
+- [Workflow Persistence Schema](workflow-schema.md)
 
 ## 待完成
 

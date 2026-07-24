@@ -15,10 +15,11 @@
 | [ADR-0006](adr-0006-file-storage-consistency.md) | File Storage Consistency and Security Boundary | Accepted |
 | [ADR-0007](adr-0007-agent-runtime-safety-memory.md) | Agent Runtime Safety and Memory | Accepted |
 | [ADR-0008](adr-0008-synchronous-ingestion-orchestration.md) | Synchronous Ingestion Orchestration for the Single-Node MVP | Accepted |
+| [ADR-0009](adr-0009-hybrid-retrieval-storage.md) | Milvus and Elasticsearch Hybrid Retrieval | Accepted |
+| [ADR-0010](adr-0010-durable-state-machine-outbox.md) | MySQL Durable State Machine and Transactional Outbox | Accepted |
 
 ## ADR 编号规则
 
 ```
 ADR-0001    ← 顺序编号，永不重复
 ```
-# ADR-0009: [Hybrid Retrieval Storage](adr-0009-hybrid-retrieval-storage.md)
