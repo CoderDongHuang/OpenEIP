@@ -18,8 +18,8 @@
 
 - [x] [Auth SDD](auth-module.md)
 - [x] [File Upload SDD](file-upload-module.md)
-- [ ] Knowledge SDD
-- [ ] Workflow SDD
+- [x] [Knowledge Base SDD](knowledge-base-module.md)
+- [x] [Workflow SDD](workflow-module.md)
 - [ ] Connector SDD
 - [x] [Agent SDD](agent-module.md)
 - [x] [Operational Frontend Workspace SDD](operational-frontend-module.md)
