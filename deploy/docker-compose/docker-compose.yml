@@ -137,6 +137,7 @@ services:
 
   milvus:
     image: milvusdb/milvus:v2.6.0
+    restart: unless-stopped
     command: ["milvus", "run", "standalone"]
     ports:
       - "127.0.0.1:19530:19530"

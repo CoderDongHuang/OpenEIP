@@ -19,7 +19,7 @@ Approved for implementation against RFC-0006 and ADR-0010.
 
 ## Implementation Conditions
 
-The implementation PR must include MySQL migration tests, restart/lease recovery, trigger and approval
+The implementation PR must include MySQL migration tests, single-node restart continuation, trigger and approval
 race tests, strict OpenAPI/event contract checks, bounded output tests, outbox delivery/deduplication,
 public-gateway smoke, and an interactive Canvas verified at desktop and mobile viewports.
 

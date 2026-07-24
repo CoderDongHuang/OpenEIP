@@ -896,6 +896,141 @@ textarea {
   display: none;
 }
 
+.workflow-page {
+  height: calc(100vh - 112px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.workflow-toolbar {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px;
+  background: #fff;
+  border: 1px solid #dce2df;
+}
+.workflow-toolbar .ant-select {
+  width: 140px;
+}
+.workflow-workspace {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 230px minmax(420px, 1fr) 320px;
+  background: #fff;
+  border: 1px solid #dce2df;
+  overflow: hidden;
+}
+.workflow-rail,
+.workflow-inspector {
+  min-height: 0;
+  overflow-y: auto;
+  background: #f8faf9;
+}
+.workflow-rail {
+  border-right: 1px solid #dce2df;
+}
+.workflow-rail .rail-heading {
+  background: #f8faf9;
+}
+.workflow-rail .ant-list-item,
+.run-panel > .ant-list .ant-list-item {
+  cursor: pointer;
+  padding: 12px 14px;
+  border-inline-start: 3px solid transparent;
+}
+.workflow-rail .ant-list-item.selected,
+.run-panel > .ant-list .ant-list-item.selected {
+  background: #e8f3ee;
+  border-inline-start-color: #18745a;
+}
+.workflow-canvas {
+  min-width: 0;
+  min-height: 480px;
+  background: #f3f6f5;
+}
+.workflow-canvas > .ant-empty {
+  margin-top: 18vh;
+}
+.workflow-canvas .react-flow__node {
+  width: 156px;
+  min-height: 52px;
+  display: grid;
+  place-items: center;
+  color: #1b2823;
+  background: #fff;
+  border: 1px solid #8fa69d;
+  border-left: 4px solid #278062;
+  border-radius: 5px;
+  box-shadow: 0 5px 12px rgb(22 45 36 / 8%);
+  font-weight: 600;
+}
+.workflow-canvas .react-flow__node.selected {
+  border-color: #15684f;
+  box-shadow: 0 0 0 2px rgb(24 116 90 / 18%);
+}
+.workflow-canvas .react-flow__handle {
+  width: 9px;
+  height: 9px;
+  background: #3f6557;
+}
+.workflow-canvas .react-flow__controls,
+.workflow-canvas .react-flow__minimap {
+  border: 1px solid #ccd6d2;
+  border-radius: 4px;
+  box-shadow: none;
+}
+.workflow-inspector {
+  border-left: 1px solid #dce2df;
+  background: #fff;
+}
+.workflow-inspector > .ant-segmented {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 10px;
+  width: calc(100% - 20px);
+}
+.node-inspector,
+.run-panel,
+.trigger-panel {
+  padding: 12px 14px 20px;
+}
+.node-inspector > .ant-space {
+  margin-bottom: 20px;
+}
+.node-inspector label {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+.node-inspector .ant-input-number {
+  width: 100%;
+}
+.inspector-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.run-panel .ant-timeline {
+  margin-top: 24px;
+}
+.run-panel .ant-timeline small {
+  display: block;
+  margin: 2px 0 7px;
+  color: #68746f;
+  overflow-wrap: anywhere;
+}
+.trigger-panel > .ant-btn {
+  margin-bottom: 10px;
+}
+.trigger-panel .ant-list-item-meta-description {
+  overflow-wrap: anywhere;
+}
+
 .mobile-drawer .ant-drawer-body {
   padding: 0;
   background: #202629;
@@ -944,6 +1079,20 @@ textarea {
   .agent-controls {
     border-right: 0;
     border-bottom: 1px solid #dce2df;
+  }
+  .workflow-page {
+    height: auto;
+  }
+  .workflow-workspace {
+    grid-template-columns: 190px minmax(400px, 1fr);
+    grid-template-rows: minmax(540px, 65vh) auto;
+    overflow-x: auto;
+  }
+  .workflow-inspector {
+    grid-column: 1 / -1;
+    min-height: 280px;
+    border-top: 1px solid #dce2df;
+    border-left: 0;
   }
 }
 
@@ -1076,6 +1225,33 @@ textarea {
   .agent-controls,
   .agent-result {
     padding: 16px;
+  }
+  .workflow-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .workflow-toolbar > .ant-space {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .workflow-toolbar .ant-select,
+  .workflow-toolbar .ant-btn {
+    width: 100%;
+  }
+  .workflow-workspace {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+  .workflow-rail {
+    max-height: 220px;
+    border-right: 0;
+    border-bottom: 1px solid #dce2df;
+  }
+  .workflow-canvas {
+    height: 560px;
+    min-height: 560px;
+    flex: 0 0 560px;
   }
 }
 

@@ -5,23 +5,24 @@
 ## User Workflow
 
 The Workflow route opens the operational editor, not a marketing page. A compact definition/version
-rail sits beside a full-height `@xyflow/react` Canvas. The top toolbar provides save, validate, publish,
-run, undo/redo, zoom-to-fit, and execution view controls. A right inspector edits the selected node or
-edge. A bottom execution panel shows ordered node status, approvals, retry actions, and sanitized output.
+rail sits beside a full-height `@xyflow/react` Canvas. The top toolbar provides node insertion, save,
+validate, publish, run, version history, and Canvas zoom controls. A right inspector edits the selected
+node. The Runs view shows ordered status, approvals, cancellation, and retry actions.
 
 ## Canvas Behavior
 
-- Drag node types from a searchable palette or insert them from a keyboard menu.
-- Connect only compatible typed ports; rejected edges leave the graph unchanged and announce the error.
-- Start/End are unique. Loop back-edges can only target the loop body port and require a maximum count.
+- Insert node types from the compact toolbar and position them by drag.
+- Connect bounded named ports; the server performs authoritative edge and graph validation.
+- Start is unique, End is required, and arbitrary graph cycles are rejected. Loop configuration is
+  server-bounded to 100 iterations.
 - Dirty, saving, saved, validating, and conflict states are explicit without shifting the toolbar.
-- Published versions are read-only. Restore creates a draft and never edits history.
-- Undo/redo is local to the current draft and resets after a server version conflict.
+- Published versions are immutable. Restore copies a version into the editable draft.
+- A server revision conflict preserves the local graph and requires an explicit refresh before retry.
 
 ## Responsive and Accessible Layout
 
-Desktop uses stable left rail, Canvas, inspector, and resizable execution panel tracks. On narrow screens,
-the Canvas remains the primary surface while palette, inspector, and execution history open as drawers.
+Desktop uses stable left rail, Canvas, and inspector tracks. On narrow screens the tracks stack without
+shrinking Canvas controls below their stable touch targets.
 Icon buttons have tooltips and accessible names. Nodes, ports, edges, menus, forms, dialogs, focus order,
 selection, and approval actions are keyboard operable. Status is never color-only and reduced-motion is
 respected.
@@ -30,9 +31,9 @@ respected.
 
 The UI renders only known node schemas and escapes all remote labels/output. Secrets are selected by
 reference and never redisplayed. Publish shows server validation grouped by node. Trigger secrets are
-shown exactly once. Approval and retry commands require confirmation, disable during submission, and
-refresh authoritative state after conflicts. SSE reconnect resumes from the last sequence; polling is a
-bounded fallback.
+shown exactly once. Cancel and retry commands require confirmation and refresh authoritative state after
+completion. The public API supports resumable SSE; the authenticated browser workspace uses bounded
+three-second polling because native `EventSource` cannot attach the existing Bearer header.
 
 ## Visual Direction
 

@@ -19,6 +19,18 @@ describe('API client', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
     const token = 'access';
+    const workflow: api.WorkflowDefinition = {
+      id: 'workflow',
+      name: 'Flow',
+      description: '',
+      role: 'OWNER',
+      status: 'DRAFT',
+      draftRevision: 2,
+      publishedVersion: 1,
+      graph: { schemaVersion: 1, nodes: [], edges: [] },
+      createdAt: '2026-07-24T00:00:00Z',
+      updatedAt: '2026-07-24T00:00:00Z',
+    };
     await Promise.all([
       api.login('demo', 'password'),
       api.register('demo2', 'demo2@example.test', 'password'),
@@ -40,8 +52,24 @@ describe('API client', () => {
       api.createSession(token, 'base', 'Title'),
       api.getHistory(token, 'session'),
       api.listAgents(token),
+      api.listWorkflows(token),
+      api.createWorkflow(token, 'Flow', ''),
+      api.updateWorkflow(token, workflow, 'Flow', '', workflow.graph),
+      api.validateWorkflow(token, workflow.id),
+      api.publishWorkflow(token, workflow),
+      api.listWorkflowVersions(token, workflow.id),
+      api.restoreWorkflowVersion(token, workflow.id, 1),
+      api.listWorkflowExecutions(token, workflow.id),
+      api.triggerWorkflow(token, workflow.id, {}, 'run-1'),
+      api.getWorkflowExecution(token, 'execution'),
+      api.cancelWorkflowExecution(token, 'execution'),
+      api.retryWorkflowNode(token, 'execution', 'node'),
+      api.listWorkflowEvents(token, 'execution'),
+      api.listWorkflowTriggers(token, workflow.id),
+      api.createWorkflowTrigger(token, workflow.id, 'WEBHOOK', {}),
+      api.decideWorkflowApproval(token, 'approval', 'APPROVE'),
     ]);
-    expect(fetchMock).toHaveBeenCalledTimes(20);
+    expect(fetchMock).toHaveBeenCalledTimes(36);
     const search = requests.find((call) => String(call[0]).endsWith('/knowledge/bases/base/search'));
     expect(search?.[1]?.body).toBe(JSON.stringify({ query: 'invoice', mode: 'HYBRID', topK: 10 }));
     const authenticated = requests.filter(
@@ -64,6 +92,7 @@ describe('API client', () => {
       new Response(null, { status: 204 }),
       new Response(null, { status: 204 }),
       new Response(null, { status: 204 }),
+      new Response(null, { status: 204 }),
       new Response('content', { status: 200 }),
     ];
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -82,6 +111,7 @@ describe('API client', () => {
     await api.deleteFile('token', 'file');
     await api.deleteKnowledgeBase('token', 'base');
     await api.detachKnowledgeDocument('token', 'base', 'file');
+    await api.deleteWorkflow('token', 'workflow');
     await api.downloadFile('token', {
       id: 'file',
       originalName: 'source.txt',

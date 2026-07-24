@@ -18,7 +18,8 @@ browser session.
 
 `platform-workflow` owns definitions, immutable versions, membership, triggers, executions, node
 attempts, approvals, ordered execution events, inbound deduplication, and a transactional outbox. MySQL
-is the source of truth. A scheduler claims due work with optimistic version checks and bounded leases.
+is the source of truth. The v0.4 alpha scheduler resumes indexed due work on one node and uses optimistic
+versions to reject stale commits; distributed leases are deferred until multi-node execution.
 Every node attempt receives a stable invocation ID; retry reuses the logical node input and creates a
 new numbered attempt. Completed nodes are never scheduled again.
 

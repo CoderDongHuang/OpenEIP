@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openeip.dev/contracts/events/workflow.trigger.event.v1.schema.json",
+  "title": "workflow trigger event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "eventType", "eventVersion", "timestamp", "source", "tenantId", "payload"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:[.-][a-z0-9]+){1,7}$", "maxLength": 128 },
+    "eventVersion": { "const": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "source": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "tenantId": { "type": "string", "format": "uuid" },
+    "payload": { "type": "object", "maxProperties": 100, "additionalProperties": true }
+  }
+}

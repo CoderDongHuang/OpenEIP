@@ -12,8 +12,8 @@ execution state, and emitted events must not diverge across separate stores.
 
 Use MySQL as the authoritative Workflow store. Persist each execution and node-attempt transition in a
 short Spring transaction guarded by an optimistic `lock_version`. Insert the corresponding ordered
-execution event and outbox message in that same transaction. A bounded poller claims due nodes and
-outbox rows using leases; expired leases are recoverable.
+execution event and outbox message in that same transaction. A bounded single-node poller resumes due
+executions; horizontal claims and leases are deferred beyond this alpha.
 
 External node calls carry a stable `invocationId` derived from execution, node, and logical iteration.
 After an ambiguous timeout the engine may invoke again with the same ID, so adapters must be idempotent
@@ -30,13 +30,14 @@ completion, not exactly-once side effects across an uncooperative remote system.
 
 ### Negative
 
-- Polling and lease indexes add database write load.
+- Polling and due-work indexes add database read/write load.
 - External side effects require idempotency cooperation and honest retryability metadata.
 - Single-region MySQL remains a v0.4 alpha availability limit.
 
 ### Risks
 
-- Concurrent workers: optimistic versions, unique logical keys, and lease-owner checks reject stale work.
+- Accidental concurrent workers: optimistic versions and unique logical keys reject stale commits;
+  multi-node side-effect execution is unsupported until explicit leases are added.
 - Outbox growth: terminal rows have retention limits and deletion occurs only after delivery evidence.
 - Approval races: one conditional state update wins; later decisions receive a stable conflict.
 
