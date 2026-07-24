@@ -1,0 +1,11 @@
+{
+  "schemaVersion" : 1,
+  "generatedAt" : "2026-07-24T14:34:51.550371400Z",
+  "engine" : "platform-workflow-h2-deterministic-nodes",
+  "nodeTransitions" : 1000,
+  "transitionPairP99Ms" : 36.09,
+  "parallelExecutions" : 100,
+  "parallelWallTimeMs" : 318.53,
+  "parallelThroughputPerSecond" : 313.94,
+  "allTerminalSucceeded" : true
+}

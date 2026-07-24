@@ -132,6 +132,117 @@ export interface AgentMetadata {
   tools: AgentTool[];
 }
 
+export type WorkflowNodeType =
+  'START' | 'END' | 'LLM' | 'AGENT' | 'TOOL' | 'CONDITION' | 'LOOP' | 'APPROVAL' | 'DELAY' | 'WEBHOOK';
+
+export interface WorkflowNode {
+  id: string;
+  type: WorkflowNodeType;
+  schemaVersion: 1;
+  position: { x: number; y: number };
+  config: Record<string, unknown>;
+}
+
+export interface WorkflowEdge {
+  id: string;
+  source: string;
+  sourcePort: string;
+  target: string;
+  targetPort: string;
+}
+
+export interface WorkflowGraph {
+  schemaVersion: 1;
+  nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
+}
+
+export interface WorkflowDefinition {
+  id: string;
+  name: string;
+  description: string;
+  role: 'OWNER' | 'EDITOR' | 'RUNNER' | 'APPROVER' | 'VIEWER';
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  draftRevision: number;
+  publishedVersion: number | null;
+  graph: WorkflowGraph;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkflowPage {
+  items: WorkflowDefinition[];
+  page: number;
+  size: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface WorkflowVersion {
+  workflowId: string;
+  version: number;
+  graphSha256: string;
+  graph: WorkflowGraph;
+  publishedBy: string;
+  publishedAt: string;
+}
+
+export type WorkflowExecutionStatus =
+  | 'QUEUED'
+  | 'RUNNING'
+  | 'WAITING_APPROVAL'
+  | 'WAITING_DELAY'
+  | 'RETRY_WAIT'
+  | 'CANCELLING'
+  | 'SUCCEEDED'
+  | 'FAILED'
+  | 'CANCELLED';
+
+export interface WorkflowExecution {
+  id: string;
+  workflowId: string;
+  workflowVersion: number;
+  status: WorkflowExecutionStatus;
+  triggerType: 'MANUAL' | 'WEBHOOK' | 'CRON' | 'EVENT';
+  currentSequence: number;
+  failureCode: string | null;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+}
+
+export interface WorkflowExecutionPage {
+  items: WorkflowExecution[];
+  page: number;
+  size: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface WorkflowEvent {
+  executionId: string;
+  sequence: number;
+  type: string;
+  nodeId: string | null;
+  occurredAt: string;
+  data: Record<string, unknown>;
+}
+
+export interface WorkflowTrigger {
+  id: string;
+  workflowId: string;
+  type: 'WEBHOOK' | 'CRON' | 'EVENT';
+  enabled: boolean;
+  config: Record<string, unknown>;
+  secret?: string;
+  createdAt: string;
+}
+
+export interface WorkflowValidation {
+  valid: boolean;
+  errors: Array<{ code: string; nodeId: string | null; message: string }>;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -254,3 +365,103 @@ export const getHistory = (token: string, sessionId: string) =>
   request<ChatMessage[]>(`/api/v1/chat/sessions/${encodeURIComponent(sessionId)}/messages`, {}, token);
 
 export const listAgents = (token: string) => request<AgentMetadata[]>('/api/v1/agents', {}, token);
+
+export const listWorkflows = (token: string, page = 1, size = 100) =>
+  request<WorkflowPage>(`/api/v1/workflows?page=${page}&size=${size}`, {}, token);
+export const createWorkflow = (token: string, name: string, description: string) =>
+  request<WorkflowDefinition>('/api/v1/workflows', json('POST', { name, description }), token);
+export const updateWorkflow = (
+  token: string,
+  workflow: WorkflowDefinition,
+  name: string,
+  description: string,
+  graph: WorkflowGraph,
+) =>
+  request<WorkflowDefinition>(
+    `/api/v1/workflows/${encodeURIComponent(workflow.id)}`,
+    { ...json('PATCH', { name, description, graph }), headers: { 'If-Match': String(workflow.draftRevision) } },
+    token,
+  );
+export const deleteWorkflow = (token: string, workflowId: string) =>
+  request<void>(`/api/v1/workflows/${encodeURIComponent(workflowId)}`, { method: 'DELETE' }, token);
+export const validateWorkflow = (token: string, workflowId: string) =>
+  request<WorkflowValidation>(
+    `/api/v1/workflows/${encodeURIComponent(workflowId)}/validate`,
+    { method: 'POST' },
+    token,
+  );
+export const publishWorkflow = (token: string, workflow: WorkflowDefinition) =>
+  request<WorkflowVersion>(
+    `/api/v1/workflows/${encodeURIComponent(workflow.id)}/publish`,
+    { method: 'POST', headers: { 'If-Match': String(workflow.draftRevision) } },
+    token,
+  );
+export const listWorkflowVersions = (token: string, workflowId: string) =>
+  request<WorkflowVersion[]>(`/api/v1/workflows/${encodeURIComponent(workflowId)}/versions`, {}, token);
+export const restoreWorkflowVersion = (token: string, workflowId: string, version: number) =>
+  request<WorkflowDefinition>(
+    `/api/v1/workflows/${encodeURIComponent(workflowId)}/versions/${version}/restore`,
+    { method: 'POST' },
+    token,
+  );
+export const listWorkflowExecutions = (token: string, workflowId: string, page = 1, size = 50) =>
+  request<WorkflowExecutionPage>(
+    `/api/v1/workflows/${encodeURIComponent(workflowId)}/executions?page=${page}&size=${size}`,
+    {},
+    token,
+  );
+export const triggerWorkflow = (
+  token: string,
+  workflowId: string,
+  input: Record<string, unknown> = {},
+  idempotencyKey: string = crypto.randomUUID(),
+) =>
+  request<WorkflowExecution>(
+    `/api/v1/workflows/${encodeURIComponent(workflowId)}/executions`,
+    { ...json('POST', { input }), headers: { 'Idempotency-Key': idempotencyKey } },
+    token,
+  );
+export const getWorkflowExecution = (token: string, executionId: string) =>
+  request<WorkflowExecution>(`/api/v1/workflow-executions/${encodeURIComponent(executionId)}`, {}, token);
+export const cancelWorkflowExecution = (token: string, executionId: string) =>
+  request<WorkflowExecution>(
+    `/api/v1/workflow-executions/${encodeURIComponent(executionId)}/cancel`,
+    { method: 'POST' },
+    token,
+  );
+export const retryWorkflowNode = (token: string, executionId: string, nodeId: string) =>
+  request<WorkflowExecution>(
+    `/api/v1/workflow-executions/${encodeURIComponent(executionId)}/nodes/${encodeURIComponent(nodeId)}/retry`,
+    { method: 'POST', headers: { 'Idempotency-Key': crypto.randomUUID() } },
+    token,
+  );
+export const listWorkflowEvents = (token: string, executionId: string, after = 0) =>
+  request<WorkflowEvent[]>(
+    `/api/v1/workflow-executions/${encodeURIComponent(executionId)}/events?after=${after}`,
+    {},
+    token,
+  );
+export const listWorkflowTriggers = (token: string, workflowId: string) =>
+  request<WorkflowTrigger[]>(`/api/v1/workflows/${encodeURIComponent(workflowId)}/triggers`, {}, token);
+export const createWorkflowTrigger = (
+  token: string,
+  workflowId: string,
+  type: WorkflowTrigger['type'],
+  config: Record<string, unknown>,
+) =>
+  request<WorkflowTrigger>(
+    `/api/v1/workflows/${encodeURIComponent(workflowId)}/triggers`,
+    json('POST', { type, enabled: true, config }),
+    token,
+  );
+export const decideWorkflowApproval = (
+  token: string,
+  approvalId: string,
+  decision: 'APPROVE' | 'REJECT',
+  comment = '',
+) =>
+  request<WorkflowExecution>(
+    `/api/v1/workflow-approvals/${encodeURIComponent(approvalId)}/decisions`,
+    { ...json('POST', { decision, comment }), headers: { 'Idempotency-Key': crypto.randomUUID() } },
+    token,
+  );

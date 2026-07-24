@@ -321,13 +321,44 @@ components:
         decision: { type: string, enum: [APPROVE, REJECT] }
         comment: { type: string, maxLength: 1000, default: '' }
     CreateTrigger:
+      oneOf:
+        - $ref: '#/components/schemas/CreateWebhookTrigger'
+        - $ref: '#/components/schemas/CreateCronTrigger'
+        - $ref: '#/components/schemas/CreateEventTrigger'
+    CreateWebhookTrigger:
       type: object
       additionalProperties: false
       required: [type, enabled, config]
       properties:
-        type: { type: string, enum: [WEBHOOK, CRON, EVENT] }
+        type: { const: WEBHOOK }
         enabled: { type: boolean }
-        config: { type: object, maxProperties: 20, additionalProperties: true }
+        config: { type: object, additionalProperties: false, maxProperties: 0 }
+    CreateCronTrigger:
+      type: object
+      additionalProperties: false
+      required: [type, enabled, config]
+      properties:
+        type: { const: CRON }
+        enabled: { type: boolean }
+        config:
+          type: object
+          additionalProperties: false
+          required: [expression]
+          properties:
+            expression: { type: string, pattern: '^\S+\s+\S+\s+\S+\s+\S+\s+\S+$', maxLength: 100 }
+    CreateEventTrigger:
+      type: object
+      additionalProperties: false
+      required: [type, enabled, config]
+      properties:
+        type: { const: EVENT }
+        enabled: { type: boolean }
+        config:
+          type: object
+          additionalProperties: false
+          required: [eventType]
+          properties:
+            eventType: { type: string, pattern: '^[a-z][a-z0-9]*(?:[.-][a-z0-9]+){1,7}$', maxLength: 128 }
     WorkflowTrigger:
       type: object
       additionalProperties: false
@@ -337,7 +368,11 @@ components:
         workflowId: { type: string, format: uuid }
         type: { type: string, enum: [WEBHOOK, CRON, EVENT] }
         enabled: { type: boolean }
-        config: { type: object, maxProperties: 20, additionalProperties: true }
+        config:
+          oneOf:
+            - { type: object, additionalProperties: false, maxProperties: 0 }
+            - { type: object, additionalProperties: false, required: [expression], properties: { expression: { type: string } } }
+            - { type: object, additionalProperties: false, required: [eventType], properties: { eventType: { type: string } } }
         secret: { type: string, minLength: 32, maxLength: 128, writeOnly: true }
         createdAt: { type: string, format: date-time }
     ValidationResult:

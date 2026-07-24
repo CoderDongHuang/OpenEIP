@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the v0.3 release smoke flow through the public gateway."""
+"""Run the release smoke flow through the public gateway."""
 
 from __future__ import annotations
 
@@ -54,7 +54,9 @@ class SmokeClient:
         headers: dict[str, str] | None = None,
         expected: tuple[int, ...] = (200,),
     ) -> Response:
-        request = Request(self.base_url + path, data=body, headers=headers or {}, method=method)
+        request = Request(
+            self.base_url + path, data=body, headers=headers or {}, method=method
+        )
         try:
             with urlopen(request, timeout=self.timeout) as result:
                 response = Response(
@@ -70,7 +72,9 @@ class SmokeClient:
             )
         if response.status not in expected:
             excerpt = response.body.decode("utf-8", errors="replace")[:1000]
-            raise AssertionError(f"{method} {path}: expected {expected}, got {response.status}: {excerpt}")
+            raise AssertionError(
+                f"{method} {path}: expected {expected}, got {response.status}: {excerpt}"
+            )
         return response
 
     def json_request(
@@ -80,6 +84,7 @@ class SmokeClient:
         payload: dict[str, Any] | None = None,
         *,
         token: str | None = None,
+        extra_headers: dict[str, str] | None = None,
         expected: tuple[int, ...] = (200,),
     ) -> Response:
         headers = {"Accept": "application/json"}
@@ -89,6 +94,7 @@ class SmokeClient:
             headers["Content-Type"] = "application/json"
         if token:
             headers["Authorization"] = f"Bearer {token}"
+        headers.update(extra_headers or {})
         return self.request(method, path, body=body, headers=headers, expected=expected)
 
     def internal_request(
@@ -174,7 +180,10 @@ def run(client: SmokeClient) -> None:
     if b"OpenEIP" not in root.body:
         raise AssertionError("Frontend root does not contain the product name")
     python_health = client.request("GET", "/ai/health").json()
-    if python_health.get("status") != "healthy" or python_health.get("version") != EXPECTED_VERSION:
+    if (
+        python_health.get("status") != "healthy"
+        or python_health.get("version") != EXPECTED_VERSION
+    ):
         raise AssertionError(f"Unexpected Python health payload: {python_health}")
     passed("gateway, frontend, and Python health")
 
@@ -182,16 +191,24 @@ def run(client: SmokeClient) -> None:
         client.json_request(
             "POST",
             "/api/v1/auth/register",
-            {"username": username, "email": f"{username}@example.test", "password": password},
+            {
+                "username": username,
+                "email": f"{username}@example.test",
+                "password": password,
+            },
             expected=(201,),
         )
     )
     user_id = registered["id"]
     login = require_envelope(
-        client.json_request("POST", "/api/v1/auth/login", {"username": username, "password": password})
+        client.json_request(
+            "POST", "/api/v1/auth/login", {"username": username, "password": password}
+        )
     )
     token = login["accessToken"]
-    current = require_envelope(client.json_request("GET", "/api/v1/auth/me", token=token))
+    current = require_envelope(
+        client.json_request("GET", "/api/v1/auth/me", token=token)
+    )
     if current["id"] != user_id or "ROLE_USER" not in current["roles"]:
         raise AssertionError(f"Unexpected current user: {current}")
     client.json_request("GET", "/api/v1/auth/roles", token=token, expected=(403,))
@@ -224,7 +241,10 @@ def run(client: SmokeClient) -> None:
         client.json_request(
             "POST",
             "/api/v1/knowledge/bases",
-            {"name": f"Release smoke {unique}", "description": "v0.3 release verification"},
+            {
+                "name": f"Release smoke {unique}",
+                "description": "v0.3 release verification",
+            },
             token=token,
             expected=(201,),
         )
@@ -294,7 +314,11 @@ def run(client: SmokeClient) -> None:
     )
     if embedded["vectorCount"] != len(chunks):
         raise AssertionError(f"Unexpected embedding result: {embedded}")
-    rag_payload = {"knowledgeBaseId": knowledge_base_id, "query": "What does the release smoke verify?", "topK": 3}
+    rag_payload = {
+        "knowledgeBaseId": knowledge_base_id,
+        "query": "What does the release smoke verify?",
+        "topK": 3,
+    }
     rag = require_envelope(
         client.internal_request(
             "/ai/api/v1/rag/queries",
@@ -323,13 +347,19 @@ def run(client: SmokeClient) -> None:
         token,
     )
     assert_sse(chat, ("token", "done"))
-    history = client.json_request("GET", f"/api/v1/chat/sessions/{session_id}/messages", token=token).json()["data"]
+    history = client.json_request(
+        "GET", f"/api/v1/chat/sessions/{session_id}/messages", token=token
+    ).json()["data"]
     if not isinstance(history, list) or len(history) != 2:
         raise AssertionError(f"Chat history was not persisted: {history}")
     passed("Java-to-Python Chat SSE and persisted history")
 
     catalog = client.json_request("GET", "/api/v1/agents", token=token).json()["data"]
-    if not isinstance(catalog, list) or not catalog or catalog[0]["agentId"] != "openeip.constrained-v1":
+    if (
+        not isinstance(catalog, list)
+        or not catalog
+        or catalog[0]["agentId"] != "openeip.constrained-v1"
+    ):
         raise AssertionError(f"Unexpected Agent catalog: {catalog}")
     agent = client.sse_request(
         "/api/v1/agents/openeip.constrained-v1/executions:stream",
@@ -341,8 +371,149 @@ def run(client: SmokeClient) -> None:
         },
         token,
     )
-    assert_sse(agent, ("execution.started", "tool.started", "tool.completed", "execution.completed"))
+    assert_sse(
+        agent,
+        ("execution.started", "tool.started", "tool.completed", "execution.completed"),
+    )
     passed("authorized Agent tool execution and termination")
+
+    workflow = require_envelope(
+        client.json_request(
+            "POST",
+            "/api/v1/workflows",
+            {
+                "name": f"Release workflow {unique}",
+                "description": "release approval and retry",
+            },
+            token=token,
+            expected=(201,),
+        )
+    )
+    workflow_id = workflow["id"]
+    approval_graph = {
+        "schemaVersion": 1,
+        "nodes": [
+            {
+                "id": "start",
+                "type": "START",
+                "schemaVersion": 1,
+                "position": {"x": 0, "y": 0},
+                "config": {},
+            },
+            {
+                "id": "approve",
+                "type": "APPROVAL",
+                "schemaVersion": 1,
+                "position": {"x": 200, "y": 0},
+                "config": {"mode": "ANY", "assigneeIds": [user_id]},
+            },
+            {
+                "id": "end",
+                "type": "END",
+                "schemaVersion": 1,
+                "position": {"x": 400, "y": 0},
+                "config": {},
+            },
+        ],
+        "edges": [
+            {
+                "id": "to_approval",
+                "source": "start",
+                "sourcePort": "out",
+                "target": "approve",
+                "targetPort": "in",
+            },
+            {
+                "id": "to_end",
+                "source": "approve",
+                "sourcePort": "out",
+                "target": "end",
+                "targetPort": "in",
+            },
+        ],
+    }
+    updated = require_envelope(
+        client.json_request(
+            "PATCH",
+            f"/api/v1/workflows/{workflow_id}",
+            {
+                "name": workflow["name"],
+                "description": workflow["description"],
+                "graph": approval_graph,
+            },
+            token=token,
+            extra_headers={"If-Match": str(workflow["draftRevision"])},
+        )
+    )
+    client.json_request(
+        "POST",
+        f"/api/v1/workflows/{workflow_id}/publish",
+        token=token,
+        extra_headers={"If-Match": str(updated["draftRevision"])},
+        expected=(201,),
+    )
+    execution = require_envelope(
+        client.json_request(
+            "POST",
+            f"/api/v1/workflows/{workflow_id}/executions",
+            {"input": {}},
+            token=token,
+            extra_headers={"Idempotency-Key": f"release-{unique}"},
+            expected=(202,),
+        )
+    )
+    execution_id = execution["id"]
+    event_payload = client.json_request(
+        "GET", f"/api/v1/workflow-executions/{execution_id}/events", token=token
+    ).json()["data"]
+    approval_id = next(
+        event["data"]["approvalId"]
+        for event in event_payload
+        if event["type"] == "workflow.approval.requested"
+    )
+    rejected = require_envelope(
+        client.json_request(
+            "POST",
+            f"/api/v1/workflow-approvals/{approval_id}/decisions",
+            {"decision": "REJECT", "comment": "exercise retry"},
+            token=token,
+            extra_headers={"Idempotency-Key": f"reject-{unique}"},
+        )
+    )
+    if rejected["status"] != "FAILED":
+        raise AssertionError(f"Workflow rejection did not fail: {rejected}")
+    client.json_request(
+        "POST",
+        f"/api/v1/workflow-executions/{execution_id}/nodes/approve/retry",
+        token=token,
+        extra_headers={"Idempotency-Key": f"retry-{unique}"},
+        expected=(202,),
+    )
+    approved = require_envelope(
+        client.json_request(
+            "POST",
+            f"/api/v1/workflow-approvals/{approval_id}/decisions",
+            {"decision": "APPROVE", "comment": "resume"},
+            token=token,
+            extra_headers={"Idempotency-Key": f"approve-{unique}"},
+        )
+    )
+    if approved["status"] != "SUCCEEDED":
+        raise AssertionError(f"Workflow did not resume to success: {approved}")
+    final_events = client.json_request(
+        "GET", f"/api/v1/workflow-executions/{execution_id}/events", token=token
+    ).json()["data"]
+    if not any(
+        event["type"] == "workflow.node.retry.requested" for event in final_events
+    ):
+        raise AssertionError("Workflow retry event is missing")
+    client.request(
+        "DELETE",
+        f"/api/v1/workflows/{workflow_id}",
+        headers={"Authorization": f"Bearer {token}"},
+        expected=(204,),
+    )
+    passed("Workflow publish, approval, retry, resume, events, and cleanup")
 
     client.request(
         "DELETE",
@@ -362,7 +533,9 @@ def run(client: SmokeClient) -> None:
         headers={"Authorization": f"Bearer {token}"},
         expected=(204,),
     )
-    client.json_request("GET", f"/api/v1/documents/files/{document_id}", token=token, expected=(404,))
+    client.json_request(
+        "GET", f"/api/v1/documents/files/{document_id}", token=token, expected=(404,)
+    )
     passed("resource cleanup and not-found boundary")
 
 
@@ -382,7 +555,13 @@ def main() -> int:
     args = parser.parse_args()
     try:
         run(SmokeClient(args.base_url, args.internal_token, args.timeout))
-    except (AssertionError, OSError, ValueError, KeyError, json.JSONDecodeError) as error:
+    except (
+        AssertionError,
+        OSError,
+        ValueError,
+        KeyError,
+        json.JSONDecodeError,
+    ) as error:
         print(f"FAIL: {error}", file=sys.stderr)
         return 1
     print("PASS: v0.3.0-alpha full-stack release smoke", flush=True)

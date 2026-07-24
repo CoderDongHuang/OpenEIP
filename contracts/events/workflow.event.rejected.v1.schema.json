@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openeip.dev/contracts/events/workflow.event.rejected.v1.schema.json",
+  "title": "workflow event rejected v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "eventType", "eventVersion", "timestamp", "source", "topic", "partition", "offset", "keySha256", "errorCode"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "const": "workflow.event.rejected" },
+    "eventVersion": { "const": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "source": { "const": "platform-workflow" },
+    "topic": { "type": "string", "minLength": 1, "maxLength": 249 },
+    "partition": { "type": "integer", "minimum": 0 },
+    "offset": { "type": "integer", "minimum": 0 },
+    "keySha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "errorCode": { "const": "WF-V-001" }
+  }
+}

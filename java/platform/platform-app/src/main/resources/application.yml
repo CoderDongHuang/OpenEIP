@@ -59,6 +59,18 @@ openeip:
     python-url: ${AGENT_PYTHON_URL:http://python:8000}
     internal-token: ${OPENEIP_INTERNAL_API_TOKEN:}
     external-tenant-id: ${AGENT_EXTERNAL_TENANT_ID:11111111-1111-4111-8111-111111111111}
+  workflow:
+    scheduler-enabled: ${WORKFLOW_SCHEDULER_ENABLED:true}
+    kafka-enabled: ${WORKFLOW_KAFKA_ENABLED:false}
+    event-topic: ${WORKFLOW_EVENT_TOPIC:workflow.events.v1}
+    inbound-topic: ${WORKFLOW_INBOUND_TOPIC:workflow.commands.v1}
+    dlq-topic: ${WORKFLOW_DLQ_TOPIC:workflow.events.dlq.v1}
+    kafka-group-id: ${WORKFLOW_KAFKA_GROUP_ID:openeip-workflow-v1}
+    external-tenant-id: ${WORKFLOW_EXTERNAL_TENANT_ID:11111111-1111-4111-8111-111111111111}
+    webhook-rate-limit:
+      requests: ${WORKFLOW_WEBHOOK_RATE_LIMIT_REQUESTS:60}
+      window-seconds: ${WORKFLOW_WEBHOOK_RATE_LIMIT_WINDOW_SECONDS:60}
+      max-keys: ${WORKFLOW_WEBHOOK_RATE_LIMIT_MAX_KEYS:10000}
 
 logging:
   level:

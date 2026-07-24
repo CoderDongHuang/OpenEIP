@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openeip.dev/contracts/events/workflow.execution.event.v1.schema.json",
+  "title": "workflow execution event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "eventType", "eventVersion", "tenantId", "executionId", "sequence", "timestamp", "data"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": {
+      "enum": [
+        "workflow.approval.decided",
+        "workflow.approval.requested",
+        "workflow.execution.cancelled",
+        "workflow.execution.completed",
+        "workflow.execution.failed",
+        "workflow.execution.queued",
+        "workflow.execution.started",
+        "workflow.execution.waiting.delay",
+        "workflow.node.completed",
+        "workflow.node.retry.requested",
+        "workflow.node.started"
+      ]
+    },
+    "eventVersion": { "const": 1 },
+    "tenantId": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "executionId": { "type": "string", "format": "uuid" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "data": { "type": "object", "maxProperties": 32, "additionalProperties": true }
+  }
+}

@@ -47,9 +47,10 @@ RUNNING/WAITING_* -> FAILED
 ```
 
 Node attempts move through PENDING, CLAIMED, RUNNING, WAITING, SUCCEEDED, FAILED, SKIPPED, or CANCELLED.
-One transaction persists the aggregate transition, ordered event, and outbox row. A lease expiry returns
-ambiguous work to a recoverable state with the same invocation ID. Parallel branches join only after all
-required predecessors are terminal-success. Condition and Loop select only declared outgoing ports.
+One transaction persists the aggregate transition, ordered event, and outbox row. Recovered work keeps
+the same logical invocation ID across attempts. Active fan-out branches join only after their required
+predecessors succeed. Condition selects a declared true/false port; Loop records a server-bounded
+iteration instruction without permitting an arbitrary graph cycle.
 
 ## 5. Trigger, Approval, and Retry
 
@@ -59,8 +60,7 @@ required predecessors are terminal-success. Condition and Loop select only decla
   by trigger plus scheduled instant.
 - Kafka accepts only configured event types and versions, validates strict schemas, and deduplicates
   `(tenant_id, event_id)` before creating an execution.
-- Approval tasks store explicit assignees, ANY/ALL mode, expiry, and one decision per assignee. Reassign
-  is owner/editor-only and never changes an already decided task.
+- Approval tasks store explicit assignees, ANY/ALL mode and one idempotent decision per assignee.
 - Automatic retry applies only to declared retryable codes. Delay uses bounded exponential backoff.
   Manual retry creates a new node attempt in the same execution lineage and cannot reopen a terminal
   successful execution.
@@ -70,8 +70,8 @@ required predecessors are terminal-success. Condition and Loop select only decla
 The engine stores ordered sanitized events and streams them over SSE with heartbeat and resume by last
 sequence. Public events never contain secrets, prompts, raw webhook bodies, node credentials, or output
 above the configured excerpt limit. Kafka schemas cover workflow published, execution started/waiting/
-completed/failed, and approval requested/decided. Metrics include queue delay, node duration, retry,
-approval age, lease recovery, outbox lag, duplicate triggers, and terminal outcomes.
+completed/failed, and approval requested/decided. Stored timestamps and statuses provide the alpha
+observability baseline; dedicated metrics and alerting are deferred.
 
 ## 7. Failure and Compatibility
 

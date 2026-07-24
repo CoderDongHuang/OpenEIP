@@ -1,4 +1,5 @@
 import {
+  ApartmentOutlined,
   DatabaseOutlined,
   FileTextOutlined,
   HomeOutlined,
@@ -36,6 +37,7 @@ const DocumentsView = lazy(() => import('./views/DocumentsView').then((module) =
 const KnowledgeView = lazy(() => import('./views/KnowledgeView').then((module) => ({ default: module.KnowledgeView })));
 const OverviewView = lazy(() => import('./views/OverviewView').then((module) => ({ default: module.OverviewView })));
 const UsersView = lazy(() => import('./views/UsersView').then((module) => ({ default: module.UsersView })));
+const WorkflowView = lazy(() => import('./views/WorkflowView').then((module) => ({ default: module.WorkflowView })));
 
 const { Header, Sider, Content } = Layout;
 const { Text, Title } = Typography;
@@ -47,6 +49,7 @@ const navigation = [
   { key: '/knowledge', icon: <DatabaseOutlined />, label: 'Knowledge' },
   { key: '/chat', icon: <MessageOutlined />, label: 'Chat' },
   { key: '/agents', icon: <RobotOutlined />, label: 'Agents' },
+  { key: '/workflows', icon: <ApartmentOutlined />, label: 'Workflows' },
   { key: '/users', icon: <TeamOutlined />, label: 'Access' },
 ];
 
@@ -147,7 +150,7 @@ function Workspace({ token, user, onLogout }: { token: string; user: CurrentUser
         <div className="sider-release">
           <span className="release-dot" />
           <span>
-            <strong>v0.3 alpha</strong>
+            <strong>v0.4 alpha</strong>
             <small>Single-node profile</small>
           </span>
         </div>
@@ -187,6 +190,7 @@ function Workspace({ token, user, onLogout }: { token: string; user: CurrentUser
               <Route path="/knowledge" element={<KnowledgeView token={token} />} />
               <Route path="/chat" element={<ChatView token={token} />} />
               <Route path="/agents" element={<AgentView token={token} />} />
+              <Route path="/workflows" element={<WorkflowView token={token} />} />
               <Route path="/users" element={<UsersView token={token} user={user} />} />
               <Route path="*" element={<Navigate to="/overview" replace />} />
             </Routes>

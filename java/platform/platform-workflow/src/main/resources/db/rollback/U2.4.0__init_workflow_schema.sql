@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS workflow_processed_events;
+DROP TABLE IF EXISTS workflow_outbox;
+DROP TABLE IF EXISTS workflow_events;
+DROP TABLE IF EXISTS workflow_approval_decisions;
+DROP TABLE IF EXISTS workflow_approvals;
+DROP TABLE IF EXISTS workflow_node_executions;
+DROP TABLE IF EXISTS workflow_executions;
+DROP TABLE IF EXISTS workflow_triggers;
+DROP TABLE IF EXISTS workflow_versions;
+DROP TABLE IF EXISTS workflow_members;
+DROP TABLE IF EXISTS workflow_definitions;

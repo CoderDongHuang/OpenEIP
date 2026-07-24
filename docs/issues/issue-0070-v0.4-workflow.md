@@ -16,14 +16,14 @@ integration. Acceptance criteria and exclusions are canonical in GitHub Issue #7
 | 4 Module Design | `workflow-module.md` | Complete |
 | 5 API/DB/UI Design | Workflow OpenAPI, persistence schema, and Canvas design | Complete |
 | 6 Architecture Review | `issue-0070-architecture-review.md` | Complete |
-| 7 Implementation | Java engine/API/event adapters and React Canvas | Pending |
-| 8 Unit Test | Java and frontend suites | Pending |
-| 9 Integration Test | MySQL/Kafka/restart/public-gateway flows | Pending |
-| 10 Benchmark | transition, trigger, and parallel execution evidence | Pending |
-| 11 Security Review | threat model and adversarial tests | Pending |
-| 12 Quality Gate | repository quality report | Pending |
-| 13 Docs Update | SDD/API/DB/UI/testing/release/project metadata | Pending |
-| 14 Pull Request | implementation PR | Pending |
+| 7 Implementation | `platform-workflow`, platform aggregation, React Canvas and gateway security | Complete |
+| 8 Unit Test | 19 Workflow tests at 83.57%; 27 frontend tests at 91.66% statements | Complete |
+| 9 Integration Test | MySQL 8.4 migration/rollback, restart continuation, events and public Compose smoke | Complete |
+| 10 Benchmark | `workflow-benchmark.json`: P99 36.09 ms and 313.94 executions/s | Complete |
+| 11 Security Review | `issue-0070-security-review.md` and adversarial contract tests | Complete |
+| 12 Quality Gate | `issue-0070-quality-gate.md` | Complete |
+| 13 Docs Update | SDD, OpenAPI, DB, UI, RFC, ADR, test plan and project metadata | Complete |
+| 14 Pull Request | GitHub PR #72 | Complete |
 | 15 Code Review | independent review | Pending |
 | 16 Merge | reviewed implementation merged | Pending |
 | 17 Release | `v0.4.0-alpha` tag workflow and evidence | Pending |

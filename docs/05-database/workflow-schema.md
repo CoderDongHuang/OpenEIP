@@ -12,10 +12,10 @@
 | `workflow_triggers` | Manual metadata, webhook, cron, Kafka configuration | secret hash only; unique trigger key |
 | `workflow_executions` | Durable aggregate and trigger lineage | unique tenant/workflow/idempotency key; optimistic version |
 | `workflow_node_executions` | Logical node iterations and numbered attempts | unique execution/node/iteration/attempt; stable invocation ID |
-| `workflow_approvals` | Approval task and aggregate decision | unique execution/node/iteration |
-| `workflow_approval_decisions` | Single-use assignee decisions | unique approval/assignee |
+| `workflow_approvals` | Approval task, ANY/ALL mode and aggregate decision | unique execution/node |
+| `workflow_approval_decisions` | Single-use assignee decisions | unique approval/assignee and approval/idempotency key |
 | `workflow_events` | Ordered sanitized execution history | unique execution/sequence; bounded payload |
-| `workflow_outbox` | Transactional Kafka publication | unique event ID; due/lease indexes |
+| `workflow_outbox` | Transactional Kafka publication | unique event ID; pending/created index |
 | `workflow_processed_events` | Inbound Kafka deduplication | unique tenant/event ID plus payload fingerprint |
 
 ## Storage Rules
@@ -25,13 +25,13 @@ columns are validated against application schemas before persistence and are siz
 graphs are immutable in `workflow_versions`; executions retain the exact version and digest. Webhook
 secrets and credentials are never stored in plaintext.
 
-Lease-bearing rows include owner, expiry, attempt, and next-due timestamps. A worker may update only the
-lease it owns and only while the aggregate optimistic version matches. Database time determines due work
-to prevent application clock disagreement.
+The v0.4 alpha scheduler is single-node. Due executions are selected from indexed status/resume fields,
+and the aggregate optimistic version rejects a concurrent stale commit. A future multi-node scheduler
+must add explicit claim-owner and lease-expiry fields before horizontal execution is supported.
 
 ## Retention and Rollback
 
 Execution events and outbox rows use explicit terminal timestamps. Delivered outbox rows may be purged
 after 7 days; execution history defaults to 30 days while definition/version audit history is retained.
-Cleanup is tenant-bounded and batch-limited. The additive migration rollback drops foreign keys and
-tables in reverse order only when no v0.4 data must be retained.
+Cleanup is tenant-bounded and batch-limited. The additive `V2.4.0` migration rollback drops foreign
+keys and tables in reverse order only when no v0.4 data must be retained.
