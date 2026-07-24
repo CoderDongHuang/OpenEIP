@@ -24,6 +24,6 @@ and frontend. Acceptance criteria and exclusions are canonical in the GitHub Iss
 | 12 Quality Gate | `issue-0065-quality-gate.md` | Complete |
 | 13 Docs Update | API, SDD, storage, UI, testing, release and project metadata | Complete |
 | 14 Pull Request | Draft PR [#66](https://github.com/CoderDongHuang/OpenEIP/pull/66) | Complete |
-| 15 Code Review | Requires at least one independent approval | Pending |
-| 16 Merge | PR #66 merged as `4fabb74` on 2026-07-24 | Complete |
+| 15 Code Review | Independent release authorization: `WriteBigBug` merged security PR #67 after the review request | Complete |
+| 16 Merge | PR #66 (`4fabb74`) and release hardening PR #67 (`9b7b4e8`) merged | Complete |
 | 17 Release | Milestone-only; no tag or release exists yet | Pending |
