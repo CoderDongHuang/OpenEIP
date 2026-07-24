@@ -23,7 +23,7 @@ and frontend. Acceptance criteria and exclusions are canonical in the GitHub Iss
 | 11 Security Review | `issue-0065-security-review.md` | Complete |
 | 12 Quality Gate | `issue-0065-quality-gate.md` | Complete |
 | 13 Docs Update | API, SDD, storage, UI, testing, release and project metadata | Complete |
-| 14 Pull Request | Draft PR to be created from this branch | Pending |
+| 14 Pull Request | Draft PR [#66](https://github.com/CoderDongHuang/OpenEIP/pull/66) | Complete |
 | 15 Code Review | Requires at least one independent approval | Pending |
 | 16 Merge | Must follow repository branch policy | Pending |
 | 17 Release | Milestone-only; no tag or release exists yet | Pending |
