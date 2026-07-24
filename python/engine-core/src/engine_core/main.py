@@ -21,7 +21,10 @@ from engine_core.embedding.api.router import build_embedding_router
 from engine_core.embedding.application.service import EmbeddingService
 from engine_core.embedding.domain.ports import EmbeddingProvider, VectorRepository
 from engine_core.embedding.infrastructure.deterministic_provider import DeterministicEmbeddingProvider
+from engine_core.embedding.infrastructure.hybrid_repository import ElasticsearchChunkIndex, HybridKnowledgeRepository
 from engine_core.embedding.infrastructure.memory_repository import InMemoryVectorRepository
+from engine_core.embedding.infrastructure.milvus_repository import MilvusVectorRepository
+from engine_core.embedding.infrastructure.openai_provider import OpenAIEmbeddingProvider
 from engine_core.ocr.api.router import build_ocr_router
 from engine_core.ocr.application.service import OcrService
 from engine_core.ocr.infrastructure.deterministic_provider import DeterministicRasterProvider
@@ -29,6 +32,7 @@ from engine_core.ocr.infrastructure.image_decoder import SafeImageDecoder
 from engine_core.parsing.api.router import build_parsing_router
 from engine_core.parsing.application.service import DocumentParsingService
 from engine_core.parsing.infrastructure.input_decoder import DocumentInputDecoder
+from engine_core.rag.api.retrieval_router import build_retrieval_router
 from engine_core.rag.api.router import build_rag_router
 from engine_core.rag.application.prompt import PromptBuilder
 from engine_core.rag.application.service import RagService
@@ -81,6 +85,8 @@ def create_app(
 
     provider = embedding_provider or _embedding_provider(resolved)
     repository = vector_repository or _vector_repository(resolved)
+    if resolved.environment.casefold() == "production" and isinstance(provider, DeterministicEmbeddingProvider):
+        raise ValueError("Deterministic embedding provider is forbidden in production")
     if resolved.environment.casefold() == "production" and isinstance(repository, InMemoryVectorRepository):
         raise ValueError("In-memory vector repository is forbidden in production")
     embedding_service = EmbeddingService(
@@ -115,6 +121,9 @@ def create_app(
             default_top_k=resolved.rag_default_top_k,
             max_top_k=resolved.rag_max_top_k,
         )
+    )
+    application.include_router(
+        build_retrieval_router(provider, repository, internal_token, resolved.rag_max_body_bytes)
     )
     application.include_router(
         build_chat_router(
@@ -184,15 +193,36 @@ def create_app(
 
 
 def _embedding_provider(settings: Settings) -> EmbeddingProvider:
-    if settings.embedding_provider != "deterministic":
-        raise ValueError("Configured embedding provider requires an injected adapter")
-    return DeterministicEmbeddingProvider(settings.embedding_dimension)
+    if settings.embedding_provider == "deterministic":
+        return DeterministicEmbeddingProvider(settings.embedding_dimension)
+    if settings.embedding_provider == "openai":
+        return OpenAIEmbeddingProvider(
+            settings.openai_api_key,
+            settings.openai_base_url,
+            settings.embedding_model,
+            settings.embedding_dimension,
+        )
+    raise ValueError("Unsupported embedding provider")
 
 
 def _vector_repository(settings: Settings) -> VectorRepository:
-    if settings.embedding_repository_backend != "memory":
-        raise ValueError("Configured vector repository requires an injected adapter")
-    return InMemoryVectorRepository()
+    if settings.embedding_repository_backend == "memory":
+        return InMemoryVectorRepository()
+    if settings.embedding_repository_backend == "milvus":
+        return HybridKnowledgeRepository(
+            MilvusVectorRepository(
+                settings.milvus_uri,
+                settings.milvus_token.get_secret_value(),
+                settings.milvus_collection,
+                settings.embedding_dimension,
+            ),
+            ElasticsearchChunkIndex(
+                settings.es_host,
+                settings.es_chunk_index,
+                settings.es_api_key.get_secret_value(),
+            ),
+        )
+    raise ValueError("Unsupported vector repository")
 
 
 def _answer_provider(settings: Settings) -> AnswerProvider:

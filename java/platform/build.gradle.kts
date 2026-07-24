@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "com.openeip"
-version = "0.2.0-alpha"
+version = "0.3.0-alpha"
 
 subprojects {
     apply(plugin = "java")
@@ -67,6 +67,7 @@ subprojects {
 
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
+        jvmArgs("-Djdk.attach.allowAttachSelf=true", "-XX:+EnableDynamicAgentLoading")
         finalizedBy("jacocoTestReport")
     }
 

@@ -1,0 +1,36 @@
+openapi: 3.1.0
+info:
+  title: OpenEIP Knowledge Retrieval API
+  version: 1.0.0
+paths:
+  /api/v1/knowledge/bases/{baseId}/search:
+    post:
+      summary: Search an authorized knowledge base
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: baseId
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [query, mode]
+              properties:
+                query: { type: string, minLength: 1, maxLength: 2000 }
+                mode: { type: string, enum: [FULL_TEXT, VECTOR, HYBRID] }
+                topK: { type: integer, minimum: 1, maximum: 50, default: 10 }
+      responses:
+        '200':
+          description: Scoped ranked chunks with citation provenance
+        '400': { description: Invalid request }
+        '401': { description: Unauthenticated }
+        '404': { description: Base absent or inaccessible }
+        '503': { description: Retrieval data plane unavailable }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }

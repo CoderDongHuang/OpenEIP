@@ -1,14 +1,14 @@
 # Embedding Module Design (Sub-SDD)
 
-> Version: 1.0 | Date: 2026-07-22 | Status: Approved for Implementation
-> Issue: [#48](https://github.com/CoderDongHuang/OpenEIP/issues/48) | ADR: [ADR-0003](../12-adr/adr-0003-storage-baseline.md), [ADR-0004](../12-adr/adr-0004-spike-validation-decisions.md)
+> Version: 2.0 | Date: 2026-07-24 | Status: Implemented for v0.3
+> Issue: [#65](https://github.com/CoderDongHuang/OpenEIP/issues/65) | RFC: [RFC-0005](../11-rfc/rfc-0005-production-knowledge-retrieval.md) | ADR: [ADR-0009](../12-adr/adr-0009-hybrid-retrieval-storage.md)
 
 ## 1. Responsibilities and Boundaries
 
 The Python Embedding module validates bounded text batches, invokes an `EmbeddingProvider`, verifies
 finite normalized vectors, and upserts tenant/base/document/chunk metadata through a
-`VectorRepository`. It does not parse documents, authorize users, select RAG context, or operate a
-production Milvus cluster.
+`VectorRepository`. It does not parse documents, authorize users, or select RAG context. The production
+adapter owns Milvus vector persistence and coordinates the Elasticsearch chunk index.
 
 ## 2. API and Limits
 
@@ -24,8 +24,15 @@ non-canonical UUIDs, invalid dimensions, blank/control-only text, and duplicate 
 - `VectorRepository.upsert/search/delete_document` always requires tenant and knowledge-base scope.
 - `DeterministicEmbeddingProvider` is the offline default for development and CI. It is a reproducible
   contract fixture, not a semantic-quality model.
-- `InMemoryVectorRepository` is allowed only outside the `production` environment. Production startup
-  fails until a durable repository adapter is explicitly injected.
+- `InMemoryVectorRepository` is allowed only outside the `production` environment. v0.3 production uses
+  Milvus HNSW/COSINE with an Elasticsearch chunk index. Production startup rejects the memory backend.
+- An OpenAI-compatible embedding adapter reads its API key only from deployment configuration and
+  normalizes every returned vector before the common validation gate.
+
+Production configuration uses `OPENEIP_EMBEDDING_PROVIDER=openai`,
+`OPENEIP_EMBEDDING_REPOSITORY_BACKEND=milvus`, `OPENEIP_OPENAI_API_KEY`,
+`OPENEIP_OPENAI_BASE_URL`, `OPENEIP_EMBEDDING_MODEL`, `OPENEIP_MILVUS_URI`,
+`OPENEIP_MILVUS_TOKEN`, and `OPENEIP_ES_HOST`. Secrets have no defaults in production.
 
 Provider and repository adapters are constructor-injected. No provider API key is accepted in an API
 body, result, event, metric, or log.

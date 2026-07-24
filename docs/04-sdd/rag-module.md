@@ -1,6 +1,6 @@
 # RAG Module Design (Sub-SDD)
 
-> Version: 1.0 | Date: 2026-07-22 | Status: Approved for Implementation
+> Version: 2.0 | Date: 2026-07-24 | Status: Implemented for v0.3
 > Issue: [#49](https://github.com/CoderDongHuang/OpenEIP/issues/49) | SAD: [Architecture Baseline](../03-sad/zh-CN.md)
 
 ## 1. Responsibilities and Boundaries
@@ -23,6 +23,9 @@ unknown/duplicate JSON fields, invalid identities, and non-JSON media types fail
 
 The response contains a bounded answer, model provenance, retrieval duration, and citations. A
 citation exposes document ID, chunk ID, source hash, and score, but not hidden prompt text or vectors.
+v0.3 citations additionally expose a maximum 500-character excerpt, page attribution, and normalized
+character range. Direct authorized retrieval supports `FULL_TEXT`, `VECTOR`, and deterministic `HYBRID`
+RRF modes without invoking an answer provider.
 
 ## 3. Data Flow
 

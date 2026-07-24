@@ -83,6 +83,24 @@ export interface ProcessingResult {
   updatedAt: string;
 }
 
+export type SearchMode = 'FULL_TEXT' | 'VECTOR' | 'HYBRID';
+
+export interface KnowledgeSearchHit {
+  documentId: string;
+  chunkId: string;
+  sourceSha256: string;
+  score: number;
+  excerpt: string;
+  pages: number[];
+  startChar: number;
+  endChar: number;
+}
+
+export interface KnowledgeSearchResult {
+  mode: SearchMode;
+  results: KnowledgeSearchHit[];
+}
+
 export interface ChatSession {
   sessionId: string;
   knowledgeBaseId: string;
@@ -220,6 +238,12 @@ export const retryKnowledgeDocument = (token: string, baseId: string, documentId
   request<ProcessingResult>(
     `/api/v1/knowledge/bases/${encodeURIComponent(baseId)}/documents/${encodeURIComponent(documentId)}/processing/retry`,
     { method: 'POST' },
+    token,
+  );
+export const searchKnowledge = (token: string, baseId: string, query: string, mode: SearchMode, topK = 10) =>
+  request<KnowledgeSearchResult>(
+    `/api/v1/knowledge/bases/${encodeURIComponent(baseId)}/search`,
+    json('POST', { query, mode, topK }),
     token,
   );
 

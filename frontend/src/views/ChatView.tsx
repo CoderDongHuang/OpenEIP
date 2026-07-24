@@ -7,7 +7,22 @@ import {
   UndoOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Alert, Avatar, Button, Empty, Form, Input, List, Modal, Select, Spin, Tag, Tooltip, Typography } from 'antd';
+import {
+  Alert,
+  Avatar,
+  Button,
+  Empty,
+  Form,
+  Input,
+  List,
+  Modal,
+  Popover,
+  Select,
+  Spin,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
@@ -265,9 +280,24 @@ function ChatMessageView({ message }: { message: DisplayMessage }) {
         {message.citations && (
           <div className="citations">
             {message.citations.map((citation) => (
-              <Tag key={citation.chunkId}>
-                {citation.documentId.slice(0, 8)} · {citation.score.toFixed(3)}
-              </Tag>
+              <Popover
+                key={citation.chunkId}
+                title={`Source ${citation.documentId.slice(0, 8)}`}
+                content={
+                  <div className="citation-detail">
+                    <p>{citation.excerpt}</p>
+                    <span>
+                      {citation.pages.length ? `Page ${citation.pages.join(', ')}` : 'Document range'} · characters{' '}
+                      {citation.startChar}-{citation.endChar}
+                    </span>
+                  </div>
+                }
+              >
+                <Tag className="citation-tag">
+                  {citation.pages.length ? `p.${citation.pages.join(',')}` : citation.documentId.slice(0, 8)} ·{' '}
+                  {citation.score.toFixed(3)}
+                </Tag>
+              </Popover>
             ))}
           </div>
         )}

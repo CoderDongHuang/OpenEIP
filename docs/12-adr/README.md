@@ -21,3 +21,4 @@
 ```
 ADR-0001    ← 顺序编号，永不重复
 ```
+# ADR-0009: [Hybrid Retrieval Storage](adr-0009-hybrid-retrieval-storage.md)

@@ -67,6 +67,9 @@ class EmbeddingService:
                     model=self._provider.model,
                     model_version=self._provider.version,
                     vector=vector,
+                    pages=chunk.pages,
+                    start_char=chunk.start_char,
+                    end_char=chunk.end_char,
                 )
                 for chunk, vector in zip(job.chunks, vectors, strict=True)
             )

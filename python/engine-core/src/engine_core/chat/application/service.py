@@ -58,6 +58,10 @@ class ChatService:
                                 "chunkId": citation.chunk_id,
                                 "sourceSha256": citation.source_sha256,
                                 "score": citation.score,
+                                "excerpt": citation.excerpt,
+                                "pages": list(citation.pages),
+                                "startChar": citation.start_char,
+                                "endChar": citation.end_char,
                             }
                             for citation in result.citations
                         ],

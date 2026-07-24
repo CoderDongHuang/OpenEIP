@@ -17,3 +17,4 @@
 ```
 RFC-0001    ← 顺序编号，永不重复，即使被拒绝也不重用
 ```
+# RFC-0005: [Production Knowledge Retrieval](rfc-0005-production-knowledge-retrieval.md)

@@ -715,6 +715,52 @@ textarea {
   flex-wrap: wrap;
   gap: 6px;
 }
+
+.citation-tag {
+  cursor: pointer;
+}
+
+.citation-detail {
+  width: min(360px, 70vw);
+}
+
+.citation-detail p {
+  margin: 0 0 8px;
+  white-space: pre-wrap;
+}
+
+.citation-detail span {
+  color: #667085;
+  font-size: 12px;
+}
+
+.knowledge-search {
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.knowledge-search-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 120px auto;
+  gap: 8px;
+}
+
+.knowledge-search-results {
+  max-height: 420px;
+  margin-top: 12px;
+  overflow: auto;
+  border-top: 1px solid #e5e7eb;
+}
+
+@media (max-width: 640px) {
+  .knowledge-search-row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .knowledge-search-row .ant-input-affix-wrapper {
+    grid-column: 1 / -1;
+  }
+}
 .composer {
   padding: 14px max(22px, calc((100% - 860px) / 2)) 18px;
   border-top: 1px solid #d9dfdc;

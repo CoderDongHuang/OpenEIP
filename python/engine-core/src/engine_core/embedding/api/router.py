@@ -26,6 +26,9 @@ class EmbeddingChunkRequest(BaseModel):
     chunk_id: str = Field(alias="chunkId", pattern=r"^chk_[a-f0-9]{32}$")
     text: str = Field(min_length=1, max_length=8192)
     source_sha256: str = Field(alias="sourceSha256", pattern=r"^[a-f0-9]{64}$")
+    pages: tuple[int, ...] = Field(default=(), max_length=100)
+    start_char: int = Field(default=0, alias="startChar", ge=0)
+    end_char: int = Field(default=0, alias="endChar", ge=0)
 
 
 class EmbeddingBatchRequest(BaseModel):
@@ -68,7 +71,10 @@ def build_embedding_router(
             tenant_id=tenant_id,
             knowledge_base_id=validate_identity(decoded.knowledge_base_id, "knowledge base", "EMB", EmbeddingError),
             document_id=validate_identity(decoded.document_id, "document", "EMB", EmbeddingError),
-            chunks=tuple(EmbeddingChunk(item.chunk_id, item.text, item.source_sha256) for item in decoded.chunks),
+            chunks=tuple(
+                EmbeddingChunk(item.chunk_id, item.text, item.source_sha256, item.pages, item.start_char, item.end_char)
+                for item in decoded.chunks
+            ),
         )
         return _success(service.execute(job), x_request_id)
 

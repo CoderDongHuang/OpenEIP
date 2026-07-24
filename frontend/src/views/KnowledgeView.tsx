@@ -5,6 +5,7 @@ import {
   PlayCircleOutlined,
   PlusOutlined,
   ReloadOutlined,
+  SearchOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
 import {
@@ -29,6 +30,8 @@ import {
   DocumentFile,
   KnowledgeBase,
   KnowledgeDocument,
+  KnowledgeSearchHit,
+  SearchMode,
   attachKnowledgeDocument,
   createKnowledgeBase,
   deleteKnowledgeBase,
@@ -38,6 +41,7 @@ import {
   listKnowledgeDocuments,
   processKnowledgeDocument,
   retryKnowledgeDocument,
+  searchKnowledge,
   updateKnowledgeBase,
 } from '../api';
 import { errorMessage, formatDate, shortId } from '../format';
@@ -51,6 +55,9 @@ export function KnowledgeView({ token }: { token: string }) {
   const [selectedId, setSelectedId] = useState('');
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [searchMode, setSearchMode] = useState<SearchMode>('HYBRID');
+  const [searchResults, setSearchResults] = useState<KnowledgeSearchHit[]>([]);
   const [error, setError] = useState('');
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<KnowledgeBase | null>(null);
@@ -74,6 +81,7 @@ export function KnowledgeView({ token }: { token: string }) {
   );
   const load = useCallback(async () => {
     setLoading(true);
+    setSearchResults([]);
     setError('');
     try {
       await loadBases();
@@ -118,6 +126,20 @@ export function KnowledgeView({ token }: { token: string }) {
       await loadDocuments(selected.id);
     } finally {
       setProcessing('');
+    }
+  }
+
+  async function runSearch(values: { query: string }) {
+    if (!selected) return;
+    setSearching(true);
+    setError('');
+    try {
+      const result = await searchKnowledge(token, selected.id, values.query.trim(), searchMode);
+      setSearchResults(result.results);
+    } catch (reason) {
+      setError(errorMessage(reason));
+    } finally {
+      setSearching(false);
     }
   }
 
@@ -236,10 +258,59 @@ export function KnowledgeView({ token }: { token: string }) {
                     </Button>
                   </Form>
                   <Text type="secondary" className="scope-note">
-                    Text and image sources can be processed. PDF is stored and downloadable, but not parsed in v0.2.
+                    Text, image, PDF, Word, PowerPoint, and Excel sources can be parsed and indexed.
                   </Text>
                 </div>
               )}
+              <div className="knowledge-search">
+                <Form className="knowledge-search-row" onFinish={(values) => void runSearch(values)}>
+                  <Form.Item name="query" rules={[{ required: true }, { max: 2000 }]} noStyle>
+                    <Input prefix={<SearchOutlined />} placeholder="Search indexed knowledge" allowClear />
+                  </Form.Item>
+                  <Select<SearchMode>
+                    value={searchMode}
+                    onChange={setSearchMode}
+                    aria-label="Retrieval mode"
+                    options={[
+                      { value: 'HYBRID', label: 'Hybrid' },
+                      { value: 'FULL_TEXT', label: 'Full text' },
+                      { value: 'VECTOR', label: 'Vector' },
+                    ]}
+                  />
+                  <Button type="primary" htmlType="submit" loading={searching} icon={<SearchOutlined />}>
+                    Search
+                  </Button>
+                </Form>
+                {searchResults.length > 0 && (
+                  <List
+                    className="knowledge-search-results"
+                    dataSource={searchResults}
+                    renderItem={(hit) => (
+                      <List.Item>
+                        <List.Item.Meta
+                          title={
+                            <Space wrap>
+                              <Text strong>{fileMap.get(hit.documentId)?.originalName || shortId(hit.documentId)}</Text>
+                              <Tag>{hit.pages.length ? `Page ${hit.pages.join(', ')}` : 'Document range'}</Tag>
+                              <Text type="secondary">{hit.score.toFixed(4)}</Text>
+                            </Space>
+                          }
+                          description={
+                            <>
+                              <Paragraph ellipsis={{ rows: 3, expandable: true, symbol: 'More' }}>
+                                {hit.excerpt}
+                              </Paragraph>
+                              <Text type="secondary">
+                                Characters {hit.startChar}-{hit.endChar} · {shortId(hit.chunkId)}
+                              </Text>
+                            </>
+                          }
+                        />
+                      </List.Item>
+                    )}
+                  />
+                )}
+              </div>
               <Table
                 className="desktop-record-table"
                 rowKey="documentId"
@@ -429,7 +500,7 @@ export function KnowledgeView({ token }: { token: string }) {
 }
 
 function isStoredOnly(file?: DocumentFile): boolean {
-  return file?.contentType === 'application/pdf';
+  return !file;
 }
 
 function statusColor(status: string, file?: DocumentFile): string {

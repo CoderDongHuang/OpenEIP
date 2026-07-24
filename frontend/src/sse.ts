@@ -5,6 +5,10 @@ export interface Citation {
   chunkId: string;
   sourceSha256: string;
   score: number;
+  excerpt: string;
+  pages: number[];
+  startChar: number;
+  endChar: number;
 }
 
 export type ChatEvent =
@@ -82,11 +86,15 @@ export class SseParser {
 }
 
 function parseCitation(value: unknown): Citation {
-  if (!isRecord(value) || Object.keys(value).length !== 4) throw new Error('Invalid citation');
+  if (!isRecord(value) || Object.keys(value).length !== 8) throw new Error('Invalid citation');
   const documentId = requiredString(value.documentId);
   const chunkId = requiredString(value.chunkId);
   const sourceSha256 = requiredString(value.sourceSha256);
   const score = value.score;
+  const excerpt = requiredString(value.excerpt);
+  const pages = value.pages;
+  const startChar = value.startChar;
+  const endChar = value.endChar;
   if (
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(documentId) ||
     !/^chk_[a-f0-9]{32}$/.test(chunkId) ||
@@ -94,11 +102,28 @@ function parseCitation(value: unknown): Citation {
     typeof score !== 'number' ||
     !Number.isFinite(score) ||
     score < -1 ||
-    score > 1
+    score > 1 ||
+    excerpt.length > 500 ||
+    !Array.isArray(pages) ||
+    pages.length > 100 ||
+    pages.some((page) => !Number.isInteger(page) || page < 1) ||
+    !Number.isInteger(startChar) ||
+    !Number.isInteger(endChar) ||
+    (startChar as number) < 0 ||
+    (endChar as number) <= (startChar as number)
   ) {
     throw new Error('Invalid citation');
   }
-  return { documentId, chunkId, sourceSha256, score };
+  return {
+    documentId,
+    chunkId,
+    sourceSha256,
+    score,
+    excerpt,
+    pages: pages as number[],
+    startChar: startChar as number,
+    endChar: endChar as number,
+  };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

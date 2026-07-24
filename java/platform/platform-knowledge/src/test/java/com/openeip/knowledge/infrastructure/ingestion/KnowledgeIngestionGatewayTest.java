@@ -96,10 +96,37 @@ class KnowledgeIngestionGatewayTest {
   }
 
   @Test
+  void sendsPdfDirectlyToVersionedParser() {
+    var parsed = gateway(TOKEN).parse(USER, DOCUMENT, "application/pdf", new byte[] {1, 2, 3});
+
+    assertThat(parsed.sourceType()).isEqualTo("pdf");
+    assertThat(requests)
+        .extracting(CapturedRequest::path)
+        .containsExactly("/api/v1/parsing/documents");
+    assertThat(requests.get(0).contentType()).isEqualTo("application/pdf");
+  }
+
+  @Test
+  void validatesTraceableSearchResults() {
+    var result = gateway(TOKEN).search(USER, BASE, "invoice", "HYBRID", 10);
+
+    assertThat(result.mode()).isEqualTo("HYBRID");
+    assertThat(result.results())
+        .singleElement()
+        .satisfies(
+            hit -> {
+              assertThat(hit.documentId()).isEqualTo(DOCUMENT);
+              assertThat(hit.pages()).containsExactly(2);
+              assertThat(hit.excerpt()).isEqualTo("matched source");
+            });
+  }
+
+  @Test
   void rejectsUnsupportedInputMissingCredentialsAndInvalidUpstreamContracts() {
     KnowledgeIngestionGateway gateway = gateway(TOKEN);
 
-    assertThatThrownBy(() -> gateway.parse(USER, DOCUMENT, "application/pdf", new byte[] {1}))
+    assertThatThrownBy(
+            () -> gateway.parse(USER, DOCUMENT, "application/octet-stream", new byte[] {1}))
         .isInstanceOf(KnowledgeIngestionException.class)
         .hasMessage("Document type is not processable");
     assertThatThrownBy(() -> gateway("").parse(USER, DOCUMENT, "text/plain", new byte[] {1}))
@@ -139,11 +166,7 @@ class KnowledgeIngestionGatewayTest {
           MAPPER
               .createObjectNode()
               .put("documentId", responseDocument)
-              .put(
-                  "sourceType",
-                  exchange.getRequestHeaders().getFirst("Content-Type").startsWith("text/plain")
-                      ? "TEXT"
-                      : "OCR")
+              .put("sourceType", sourceType(exchange.getRequestHeaders().getFirst("Content-Type")))
               .put("normalizedTextSha256", "a".repeat(64))
               .set(
                   "chunks",
@@ -154,7 +177,31 @@ class KnowledgeIngestionGatewayTest {
                               .createObjectNode()
                               .put("chunkId", "chk_" + "b".repeat(32))
                               .put("text", "source")
-                              .put("sha256", "c".repeat(64))));
+                              .put("sha256", "c".repeat(64))
+                              .put("startChar", 0)
+                              .put("endChar", 6)
+                              .set("pages", MAPPER.createArrayNode().add(1))));
+    } else if ("/api/v1/retrieval/search".equals(path)) {
+      JsonNode request = MAPPER.readTree(requestBody);
+      data =
+          MAPPER
+              .createObjectNode()
+              .put("mode", request.path("mode").asText())
+              .set(
+                  "results",
+                  MAPPER
+                      .createArrayNode()
+                      .add(
+                          MAPPER
+                              .createObjectNode()
+                              .put("documentId", DOCUMENT)
+                              .put("chunkId", "chk_" + "d".repeat(32))
+                              .put("sourceSha256", "e".repeat(64))
+                              .put("score", 0.03)
+                              .put("excerpt", "matched source")
+                              .put("startChar", 10)
+                              .put("endChar", 24)
+                              .set("pages", MAPPER.createArrayNode().add(2))));
     } else {
       JsonNode request = MAPPER.readTree(requestBody);
       data =
@@ -171,6 +218,16 @@ class KnowledgeIngestionGatewayTest {
     exchange.sendResponseHeaders(200, response.length);
     exchange.getResponseBody().write(response);
     exchange.close();
+  }
+
+  private static String sourceType(String contentType) {
+    if (contentType.startsWith("text/plain")) {
+      return "TEXT";
+    }
+    if (contentType.startsWith("application/pdf")) {
+      return "PDF";
+    }
+    return "OCR";
   }
 
   private record CapturedRequest(

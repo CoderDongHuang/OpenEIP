@@ -3,11 +3,11 @@
 > Open Enterprise Intelligence Platform
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.2.0--alpha-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-v0.3.0--alpha-orange.svg)](CHANGELOG.md)
 
-OpenEIP 是一个面向企业 AI 场景的开源平台项目。当前 `v0.2.0-alpha` 是 MVP 预发布版本，交付认证授权、文件控制面、受限文档处理、知识库、Embedding、RAG、流式 Chat 和约束 Agent。
+OpenEIP 是一个面向企业 AI 场景的开源平台项目。当前开发列车为 `v0.3.0-alpha` Knowledge，在 v0.2 MVP 基础上交付 PDF/Office 解析、生产 Embedding、全文/向量/混合检索与可定位 Citation。
 
-该版本用于单节点内部验证。OCR、Embedding、RAG 和 Agent 默认使用确定性 Provider，向量数据位于进程内存，文件存储使用本地 Volume；真实模型、Milvus、Kafka 生产链路、多机部署和高可用不属于本次发布承诺。
+该版本用于单节点内部验证。开发环境仍可使用确定性 Provider，但默认 Compose 已使用 Milvus 持久向量检索和 Elasticsearch 全文检索；生产模式拒绝确定性 Embedding 与内存检索适配器。多机部署、高可用、跨存储自动对账和真实模型质量评估不属于本次 alpha 承诺。
 
 ## 当前交付
 
@@ -56,10 +56,7 @@ Browser -> Gateway -> Java Platform -> Python AI Engine
                          \------ Event Bus --/
 ```
 
-默认部署包含基于官方 8.4.10 LTS、digest 固定并移除非运行时管理工具的 hardened MySQL 镜像；Kafka、Milvus、远程 MCP 和真实模型 Provider 已完成技术验证，但将在后续版本通过生产化设计后进入默认部署。
-
-v0.2 中 TXT 与 PNG/JPEG 可进入受限处理链路；PDF 仅支持安全存储和下载。向量数据位于
-Python 进程内存，服务重启后可在 Knowledge 页对已就绪文档执行“重建向量”。
+默认部署包含 hardened MySQL 8.4.10、Milvus 2.6、Elasticsearch 8.19、etcd 与 MinIO。PDF、DOCX、PPTX、XLSX、TXT 和 OCR 结果可进入受限解析链路，Knowledge 页支持全文、向量与混合检索，Chat Citation 可定位到原文摘录、页码和字符范围。
 
 ## 项目结构
 

@@ -50,14 +50,19 @@ export function DocumentsView({ token }: { token: string }) {
         <div>
           <Title level={3}>Documents</Title>
           <Paragraph type="secondary">
-            Upload TXT, PNG, or JPEG for processing. PDF is stored and downloadable only in v0.2.
+            Upload text, image, PDF, Word, PowerPoint, or Excel sources for processing.
           </Paragraph>
         </div>
         <Space>
           <Tooltip title="Refresh">
             <Button icon={<ReloadOutlined />} onClick={() => void load()} aria-label="Refresh" />
           </Tooltip>
-          <Upload customRequest={upload} showUploadList={false} accept=".txt,.png,.jpg,.jpeg,.pdf" multiple={false}>
+          <Upload
+            customRequest={upload}
+            showUploadList={false}
+            accept=".txt,.png,.jpg,.jpeg,.pdf,.docx,.pptx,.xlsx"
+            multiple={false}
+          >
             <Button type="primary" icon={<UploadOutlined />} loading={uploading}>
               Upload
             </Button>
@@ -96,11 +101,7 @@ export function DocumentsView({ token }: { token: string }) {
           {
             title: 'Availability',
             key: 'status',
-            render: (_, file) => (
-              <Tag color={file.contentType === 'application/pdf' ? 'gold' : 'green'}>
-                {file.contentType === 'application/pdf' ? 'Stored only' : 'Processable'}
-              </Tag>
-            ),
+            render: () => <Tag color="green">Processable</Tag>,
           },
           { title: 'Uploaded', dataIndex: 'createdAt', key: 'date', render: formatDate, responsive: ['lg'] },
           {
@@ -185,9 +186,7 @@ export function DocumentsView({ token }: { token: string }) {
                   <Text type="secondary">
                     {formatBytes(file.sizeBytes)} / {formatDate(file.createdAt)}
                   </Text>
-                  <Tag color={file.contentType === 'application/pdf' ? 'gold' : 'green'}>
-                    {file.contentType === 'application/pdf' ? 'Stored only' : 'Processable'}
-                  </Tag>
+                  <Tag color="green">Processable</Tag>
                 </Space>
               }
             />

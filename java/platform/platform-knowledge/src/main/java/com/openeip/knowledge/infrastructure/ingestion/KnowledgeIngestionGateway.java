@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class KnowledgeIngestionGateway {
   private static final String OCR_RESULT_MEDIA_TYPE = "application/vnd.openeip.ocr-result.v1+json";
-  private static final int MAX_RESPONSE_BYTES = 8 * 1024 * 1024;
+  private static final int MAX_RESPONSE_BYTES = 16 * 1024 * 1024;
   private static final int EMBEDDING_BATCH_SIZE = 32;
   private static final Pattern SHA256 = Pattern.compile("^[a-f0-9]{64}$");
   private static final Pattern CHUNK_ID = Pattern.compile("^chk_[a-f0-9]{32}$");
@@ -71,7 +72,7 @@ public class KnowledgeIngestionGateway {
         throw KnowledgeIngestionException.upstream();
       }
       parsingContentType = OCR_RESULT_MEDIA_TYPE;
-    } else if (!"text/plain".equals(contentType)) {
+    } else if (!isDirectlyParsable(contentType)) {
       throw KnowledgeIngestionException.unsupported();
     }
 
@@ -91,14 +92,17 @@ public class KnowledgeIngestionGateway {
     for (int offset = 0; offset < chunks.size(); offset += EMBEDDING_BATCH_SIZE) {
       List<ParsedChunk> batch =
           chunks.subList(offset, Math.min(chunks.size(), offset + EMBEDDING_BATCH_SIZE));
-      List<Map<String, String>> encodedChunks =
+      List<Map<String, Object>> encodedChunks =
           batch.stream()
               .map(
                   chunk ->
-                      Map.of(
+                      Map.<String, Object>of(
                           "chunkId", chunk.chunkId(),
                           "text", chunk.text(),
-                          "sourceSha256", chunk.sha256()))
+                          "sourceSha256", chunk.sha256(),
+                          "pages", chunk.pages(),
+                          "startChar", chunk.startChar(),
+                          "endChar", chunk.endChar()))
               .toList();
       byte[] body;
       try {
@@ -122,6 +126,56 @@ public class KnowledgeIngestionGateway {
       total += batch.size();
     }
     return total;
+  }
+
+  public SearchResult search(
+      String userId, String knowledgeBaseId, String query, String mode, int topK) {
+    byte[] body;
+    try {
+      body =
+          mapper.writeValueAsBytes(
+              Map.of(
+                  "knowledgeBaseId", knowledgeBaseId, "query", query, "mode", mode, "topK", topK));
+    } catch (JsonProcessingException exception) {
+      throw KnowledgeIngestionException.upstream();
+    }
+    JsonNode data = post("/api/v1/retrieval/search", "application/json", body, userId, Map.of());
+    if (!mode.equals(requiredText(data, "mode"))
+        || !data.path("results").isArray()
+        || data.path("results").size() > 50) {
+      throw KnowledgeIngestionException.upstream();
+    }
+    List<SearchHit> hits = new ArrayList<>();
+    for (JsonNode value : data.path("results")) {
+      String documentId = requiredText(value, "documentId");
+      String chunkId = requiredText(value, "chunkId");
+      String sourceSha256 = requiredText(value, "sourceSha256");
+      String excerpt = requiredText(value, "excerpt");
+      JsonNode pagesNode = value.path("pages");
+      double score = value.path("score").asDouble(Double.NaN);
+      int startChar = value.path("startChar").asInt(-1);
+      int endChar = value.path("endChar").asInt(-1);
+      if (!isUuid(documentId)
+          || !CHUNK_ID.matcher(chunkId).matches()
+          || !SHA256.matcher(sourceSha256).matches()
+          || excerpt.length() > 500
+          || !pagesNode.isArray()
+          || pagesNode.size() > 100
+          || !Double.isFinite(score)
+          || startChar < 0
+          || endChar <= startChar) {
+        throw KnowledgeIngestionException.upstream();
+      }
+      List<Integer> pages = new ArrayList<>();
+      pagesNode.forEach(page -> pages.add(page.asInt()));
+      if (pages.stream().anyMatch(page -> page < 1)) {
+        throw KnowledgeIngestionException.upstream();
+      }
+      hits.add(
+          new SearchHit(
+              documentId, chunkId, sourceSha256, score, excerpt, pages, startChar, endChar));
+    }
+    return new SearchResult(mode, List.copyOf(hits));
   }
 
   private JsonNode post(
@@ -177,7 +231,7 @@ public class KnowledgeIngestionGateway {
     requireText(data, "documentId", documentId);
     String sourceType = requiredText(data, "sourceType");
     String fingerprint = requiredText(data, "normalizedTextSha256");
-    if ((!"TEXT".equals(sourceType) && !"OCR".equals(sourceType))
+    if ((!Set.of("TEXT", "OCR", "PDF", "DOCX", "PPTX", "XLSX").contains(sourceType))
         || !SHA256.matcher(fingerprint).matches()
         || !data.path("chunks").isArray()
         || data.path("chunks").isEmpty()
@@ -195,7 +249,18 @@ public class KnowledgeIngestionGateway {
           || !SHA256.matcher(sha256).matches()) {
         throw KnowledgeIngestionException.upstream();
       }
-      chunks.add(new ParsedChunk(chunkId, text, sha256));
+      JsonNode pagesNode = value.path("pages");
+      if (!pagesNode.isArray() || pagesNode.size() > 100) {
+        throw KnowledgeIngestionException.upstream();
+      }
+      List<Integer> pages = new ArrayList<>();
+      pagesNode.forEach(page -> pages.add(page.asInt()));
+      int startChar = value.path("startChar").asInt(-1);
+      int endChar = value.path("endChar").asInt(-1);
+      if (pages.stream().anyMatch(page -> page < 1) || startChar < 0 || endChar <= startChar) {
+        throw KnowledgeIngestionException.upstream();
+      }
+      chunks.add(new ParsedChunk(chunkId, text, sha256, List.copyOf(pages), startChar, endChar));
     }
     return new ParsedDocument(
         sourceType.toLowerCase(Locale.ROOT), fingerprint, List.copyOf(chunks));
@@ -219,6 +284,25 @@ public class KnowledgeIngestionGateway {
     return value.endsWith("/") ? value.substring(0, value.length() - 1) : value;
   }
 
+  private static boolean isUuid(String value) {
+    try {
+      UUID.fromString(value);
+      return true;
+    } catch (IllegalArgumentException exception) {
+      return false;
+    }
+  }
+
+  private static boolean isDirectlyParsable(String contentType) {
+    return Set.of(
+            "text/plain",
+            "application/pdf",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        .contains(contentType);
+  }
+
   public record ParsedDocument(String sourceType, String fingerprint, List<ParsedChunk> chunks) {
     public ParsedDocument {
       chunks = List.copyOf(chunks);
@@ -230,5 +314,34 @@ public class KnowledgeIngestionGateway {
     }
   }
 
-  public record ParsedChunk(String chunkId, String text, String sha256) {}
+  public record ParsedChunk(
+      String chunkId, String text, String sha256, List<Integer> pages, int startChar, int endChar) {
+    public ParsedChunk(String chunkId, String text, String sha256) {
+      this(chunkId, text, sha256, List.of(1), 0, text.length());
+    }
+
+    public ParsedChunk {
+      pages = List.copyOf(pages);
+    }
+  }
+
+  public record SearchHit(
+      String documentId,
+      String chunkId,
+      String sourceSha256,
+      double score,
+      String excerpt,
+      List<Integer> pages,
+      int startChar,
+      int endChar) {
+    public SearchHit {
+      pages = List.copyOf(pages);
+    }
+  }
+
+  public record SearchResult(String mode, List<SearchHit> results) {
+    public SearchResult {
+      results = List.copyOf(results);
+    }
+  }
 }
