@@ -23,7 +23,7 @@ integration. Acceptance criteria and exclusions are canonical in GitHub Issue #7
 | 11 Security Review | `issue-0070-security-review.md` and adversarial contract tests | Complete |
 | 12 Quality Gate | `issue-0070-quality-gate.md` | Complete |
 | 13 Docs Update | SDD, OpenAPI, DB, UI, RFC, ADR, test plan and project metadata | Complete |
-| 14 Pull Request | implementation PR | Pending |
+| 14 Pull Request | GitHub PR #72 | Complete |
 | 15 Code Review | independent review | Pending |
 | 16 Merge | reviewed implementation merged | Pending |
 | 17 Release | `v0.4.0-alpha` tag workflow and evidence | Pending |
