@@ -46,6 +46,10 @@ subprojects {
         imports {
             mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.16")
         }
+        dependencies {
+            dependency("io.netty:netty-codec:4.1.136.Final")
+            dependency("org.postgresql:postgresql:42.7.12")
+        }
     }
 
     dependencies {
