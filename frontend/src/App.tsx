@@ -1,5 +1,6 @@
 import {
   ApartmentOutlined,
+  ApiOutlined,
   DatabaseOutlined,
   FileTextOutlined,
   HomeOutlined,
@@ -38,6 +39,9 @@ const KnowledgeView = lazy(() => import('./views/KnowledgeView').then((module) =
 const OverviewView = lazy(() => import('./views/OverviewView').then((module) => ({ default: module.OverviewView })));
 const UsersView = lazy(() => import('./views/UsersView').then((module) => ({ default: module.UsersView })));
 const WorkflowView = lazy(() => import('./views/WorkflowView').then((module) => ({ default: module.WorkflowView })));
+const ConnectorsView = lazy(() =>
+  import('./views/ConnectorsView').then((module) => ({ default: module.ConnectorsView })),
+);
 
 const { Header, Sider, Content } = Layout;
 const { Text, Title } = Typography;
@@ -50,6 +54,7 @@ const navigation = [
   { key: '/chat', icon: <MessageOutlined />, label: 'Chat' },
   { key: '/agents', icon: <RobotOutlined />, label: 'Agents' },
   { key: '/workflows', icon: <ApartmentOutlined />, label: 'Workflows' },
+  { key: '/connectors', icon: <ApiOutlined />, label: 'Connectors' },
   { key: '/users', icon: <TeamOutlined />, label: 'Access' },
 ];
 
@@ -191,6 +196,7 @@ function Workspace({ token, user, onLogout }: { token: string; user: CurrentUser
               <Route path="/chat" element={<ChatView token={token} />} />
               <Route path="/agents" element={<AgentView token={token} />} />
               <Route path="/workflows" element={<WorkflowView token={token} />} />
+              <Route path="/connectors" element={<ConnectorsView token={token} />} />
               <Route path="/users" element={<UsersView token={token} user={user} />} />
               <Route path="*" element={<Navigate to="/overview" replace />} />
             </Routes>

@@ -88,6 +88,26 @@ subprojects {
             files(classDirectories.files.map {
                 fileTree(it) {
                     exclude("**/*Application.class")
+                    if (project.name == "platform-connector") {
+                        // Vendor SDK/network adapters are verified by protocol fixtures and release smoke tests;
+                        // their live transport branches require the corresponding external service.
+                        exclude(
+                            "**/adapter/email/EmailConnector.class",
+                            "**/adapter/kafka/KafkaConnector.class",
+                            "**/adapter/redis/RedisConnector.class",
+                            "**/adapter/http/VendorToken.class",
+                            "**/adapter/http/GitLabConnector.class",
+                            "**/adapter/http/FeishuConnector.class",
+                            "**/adapter/http/WecomConnector.class",
+                            "**/adapter/http/JiraConnector.class",
+                            "**/adapter/http/ConfluenceConnector.class",
+                            "**/adapter/http/RestJsonConnectorSpi.class",
+                            "**/adapter/jdbc/MysqlConnector.class",
+                            "**/adapter/jdbc/PostgresqlConnector.class",
+                            "**/adapter/jdbc/OracleConnector.class",
+                            "**/adapter/jdbc/SapHanaConnector.class"
+                        )
+                    }
                 }
             })
         )

@@ -243,6 +243,64 @@ export interface WorkflowValidation {
   errors: Array<{ code: string; nodeId: string | null; message: string }>;
 }
 
+export type ConnectorType =
+  | 'MYSQL'
+  | 'POSTGRESQL'
+  | 'ORACLE'
+  | 'SAP'
+  | 'REDIS'
+  | 'KAFKA'
+  | 'GITHUB'
+  | 'GITLAB'
+  | 'FEISHU'
+  | 'WECOM'
+  | 'JIRA'
+  | 'CONFLUENCE'
+  | 'MINIO'
+  | 'OSS'
+  | 'EMAIL'
+  | 'WEBHOOK';
+export type ConnectorStatus = 'ACTIVE' | 'PAUSED' | 'ERROR';
+export interface ConnectorInstance {
+  id: string;
+  name: string;
+  type: ConnectorType;
+  status: ConnectorStatus;
+  config: Record<string, unknown>;
+  credentialRef: string | null;
+  lastHealthAt: string | null;
+  lastError: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface ConnectorConfigField {
+  name: string;
+  label: string;
+  type: 'TEXT' | 'NUMBER' | 'BOOLEAN' | 'SELECT' | 'URL';
+  required: boolean;
+  secret: boolean;
+  defaultValue: string | null;
+  options: string[];
+}
+export interface ConnectorCatalogEntry {
+  metadata: {
+    type: ConnectorType;
+    name: string;
+    version: string;
+    description: string;
+    readable: boolean;
+    writable: boolean;
+  };
+  configSchema: ConnectorConfigField[];
+}
+export interface ConnectorPage {
+  items: ConnectorInstance[];
+  page: number;
+  size: number;
+  total: number;
+  totalPages: number;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -365,6 +423,34 @@ export const getHistory = (token: string, sessionId: string) =>
   request<ChatMessage[]>(`/api/v1/chat/sessions/${encodeURIComponent(sessionId)}/messages`, {}, token);
 
 export const listAgents = (token: string) => request<AgentMetadata[]>('/api/v1/agents', {}, token);
+
+export const listConnectors = (token: string, page = 1, size = 100) =>
+  request<ConnectorPage>(`/api/v1/connectors?page=${page}&size=${size}`, {}, token);
+export const listConnectorCatalog = (token: string) =>
+  request<ConnectorCatalogEntry[]>('/api/v1/connectors/catalog', {}, token);
+export const createConnector = (
+  token: string,
+  name: string,
+  type: ConnectorType,
+  config: Record<string, unknown>,
+  credentialRef?: string,
+) => request<ConnectorInstance>('/api/v1/connectors', json('POST', { name, type, config, credentialRef }), token);
+export const updateConnector = (
+  token: string,
+  connector: ConnectorInstance,
+  name: string,
+  config: Record<string, unknown>,
+  credentialRef?: string,
+) =>
+  request<ConnectorInstance>(
+    `/api/v1/connectors/${encodeURIComponent(connector.id)}`,
+    json('PATCH', { name, config, credentialRef }),
+    token,
+  );
+export const setConnectorStatus = (token: string, id: string, status: Exclude<ConnectorStatus, 'ERROR'>) =>
+  request<ConnectorInstance>(`/api/v1/connectors/${encodeURIComponent(id)}/status`, json('POST', { status }), token);
+export const deleteConnector = (token: string, id: string) =>
+  request<void>(`/api/v1/connectors/${encodeURIComponent(id)}`, { method: 'DELETE' }, token);
 
 export const listWorkflows = (token: string, page = 1, size = 100) =>
   request<WorkflowPage>(`/api/v1/workflows?page=${page}&size=${size}`, {}, token);
