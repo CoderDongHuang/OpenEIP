@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Global application settings."""
 
-    version: str = "0.3.0-alpha"
+    version: str = "0.4.0-alpha"
 
     # Server
     host: str = "0.0.0.0"
