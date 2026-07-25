@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "com.openeip"
-version = "0.4.0-alpha"
+version = "0.5.0-alpha"
 
 subprojects {
     apply(plugin = "java")
