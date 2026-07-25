@@ -22,9 +22,9 @@ reference; plaintext secrets are never accepted by the control plane.
 | 11 Security Review | `issue-0071-security-review.md` | Complete |
 | 12 Quality Gate | `issue-0071-quality-gate.md` | Complete |
 | 13 Docs Update | SDD, RFC/ADR, acceptance matrix, storage, UI and release metadata | Complete |
-| 14 Pull Request | To be created | Pending |
-| 15 Code Review | Independent review | Pending |
-| 16 Merge | To be recorded | Pending |
+| 14 Pull Request | PR #75 | Complete |
+| 15 Code Review | Independent review and all required CI checks | Complete |
+| 16 Merge | PR #75 merged as `41367b4` | Complete |
 | 17 Release | `v0.5.0-alpha` only after all gates pass | Pending |
 
 ## Initial Scope

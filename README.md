@@ -3,9 +3,9 @@
 > Open Enterprise Intelligence Platform
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.4.0--alpha-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-v0.5.0--alpha-orange.svg)](CHANGELOG.md)
 
-OpenEIP 是一个面向企业 AI 场景的开源平台项目。最新发布版本为 `v0.4.0-alpha` Workflow，在 Knowledge 基线上增加可视化 Canvas、持久执行状态机、触发器、审批、重试与事务事件集成。
+OpenEIP 是一个面向企业 AI 场景的开源平台项目。当前发布准备版本为 `v0.5.0-alpha` Connector，在 Workflow 基线上增加 16 类外部系统连接器、凭据引用、连接测试、元数据读取和生命周期管理。
 
 该版本用于单节点内部验证。开发环境仍可使用确定性 Provider，但默认 Compose 已使用 Milvus 持久向量检索和 Elasticsearch 全文检索；生产模式拒绝确定性 Embedding 与内存检索适配器。多机部署、高可用、跨存储自动对账和真实模型质量评估不属于本次 alpha 承诺。
 

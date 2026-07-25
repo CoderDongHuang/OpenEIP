@@ -6,6 +6,16 @@
 
 ## [Unreleased]
 
+## [0.5.0-alpha] - 2026-07-25
+
+### Added
+- v0.5 Connector 控制平面（Issue #71）：租户隔离的 CRUD、生命周期操作、连接测试和凭据引用管理。
+- 交付 16 类适配器：MySQL、PostgreSQL、Oracle、SAP、Redis、Kafka、GitHub、GitLab、飞书、企业微信、Jira、Confluence、MinIO、OSS、Email 和 Webhook。
+- Connector SPI v1、统一错误模型、配置校验、元数据读取及适配器协议契约测试；数据库迁移 `V2.5.0__init_connector_schema.sql`。
+
+### Security
+- 控制平面只接受 `secret://...` 凭据引用，拒绝明文密码、Token 和 Secret 配置；凭据引用在 API、日志和 UI 中均脱敏。
+
 ## [0.4.0-alpha] - 2026-07-25
 
 ### Added

@@ -15,7 +15,7 @@ v0.3 ──→ Knowledge           alpha 已发布
 v0.4 ──→ Workflow            alpha 已发布
          Node / Canvas / Execution / Trigger / Approval / Retry
 
-v0.5 ──→ Connector           规划中
+v0.5 ──→ Connector           alpha 待发布
          MySQL / PostgreSQL / Kafka / Git / 飞书 / 企业微信 / Email
 
 v0.6 ──→ Agent               规划中
@@ -53,6 +53,7 @@ v1.0 ──→ LTS                 规划中
 - `v0.2.0-alpha` 仅承诺单节点、确定性 Provider 和内存向量库范围内的可验证 MVP。
 - `v0.3.0-alpha` Knowledge 已于 2026-07-24 作为 GitHub Pre-release 发布；已公开标签保持不变。
 - `v0.4.0-alpha` Workflow 已于 2026-07-25 作为 GitHub Pre-release 发布；已公开标签保持不变。
+- v0.5 Connector 已完成实现与合并，待发布准备分支通过最终验证后创建 `v0.5.0-alpha` 标签。
 
 ## LTS 策略
 

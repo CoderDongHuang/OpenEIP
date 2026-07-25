@@ -14,7 +14,7 @@ from typing import Any
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-EXPECTED_VERSION = "0.4.0-alpha"
+EXPECTED_VERSION = "0.5.0-alpha"
 DEFAULT_TENANT_ID = "11111111-1111-4111-8111-111111111111"
 OCR_FIXTURE = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAXAAAAAkCAAAAAC1Gj62AAABGUlEQVR4nO2a0QrDIAxFdez/"
@@ -564,7 +564,7 @@ def main() -> int:
     ) as error:
         print(f"FAIL: {error}", file=sys.stderr)
         return 1
-    print("PASS: v0.4.0-alpha full-stack release smoke", flush=True)
+    print("PASS: v0.5.0-alpha full-stack release smoke", flush=True)
     return 0
 
 
