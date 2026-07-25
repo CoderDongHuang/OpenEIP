@@ -13,6 +13,7 @@ COPY platform-knowledge/ platform-knowledge/
 COPY platform-chat/ platform-chat/
 COPY platform-agent/ platform-agent/
 COPY platform-workflow/ platform-workflow/
+COPY platform-connector/ platform-connector/
 COPY platform-app/ platform-app/
 RUN --mount=type=cache,target=/root/.gradle \
     sed -i 's/\r$//' gradlew \

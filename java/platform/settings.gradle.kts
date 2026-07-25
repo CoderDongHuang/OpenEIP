@@ -8,5 +8,6 @@ include(
     "platform-knowledge",
     "platform-chat",
     "platform-agent",
-    "platform-workflow"
+    "platform-workflow",
+    "platform-connector"
 )
