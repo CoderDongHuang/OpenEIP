@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+## [0.4.0-alpha] - 2026-07-25
+
 ### Added
 - v0.4 Workflow：草稿、严格图校验、不可变发布版本、版本恢复和基于 `@xyflow/react` 的可视化 Canvas（Issue #70）。
 - MySQL 持久执行状态机，支持有序事件、Delay/Approval 暂停恢复、取消、手动重试和重启后继续处理。
@@ -14,6 +16,7 @@
 
 ### Security
 - Workflow 图、触发器配置、执行输入和事件正文采用 fail-closed 类型、字段与尺寸边界；Webhook secret 仅显示一次并以 SHA-256 摘要存储。
+- 固定已修复的 `brace-expansion`，并将前端路由与 ESLint 工具链调整到无 HIGH/CRITICAL 依赖公告的兼容版本。
 
 ## [0.3.0-alpha] - 2026-07-24
 
