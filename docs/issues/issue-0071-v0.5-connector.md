@@ -25,7 +25,7 @@ reference; plaintext secrets are never accepted by the control plane.
 | 14 Pull Request | PR #75 | Complete |
 | 15 Code Review | Independent review and all required CI checks | Complete |
 | 16 Merge | PR #75 merged as `41367b4` | Complete |
-| 17 Release | `v0.5.0-alpha` only after all gates pass | Pending |
+| 17 Release | `v0.5.0-alpha` published with workflow, GHCR digests and attestations | Complete |
 
 ## Initial Scope
 
