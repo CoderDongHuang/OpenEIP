@@ -26,4 +26,4 @@ integration. Acceptance criteria and exclusions are canonical in GitHub Issue #7
 | 14 Pull Request | GitHub PR #72 | Complete |
 | 15 Code Review | user-confirmed independent audit approval for PR #72 | Complete |
 | 16 Merge | PR #72 merged as `4373685` on 2026-07-24 | Complete |
-| 17 Release | `v0.4.0-alpha` tag workflow and evidence | Pending |
+| 17 Release | `v0.4.0-alpha` Pre-release, workflow run `30147381604`, GHCR digests, SPDX SBOM and SLSA provenance | Complete |
