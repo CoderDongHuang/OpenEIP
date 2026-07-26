@@ -18,18 +18,19 @@ LLM 或 Agent 质量。生产模型、Milvus 容量和多节点故障测试必�
 
 ## 模块计划与证据
 
-| 模块 | 测试计划 | Benchmark 证据 | 已验证基线 |
-|---|---|---|---|
-| Auth | [Plan](auth-test-plan.md) | [Result](results/auth-benchmark.json) | 31 tests，96.33%，登录 P99 337.51 ms |
-| File Upload | [Plan](file-upload-test-plan.md) | [Result](results/file-upload-benchmark.json) | 29 tests，94.84%，1 MiB P99 5.60 ms |
-| OCR | [Plan](ocr-test-plan.md) | [Result](results/ocr-benchmark.json) | 受限栅格流水线 P99 24.07 ms |
-| Document Parsing | [Plan](document-parsing-test-plan.md) | [Result](results/document-parsing-benchmark.json) | 1 MiB/1,172 chunks P99 60.63 ms |
-| Knowledge Base | [Plan](knowledge-base-test-plan.md) | [Result](results/knowledge-base-benchmark.json) | 92.85%，状态转换 P99 7.78 ms |
-| Embedding | [Plan](embedding-test-plan.md) | [Result](results/embedding-benchmark.json) | 97.91%，32-text batch P99 1.359 ms |
-| RAG | [Plan](rag-test-plan.md) | [Result](results/rag-benchmark.json) | 98.11%，1,000-record P99 6.449 ms |
-| Chat | [Plan](chat-test-plan.md) | [Result](results/chat-benchmark.json) | Java 95.28%，首 Token P99 5.762 ms |
-| Agent | [Plan](agent-test-plan.md) | [Result](results/agent-benchmark.json) | Python 93.62% / Java 94.18%，完成 P99 0.116 ms |
-| Workflow | [Plan](v0.4-workflow-test-plan.md) | [Result](results/workflow-benchmark.json) | 1,000 transitions P99 36.09 ms；100 并发执行 313.94/s |
+| 模块             | 测试计划                              | Benchmark 证据                                    | 已验证基线                                            |
+| ---------------- | ------------------------------------- | ------------------------------------------------- | ----------------------------------------------------- |
+| Auth             | [Plan](auth-test-plan.md)             | [Result](results/auth-benchmark.json)             | 31 tests，96.33%，登录 P99 337.51 ms                  |
+| File Upload      | [Plan](file-upload-test-plan.md)      | [Result](results/file-upload-benchmark.json)      | 29 tests，94.84%，1 MiB P99 5.60 ms                   |
+| OCR              | [Plan](ocr-test-plan.md)              | [Result](results/ocr-benchmark.json)              | 受限栅格流水线 P99 24.07 ms                           |
+| Document Parsing | [Plan](document-parsing-test-plan.md) | [Result](results/document-parsing-benchmark.json) | 1 MiB/1,172 chunks P99 60.63 ms                       |
+| Knowledge Base   | [Plan](knowledge-base-test-plan.md)   | [Result](results/knowledge-base-benchmark.json)   | 92.85%，状态转换 P99 7.78 ms                          |
+| Embedding        | [Plan](embedding-test-plan.md)        | [Result](results/embedding-benchmark.json)        | 97.91%，32-text batch P99 1.359 ms                    |
+| RAG              | [Plan](rag-test-plan.md)              | [Result](results/rag-benchmark.json)              | 98.11%，1,000-record P99 6.449 ms                     |
+| Chat             | [Plan](chat-test-plan.md)             | [Result](results/chat-benchmark.json)             | Java 95.28%，首 Token P99 5.762 ms                    |
+| Agent            | [Plan](agent-test-plan.md)            | [Result](results/agent-benchmark.json)            | Python 93.62% / Java 94.18%，完成 P99 0.116 ms        |
+| Workflow         | [Plan](v0.4-workflow-test-plan.md)    | [Result](results/workflow-benchmark.json)         | 1,000 transitions P99 36.09 ms；100 并发执行 313.94/s |
+| Agent v0.6       | [Plan](v0.6-agent-test-plan.md)       | Pending implementation evidence                   | Proposed gates for five first-party Agents            |
 
 最终合并快照必须重新运行全量门禁；上表的模块开发数据不能替代发布候选结果。
 
