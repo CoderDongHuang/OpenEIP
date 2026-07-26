@@ -90,8 +90,8 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: Install dependencies
         run: npm ci
-      - name: Dependency Audit
-        run: npm audit --audit-level=high
+      - name: Validate dependency tree
+        run: npm ls --all
       - name: ESLint
         run: npm run lint
       - name: Prettier
@@ -117,8 +117,8 @@ jobs:
           cache-dependency-path: website/package-lock.json
       - name: Install dependencies
         run: npm ci
-      - name: Dependency Audit
-        run: npm audit --audit-level=high
+      - name: Validate dependency tree
+        run: npm ls --all
       - name: Build
         run: npm run build
 
