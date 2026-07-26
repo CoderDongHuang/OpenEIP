@@ -115,6 +115,10 @@ No existing request allowlist becomes a persistent grant without administrator c
 This proposal requires at least one week of public discussion and a two-thirds Maintainer vote. Append the
 vote, rationale, and decision date before changing the status to Accepted.
 
+Public discussion opened on 2026-07-26 at
+https://github.com/CoderDongHuang/OpenEIP/discussions/80. The earliest valid Maintainer decision date is
+2026-08-02.
+
 ## References
 
-Issue #78; ADR-0007; ADR-0012; ADR-0013; ADR-0014; Agent v0.6 Module SDD.
+Issue #78; Discussion #80; PR #79; ADR-0007; ADR-0012; ADR-0013; ADR-0014; Agent v0.6 Module SDD.
