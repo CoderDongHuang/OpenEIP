@@ -7,13 +7,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.kafka:spring-kafka")
     implementation("io.lettuce:lettuce-core")
-    implementation("org.eclipse.angus:angus-mail:2.0.3")
+    implementation("org.eclipse.angus:angus-mail:2.0.5")
 
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.3")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.3")
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.oracle.database.jdbc:ojdbc11")
-    runtimeOnly("com.sap.cloud.db.jdbc:ngdbc:2.25.9")
+    runtimeOnly("com.sap.cloud.db.jdbc:ngdbc:2.29.7")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("com.h2database:h2")
 }
