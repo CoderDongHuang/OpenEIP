@@ -13,9 +13,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     // JWT
-    implementation("io.jsonwebtoken:jjwt-api:0.12.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
+    implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
 
     // Database
     runtimeOnly("com.mysql:mysql-connector-j")
@@ -25,14 +25,14 @@ dependencies {
     // Lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.3")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.3")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("com.h2database:h2")
-    testImplementation("org.testcontainers:junit-jupiter:1.21.3")
-    testImplementation("org.testcontainers:mysql:1.21.3")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.4")
+    testImplementation("org.testcontainers:mysql:1.21.4")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
 }
 
