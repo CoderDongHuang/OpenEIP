@@ -10,13 +10,13 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-mysql")
 
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.3")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.3")
     runtimeOnly("com.mysql:mysql-connector-j")
 
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("com.h2database:h2")
-    testImplementation("org.testcontainers:junit-jupiter:1.21.3")
-    testImplementation("org.testcontainers:mysql:1.21.3")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.4")
+    testImplementation("org.testcontainers:mysql:1.21.4")
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
 }
