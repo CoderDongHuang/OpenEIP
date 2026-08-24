@@ -9,7 +9,7 @@ dependencies {
     implementation("io.lettuce:lettuce-core")
     implementation("org.eclipse.angus:angus-mail:2.0.5")
 
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.3")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.4")
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.oracle.database.jdbc:ojdbc11")
