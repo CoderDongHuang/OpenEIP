@@ -132,6 +132,146 @@ export interface AgentMetadata {
   tools: AgentTool[];
 }
 
+export interface CursorPage<T> {
+  items: T[];
+  nextCursor?: string | null;
+}
+
+export interface AgentDefinitionV2 {
+  id: string;
+  ownerId: string;
+  name: string;
+  type: 'DOCUMENT' | 'SQL' | 'BI' | 'SEARCH' | 'WORKFLOW' | 'CUSTOM';
+  description: string;
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  draft: Record<string, unknown>;
+  draftRevision: number;
+  publishedVersion: number | null;
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AgentVersionV2 {
+  id: string;
+  agentId: string;
+  version: number | null;
+  status: 'CANDIDATE' | 'PUBLISHED';
+  sourceDraftRevision: number;
+  digest: string;
+  config: Record<string, unknown>;
+  evaluationRunId: string | null;
+  createdBy: string;
+  createdAt: string;
+  publishedBy: string | null;
+  publishedAt: string | null;
+}
+
+export interface AgentRunV2 {
+  id: string;
+  agentId: string;
+  agentVersionId: string;
+  agentVersion: number;
+  status: 'QUEUED' | 'PLANNING' | 'EXECUTING' | 'REFLECTING' | 'PAUSED' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED';
+  resourceHandles: string[];
+  budget: { maxSteps: number; maxDurationSeconds: number; maxToolCalls: number; maxWorkers: number };
+  currentSequence: number;
+  revision: number;
+  failureCode: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AgentRunEventV2 {
+  id: string;
+  runId: string;
+  sequence: number;
+  type: string;
+  payload: Record<string, unknown>;
+  occurredAt: string;
+}
+
+export interface AgentToolV2 {
+  id: string;
+  toolKey: string;
+  name: string;
+  version: string;
+  riskClass: 'READ' | 'WRITE' | 'DESTRUCTIVE';
+  operations: string[];
+  maxDurationMs: number;
+}
+
+export interface AgentToolGrantV2 {
+  id: string;
+  agentVersionId: string;
+  toolVersionId: string;
+  operations: string[];
+  resourceSelector: Record<string, unknown>;
+  approvalMode: 'NONE' | 'POLICY' | 'PER_CALL';
+  expiresAt: string | null;
+  revision: number;
+  revokedAt: string | null;
+}
+
+export interface AgentMemoryV2 {
+  id: string;
+  agentId: string;
+  purpose: string;
+  sourceType: string;
+  sourceId: string;
+  sensitivity: string;
+  provenance: Record<string, unknown>;
+  state: 'ACTIVE' | 'QUARANTINED' | 'DELETING' | 'DELETED';
+  retentionDeadline: string;
+  revision: number;
+  createdAt: string;
+}
+
+export interface McpServerV2 {
+  id: string;
+  name: string;
+  transport: 'STDIO' | 'STREAMABLE_HTTP';
+  endpoint: string;
+  authType: 'NONE' | 'OAUTH2' | 'BEARER_REF' | 'MTLS_REF';
+  credentialConfigured: boolean;
+  status: 'REGISTERED' | 'DISABLED';
+  revision: number;
+  updatedAt: string;
+}
+
+export interface EvaluationDatasetV2 {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  revision: number;
+  updatedAt: string;
+}
+
+export interface EvaluationSuiteV2 {
+  id: string;
+  name: string;
+  status: string;
+  versionId: string;
+  datasetVersionIds: string[];
+  gatePolicy: Record<string, number>;
+  digest: string;
+}
+
+export interface EvaluationRunV2 {
+  id: string;
+  suiteVersionId: string;
+  candidateAgentVersionId: string;
+  baselineAgentVersionId: string;
+  repeatCount: number;
+  status: string;
+  gateStatus: 'PASS' | 'FAIL' | null;
+  revision: number;
+  metrics: Array<{ key: string; value: number; sampleCount: number; low?: number; high?: number }>;
+  gates: Array<{ key: string; status: string; actual?: number; threshold?: number; reasonCode: string }>;
+  createdAt: string;
+}
+
 export type WorkflowNodeType =
   'START' | 'END' | 'LLM' | 'AGENT' | 'TOOL' | 'CONDITION' | 'LOOP' | 'APPROVAL' | 'DELAY' | 'WEBHOOK';
 
@@ -549,5 +689,163 @@ export const decideWorkflowApproval = (
   request<WorkflowExecution>(
     `/api/v1/workflow-approvals/${encodeURIComponent(approvalId)}/decisions`,
     { ...json('POST', { decision, comment }), headers: { 'Idempotency-Key': crypto.randomUUID() } },
+    token,
+  );
+
+const agentMutation = (method: string, body?: unknown, revision?: number): RequestInit => {
+  const headers: Record<string, string> = { 'Idempotency-Key': crypto.randomUUID() };
+  if (revision !== undefined) headers['If-Match'] = String(revision);
+  return { ...json(method, body), headers };
+};
+
+export const listAgentDefinitionsV2 = (token: string) =>
+  request<CursorPage<AgentDefinitionV2>>('/api/v2/agents?limit=100', {}, token);
+export const createAgentDefinitionV2 = (
+  token: string,
+  value: Pick<AgentDefinitionV2, 'name' | 'type' | 'description'>,
+) => request<AgentDefinitionV2>('/api/v2/agents', json('POST', value), token);
+export const updateAgentDefinitionV2 = (token: string, value: AgentDefinitionV2, patch: Record<string, unknown>) =>
+  request<AgentDefinitionV2>(
+    `/api/v2/agents/${encodeURIComponent(value.id)}`,
+    {
+      ...json('PATCH', patch),
+      headers: { 'Content-Type': 'application/merge-patch+json', 'If-Match': String(value.revision) },
+    },
+    token,
+  );
+export const archiveAgentDefinitionV2 = (token: string, value: AgentDefinitionV2) =>
+  request<AgentDefinitionV2>(
+    `/api/v2/agents/${encodeURIComponent(value.id)}:archive`,
+    agentMutation('POST', undefined, value.revision),
+    token,
+  );
+export const listAgentVersionsV2 = (token: string, agentId: string) =>
+  request<CursorPage<AgentVersionV2>>(`/api/v2/agents/${encodeURIComponent(agentId)}/versions?limit=100`, {}, token);
+export const createAgentCandidateV2 = (token: string, value: AgentDefinitionV2) =>
+  request<AgentVersionV2>(
+    `/api/v2/agents/${encodeURIComponent(value.id)}/versions:candidate`,
+    agentMutation('POST', undefined, value.revision),
+    token,
+  );
+export const publishAgentVersionV2 = (token: string, value: AgentDefinitionV2, evaluationRunId: string) =>
+  request<AgentVersionV2>(
+    `/api/v2/agents/${encodeURIComponent(value.id)}/versions:publish`,
+    agentMutation('POST', { evaluationRunId }, value.revision),
+    token,
+  );
+export const restoreAgentVersionV2 = (token: string, value: AgentDefinitionV2, version: number) =>
+  request<AgentDefinitionV2>(
+    `/api/v2/agents/${encodeURIComponent(value.id)}/versions/${version}:restore-draft`,
+    agentMutation('POST', undefined, value.revision),
+    token,
+  );
+
+export const listAgentRunsV2 = (token: string) =>
+  request<CursorPage<AgentRunV2>>('/api/v2/agent-runs?limit=100', {}, token);
+export const createAgentRunV2 = (
+  token: string,
+  agentId: string,
+  value: { agentVersion: number; input: string; resourceHandles: string[]; budget: Record<string, number> },
+) => request<AgentRunV2>(`/api/v2/agents/${encodeURIComponent(agentId)}/runs`, agentMutation('POST', value), token);
+export const listAgentRunEventsV2 = (token: string, runId: string) =>
+  request<CursorPage<AgentRunEventV2>>(
+    `/api/v2/agent-runs/${encodeURIComponent(runId)}/events?afterSequence=0&limit=100`,
+    {},
+    token,
+  );
+export const commandAgentRunV2 = (token: string, run: AgentRunV2, command: 'pause' | 'resume' | 'cancel') =>
+  request<AgentRunV2>(
+    `/api/v2/agent-runs/${encodeURIComponent(run.id)}:${command}`,
+    agentMutation('POST', undefined, run.revision),
+    token,
+  );
+
+export const listAgentToolsV2 = (token: string) =>
+  request<CursorPage<AgentToolV2>>('/api/v2/tools?limit=100', {}, token);
+export const listAgentToolGrantsV2 = (token: string) =>
+  request<CursorPage<AgentToolGrantV2>>('/api/v2/tool-grants?limit=100', {}, token);
+export const createAgentToolGrantV2 = (
+  token: string,
+  value: {
+    agentVersionId: string;
+    toolVersionId: string;
+    operations: string[];
+    resourceSelector: Record<string, unknown>;
+    argumentConstraints: Record<string, unknown>;
+    approvalMode: AgentToolGrantV2['approvalMode'];
+  },
+) => request<AgentToolGrantV2>('/api/v2/tool-grants', agentMutation('POST', value), token);
+export const revokeAgentToolGrantV2 = (token: string, grant: AgentToolGrantV2) =>
+  request<AgentToolGrantV2>(
+    `/api/v2/tool-grants/${encodeURIComponent(grant.id)}`,
+    agentMutation('DELETE', undefined, grant.revision),
+    token,
+  );
+
+export const listAgentMemoriesV2 = (token: string, state?: string) =>
+  request<CursorPage<AgentMemoryV2>>(
+    `/api/v2/memories?limit=100${state ? `&state=${encodeURIComponent(state)}` : ''}`,
+    {},
+    token,
+  );
+export const quarantineAgentMemoryV2 = (token: string, memory: AgentMemoryV2) =>
+  request<AgentMemoryV2>(
+    `/api/v2/memories/${encodeURIComponent(memory.id)}:quarantine`,
+    agentMutation('POST', undefined, memory.revision),
+    token,
+  );
+export const deleteAgentMemoryV2 = (token: string, memory: AgentMemoryV2) =>
+  request<AgentMemoryV2>(
+    `/api/v2/memories/${encodeURIComponent(memory.id)}`,
+    agentMutation('DELETE', undefined, memory.revision),
+    token,
+  );
+export const exportAgentMemoriesV2 = (token: string, purpose?: string) =>
+  request<{ exportId: string; count: number }>(
+    '/api/v2/memories:export',
+    agentMutation('POST', { purpose, includeContent: false }),
+    token,
+  );
+
+export const listMcpServersV2 = (token: string) =>
+  request<CursorPage<McpServerV2>>('/api/v2/mcp-servers?limit=100', {}, token);
+export const createMcpServerV2 = (
+  token: string,
+  value: Pick<McpServerV2, 'name' | 'transport' | 'endpoint' | 'authType'> & { credentialRef?: string },
+) => request<McpServerV2>('/api/v2/mcp-servers', agentMutation('POST', value), token);
+export const commandMcpServerV2 = (token: string, server: McpServerV2, command: 'test' | 'discover') =>
+  request<Record<string, unknown>>(
+    `/api/v2/mcp-servers/${encodeURIComponent(server.id)}:${command}`,
+    agentMutation('POST', undefined, server.revision),
+    token,
+  );
+export const disableMcpServerV2 = (token: string, server: McpServerV2) =>
+  request<McpServerV2>(
+    `/api/v2/mcp-servers/${encodeURIComponent(server.id)}`,
+    agentMutation('DELETE', undefined, server.revision),
+    token,
+  );
+
+export const listEvaluationDatasetsV2 = (token: string) =>
+  request<CursorPage<EvaluationDatasetV2>>('/api/v2/evaluation-datasets?limit=100', {}, token);
+export const createEvaluationDatasetV2 = (token: string, name: string, description: string) =>
+  request<EvaluationDatasetV2>('/api/v2/evaluation-datasets', agentMutation('POST', { name, description }), token);
+export const listEvaluationSuitesV2 = (token: string) =>
+  request<CursorPage<EvaluationSuiteV2>>('/api/v2/evaluation-suites?limit=100', {}, token);
+export const createEvaluationRunV2 = (
+  token: string,
+  value: {
+    suiteVersionId: string;
+    candidateAgentVersionId: string;
+    baselineAgentVersionId: string;
+    repeatCount: number;
+  },
+) => request<EvaluationRunV2>('/api/v2/evaluation-runs', agentMutation('POST', value), token);
+export const getEvaluationRunV2 = (token: string, evaluationRunId: string) =>
+  request<EvaluationRunV2>(`/api/v2/evaluation-runs/${encodeURIComponent(evaluationRunId)}`, {}, token);
+export const cancelEvaluationRunV2 = (token: string, value: EvaluationRunV2) =>
+  request<EvaluationRunV2>(
+    `/api/v2/evaluation-runs/${encodeURIComponent(value.id)}:cancel`,
+    agentMutation('POST', undefined, value.revision),
     token,
   );
