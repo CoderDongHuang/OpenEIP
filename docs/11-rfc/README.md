@@ -13,7 +13,7 @@
 | [RFC-0004](rfc-0004-operational-workspace.md) | Operational Frontend Workspace and Ingestion Boundary | Accepted (Bootstrap) |
 | [RFC-0005](rfc-0005-production-knowledge-retrieval.md) | Production Knowledge Retrieval | Accepted |
 | [RFC-0006](rfc-0006-durable-workflow-orchestration.md) | Durable Workflow Orchestration | Accepted |
-| [RFC-0008](rfc-0008-agent-platform-v2.md) | Production Agent Platform v2 | Proposed |
+| [RFC-0008](rfc-0008-agent-platform-v2.md) | Production Agent Platform v2 | Accepted |
 
 ## RFC 编号规则
 

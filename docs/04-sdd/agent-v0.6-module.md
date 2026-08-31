@@ -1,6 +1,6 @@
 # Agent v0.6 Module Design (Sub-SDD)
 
-> Version: 0.6 draft | Date: 2026-07-26 | Status: Proposed for review  
+> Version: 0.6 | Date: 2026-08-30 | Status: Accepted for implementation
 > Issue: #78 | RFC: RFC-0008 | Decisions: ADR-0012, ADR-0013, ADR-0014
 
 ## Responsibilities and boundaries
@@ -19,7 +19,7 @@ prompts are neither API fields nor persisted observability data.
 
 | Aggregate                       | Identity/version                                                 | Owner          |
 | ------------------------------- | ---------------------------------------------------------------- | -------------- |
-| AgentDefinition / AgentVersion  | UUID; immutable published integer version and digest             | Java           |
+| AgentDefinition / AgentVersion  | UUID; immutable candidate digest; published integer version      | Java           |
 | ToolDefinition / ToolVersion    | reverse-DNS ID; immutable SemVer and digest                      | Java           |
 | ToolGrant                       | Agent version + Tool version + resource/argument/approval policy | Java           |
 | AgentRun / Step / Attempt       | UUID, revision, pinned dependency snapshot                       | Java           |
@@ -29,6 +29,12 @@ prompts are neither API fields nor persisted observability data.
 
 Published objects are immutable. Archive prevents selection for new runs but preserves historical pins. Every
 command carries `Idempotency-Key`; mutations use expected revision/ETag.
+
+Before Evaluation, Java freezes the current draft into an immutable `CANDIDATE` snapshot with its draft
+revision and digest. Evaluation pins that snapshot and a published baseline. Publish promotes the same row to
+`PUBLISHED` only when the run passed and the definition still has the same draft revision and digest. Candidate
+rows do not receive or consume an integer version until promotion; runs and Tool grants accept only published
+versions. This lifecycle supports first publication without evaluating mutable state or creating version gaps.
 
 ## Execution protocol
 

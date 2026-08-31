@@ -1,6 +1,6 @@
 # Agent v0.6 Database Design
 
-> Migration target: `V2.6.0` (additive, forward-only) | Status: Proposed
+> Migration target: `V2.6.0` (additive, forward-only) | Status: Accepted Design Baseline
 
 All tables use binary UUID primary keys, `tenant_id`, UTC timestamps, optimistic `revision`, and indexes that
 start with `tenant_id`. Foreign keys include or are application-validated against the same tenant. JSON columns
@@ -8,7 +8,7 @@ are schema-validated before persistence and never contain credentials, prompts, 
 
 | Table group | Tables                                                                                                                                                     | Key invariants                                                                                  |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Agent       | `agent_definition`, `agent_version`                                                                                                                        | one draft; published rows immutable; unique tenant/name and definition/version; SHA-256 digest  |
+| Agent       | `agent_definition`, `agent_version`                                                                                                                        | one draft; immutable candidate; unique published number; SHA-256 digest                         |
 | Tool        | `tool_definition`, `tool_version`, `agent_tool_grant`                                                                                                      | immutable exact version; grant pins Agent/Tool version, selector, constraints, approval, expiry |
 | Run         | `agent_run`, `agent_run_dependency`, `agent_step`, `agent_attempt`, `agent_handoff`, `agent_command`, `agent_checkpoint`                                   | revision state machine; lease/fencing; idempotency; sanitized references only                   |
 | Timeline    | `agent_run_event`, `agent_outbox`                                                                                                                          | unique run/sequence and tenant/idempotency; append-only; safe payload schema                    |
@@ -23,7 +23,9 @@ attempt_number)`; commits require the current lease owner, unexpired lease, and 
 deduplication is unique by `(tenant_id, run_id, idempotency_key)`. Events are unique by `(tenant_id, run_id,
 sequence)` and sequence is allocated transactionally.
 
-Published Agent/Tool/dataset/suite versions reject update/delete. Archive is metadata on the owning definition.
+Agent candidate configuration is immutable and has no `version_number`. Promotion only fills publication
+metadata and a unique integer version after a passing Evaluation of the same current-draft digest. Published
+Agent/Tool/dataset/suite versions reject update/delete. Archive is metadata on the owning definition.
 Run dependency rows store exact IDs, versions, digests, and safe configuration hashes for replay.
 
 ## Memory and deletion

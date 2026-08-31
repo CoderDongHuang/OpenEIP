@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Abstract
 
@@ -118,6 +118,19 @@ vote, rationale, and decision date before changing the status to Accepted.
 Public discussion opened on 2026-07-26 at
 https://github.com/CoderDongHuang/OpenEIP/discussions/80. The earliest valid Maintainer decision date is
 2026-08-02.
+
+### Decision record
+
+Decision date: 2026-08-31
+
+| Maintainer | Vote | Rationale |
+| ---------- | ---- | --------- |
+| `@CoderDongHuang` (Bootstrap Maintainer) | Approve | The design keeps Java as the authorization and durable-state authority, preserves Agent SPI v1 compatibility, constrains Tool/MCP/Memory authority, and defines measurable safety and evaluation gates for the v0.6 scope. |
+
+The project currently has one Bootstrap Maintainer, so this one affirmative vote is 100% of the Maintainer
+body and satisfies the required two-thirds threshold. The discussion window exceeded one week before the
+decision. RFC-0008 is accepted for implementation subject to the independent architecture/security review
+conditions and all remaining OEP quality gates.
 
 ## References
 

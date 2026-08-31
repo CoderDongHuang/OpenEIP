@@ -1,6 +1,6 @@
 # Tool SPI v1
 
-> Contract version: `1.0` | Runtime: Python >= 3.12 | Status: Proposed
+> Contract version: `1.0` | Runtime: Python >= 3.12 | Status: Accepted
 
 ```python
 class ToolSpi(ABC):

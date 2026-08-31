@@ -76,7 +76,7 @@ paths:
   /api/v2/agents/{agentId}/versions:
     get:
       operationId: listAgentVersions
-      summary: List immutable Agent versions
+      summary: List immutable Agent candidate snapshots and published versions
       parameters:
         [
           { $ref: "#/components/parameters/AgentId" },
@@ -84,6 +84,22 @@ paths:
           { $ref: "#/components/parameters/Limit" },
         ]
       responses: { "200": { $ref: "#/components/responses/Page" } }
+  /api/v2/agents/{agentId}/versions:candidate:
+    post:
+      operationId: createAgentVersionCandidate
+      summary: Freeze the current draft as an immutable Evaluation candidate
+      parameters:
+        [
+          { $ref: "#/components/parameters/AgentId" },
+          { $ref: "#/components/parameters/IdempotencyKey" },
+          { $ref: "#/components/parameters/IfMatch" },
+        ]
+      responses:
+        {
+          "201": { $ref: "#/components/responses/Object" },
+          "409": { $ref: "#/components/responses/Error" },
+          "412": { $ref: "#/components/responses/Error" },
+        }
   /api/v2/agents/{agentId}:archive:
     post:
       operationId: archiveAgentDefinition
@@ -123,7 +139,7 @@ paths:
   /api/v2/agents/{agentId}/versions:publish:
     post:
       operationId: publishAgentVersion
-      summary: Publish an evaluated Agent version
+      summary: Promote the evaluated current-draft candidate to a published version
       parameters:
         [
           { $ref: "#/components/parameters/AgentId" },
