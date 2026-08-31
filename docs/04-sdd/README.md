@@ -22,7 +22,7 @@
 - [x] [Workflow SDD](workflow-module.md)
 - [ ] Connector SDD
 - [x] [Agent SDD](agent-module.md)
-- [ ] [Agent v0.6 SDD](agent-v0.6-module.md) (proposed; independent review pending)
+- [x] [Agent v0.6 SDD](agent-v0.6-module.md) (accepted; RFC-0008 and ADR-0012/0013/0014 approved)
 - [ ] [Agent Event Contract v2](agent-events-v2.md) (proposed)
 - [x] [Operational Frontend Workspace SDD](operational-frontend-module.md)
 - [ ] BI SDD
