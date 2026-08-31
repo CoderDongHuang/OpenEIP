@@ -29,13 +29,20 @@ Memory administration, MCP Server administration, and an Evaluation Dashboard.
 | 11 Security Review | Executable Agent abuse controls, dependency/container scans and website safe image parser regression | Complete with moderate upstream residual 2026-08-31 |
 | 12 Quality Gate | `issue-0078-quality-gate.md`; HIGH/CRITICAL gate passed, with moderate upstream `uuid` residual documented | Passed with residual risk 2026-08-31 |
 | 13 Docs Update | RFC/ADR decisions, SDD/SPI/OpenAPI/schema, test plan, security review, benchmark and gate evidence | Complete 2026-08-31 |
-| 14 Pull Request | User-owned step | Not started |
-| 15 Code Review | User-owned step | Not started |
-| 16 Merge | User-owned step | Not started |
-| 17 Release | User-owned step | Not started |
+| 14 Pull Request | Implementation PR #97 merged; release preparation PR | In progress |
+| 15 Code Review | Formal Review was absent on implementation PR #97; release preparation requires independent review | Required before release |
+| 16 Merge | Implementation PR #97 merged as `4f7a3fb`; release preparation merge pending | Partial |
+| 17 Release | `v0.6.0-alpha` Tag, Release workflow and GitHub Pre-release | Not started |
 
 No implementation may begin until RFC discussion and voting complete, the ADRs are accepted, and
 the architecture and security design reviews are independently approved.
+
+## Process correction
+
+PR #97 was merged after all six CI checks passed, but GitHub records no formal review on that PR. CI is
+not a substitute for Code Review. The v0.6 release is therefore blocked until an independent maintainer
+reviews the release preparation PR and confirms the implementation, compatibility, security, and evidence
+records. The missing pre-merge review is recorded rather than retroactively represented as complete.
 
 ## Implementation and evidence notes
 

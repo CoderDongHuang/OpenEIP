@@ -8,7 +8,7 @@
 - [Auth Database Design](auth-schema.md)
 - [File Upload Database Design](file-upload-schema.md)
 - [Workflow Persistence Schema](workflow-schema.md)
-- [Agent v0.6 Database Design](agent-v0.6-schema.md) (proposed)
+- [Agent v0.6 Database Design](agent-v0.6-schema.md) (accepted; migration and rollback evidence recorded)
 
 ## 待完成
 
