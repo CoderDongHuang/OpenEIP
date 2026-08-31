@@ -21,7 +21,9 @@ import org.springframework.test.context.DynamicPropertySource;
       "spring.jpa.hibernate.ddl-auto=create-drop",
       "spring.flyway.enabled=false",
       "openeip.jwt.allow-ephemeral-key=true",
-      "openeip.auth.rate-limit.requests=1000"
+      "openeip.auth.rate-limit.requests=1000",
+      "openeip.agent.v2.bootstrap-enabled=false",
+      "openeip.agent.v2.capability-secret=test-agent-capability-secret-at-least-32-characters"
     })
 class PlatformApplicationTest {
 

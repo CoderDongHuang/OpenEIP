@@ -59,6 +59,10 @@ openeip:
     python-url: ${AGENT_PYTHON_URL:http://python:8000}
     internal-token: ${OPENEIP_INTERNAL_API_TOKEN:}
     external-tenant-id: ${AGENT_EXTERNAL_TENANT_ID:11111111-1111-4111-8111-111111111111}
+    v2:
+      scheduler-enabled: ${AGENT_V2_SCHEDULER_ENABLED:true}
+      capability-secret: ${AGENT_CAPABILITY_SECRET:}
+      capability-ttl-seconds: ${AGENT_CAPABILITY_TTL_SECONDS:300}
   workflow:
     scheduler-enabled: ${WORKFLOW_SCHEDULER_ENABLED:true}
     kafka-enabled: ${WORKFLOW_KAFKA_ENABLED:false}
