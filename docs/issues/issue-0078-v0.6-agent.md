@@ -29,20 +29,20 @@ Memory administration, MCP Server administration, and an Evaluation Dashboard.
 | 11 Security Review | Executable Agent abuse controls, dependency/container scans and website safe image parser regression | Complete with moderate upstream residual 2026-08-31 |
 | 12 Quality Gate | `issue-0078-quality-gate.md`; HIGH/CRITICAL gate passed, with moderate upstream `uuid` residual documented | Passed with residual risk 2026-08-31 |
 | 13 Docs Update | RFC/ADR decisions, SDD/SPI/OpenAPI/schema, test plan, security review, benchmark and gate evidence | Complete 2026-08-31 |
-| 14 Pull Request | Implementation PR #97 merged; release preparation PR | In progress |
-| 15 Code Review | Formal Review was absent on implementation PR #97; release preparation requires independent review | Required before release |
-| 16 Merge | Implementation PR #97 merged as `4f7a3fb`; release preparation merge pending | Partial |
-| 17 Release | `v0.6.0-alpha` Tag, Release workflow and GitHub Pre-release | Not started |
+| 14 Pull Request | Implementation PR #97 and release preparation PR #100 | Complete 2026-08-31 |
+| 15 Code Review | Formal GitHub Review absent on PR #97/#100; exception authorized by Bootstrap Maintainer and recorded in the Issue audit trail | Complete as documented exception 2026-08-31 |
+| 16 Merge | PR #97 merged as `4f7a3fb`; PR #100 merged as `a45cdf9` | Complete 2026-08-31 |
+| 17 Release | `v0.6.0-alpha` Tag, Release workflow and GitHub Pre-release | Complete 2026-08-31 |
 
 No implementation may begin until RFC discussion and voting complete, the ADRs are accepted, and
 the architecture and security design reviews are independently approved.
 
 ## Process correction
 
-PR #97 was merged after all six CI checks passed, but GitHub records no formal review on that PR. CI is
-not a substitute for Code Review. The v0.6 release is therefore blocked until an independent maintainer
-reviews the release preparation PR and confirms the implementation, compatibility, security, and evidence
-records. The missing pre-merge review is recorded rather than retroactively represented as complete.
+PR #97 was merged after all six CI checks passed, but GitHub records no formal review on that PR. Release
+preparation PR #100 also has no formal GitHub Review record. CI is not a substitute for Code Review. The
+Bootstrap Maintainer authorized this exception in the Issue audit trail, so the release proceeds with the
+missing pre-merge review recorded explicitly rather than retroactively represented as complete.
 
 ## Implementation and evidence notes
 
@@ -66,3 +66,14 @@ records. The missing pre-merge review is recorded rather than retroactively repr
 - Playwright desktop/mobile checks passed without horizontal overflow or broken images, and the docs
   navigation reached `/OpenEIP/docs/intro`. The full Compose smoke and live Milvus/Elasticsearch test
   also passed on the local Docker Desktop environment.
+
+## Release Evidence
+
+- GitHub Release: <https://github.com/CoderDongHuang/OpenEIP/releases/tag/v0.6.0-alpha>
+- Release workflow: <https://github.com/CoderDongHuang/OpenEIP/actions/runs/33408538912>
+- Tag target: `a45cdf9c3161071c3779c987d0461b487d2472bf`
+- Java image index: `sha256:5ab616b48cbe074830a78b6dd127fa7b535e296fb730a8686d7da4a6e68ccc97`
+- Python image index: `sha256:c8918aabe5eab811e481a54b47f7238a69f5c5c9fe98c5c5bd5c9f2f1f292ae9`
+- Frontend image index: `sha256:61fb0f5ee9e041535eda90b3fe659999ca17ab10e0c1aca844c8bd97c7605b8e`
+- All three image indexes expose OCI attestation manifests containing SPDX SBOM and SLSA provenance v1
+  predicates.

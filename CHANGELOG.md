@@ -19,7 +19,8 @@
 
 ### Validation
 - Java、Python、Frontend、Docker Compose smoke、Playwright 和真实 Milvus/Elasticsearch 混合检索验证已完成。
-- v0.6 release preparation PR 和发布工作流仍需完成；本条目在发布 Tag 创建前不得视为已发布。
+- `v0.6.0-alpha` 已于 2026-08-31 作为 GitHub Pre-release 发布；Release workflow、Tag、GHCR 镜像 digest、SPDX SBOM 和 SLSA provenance 已核验。
+- PR #97 和 PR #100 缺少正式 GitHub Review，按 Bootstrap Maintainer 授权记录为本次 alpha 发布的流程例外。
 
 ## [0.5.0-alpha] - 2026-07-25
 
