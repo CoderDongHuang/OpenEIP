@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Global application settings."""
 
-    version: str = "0.5.0-alpha"
+    version: str = "0.6.0-alpha"
 
     # Server
     host: str = "0.0.0.0"
@@ -88,6 +88,8 @@ class Settings(BaseSettings):
     agent_max_result_chars: int = 8000
     agent_max_answer_chars: int = 8000
     agent_answer_chunk_chars: int = 256
+    agent_v2_max_body_bytes: int = 1024 * 1024
+    agent_capability_secret: SecretStr = SecretStr("")
 
     # LLM
     llm_default_model: str = "gpt-4o"

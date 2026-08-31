@@ -26,8 +26,8 @@ class McpStdioAdapter:
         if remote_name is None:
             raise AgentError("AGENT-S-001", "Agent execution failed", 503)
         try:
-            from mcp import ClientSession, StdioServerParameters  # type: ignore[import-not-found]
-            from mcp.client.stdio import stdio_client  # type: ignore[import-not-found]
+            from mcp import ClientSession, StdioServerParameters
+            from mcp.client.stdio import stdio_client
 
             parameters = StdioServerParameters(command=self._command, args=list(self._args))
             async with (
