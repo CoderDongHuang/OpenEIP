@@ -33,6 +33,8 @@ services:
       DOCUMENT_STORAGE_ROOT: /app/data/files
       KNOWLEDGE_INGESTION_PYTHON_URL: http://python:8000
       CHAT_PYTHON_URL: http://python:8000
+      AGENT_PYTHON_URL: http://python:8000
+      AGENT_CAPABILITY_SECRET: ${AGENT_CAPABILITY_SECRET:-local-agent-capability-secret-change-me}
       OPENEIP_INTERNAL_API_TOKEN: ${OPENEIP_INTERNAL_API_TOKEN:-local-openeip-internal-token}
     depends_on:
       mysql:
@@ -92,10 +94,14 @@ services:
       OPENEIP_OPENAI_API_KEY: ${OPENEIP_OPENAI_API_KEY:-}
       OPENEIP_MILVUS_URI: http://milvus:19530
       OPENEIP_ES_HOST: http://elasticsearch:9200
+      OPENEIP_AGENT_CAPABILITY_SECRET: ${AGENT_CAPABILITY_SECRET:-local-agent-capability-secret-change-me}
+      OPENEIP_REDIS_URL: redis://redis:6379/0
     depends_on:
       milvus:
         condition: service_healthy
       elasticsearch:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
@@ -174,6 +180,17 @@ services:
       retries: 20
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - openeip
+
+  redis:
+    image: redis:7.4.3-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     networks:
       - openeip
 
