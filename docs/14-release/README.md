@@ -7,6 +7,7 @@
 
 | 版本 | 日期 | 说明 |
 |---|---|---|
+| [v0.6.0-alpha](v0.6.0-alpha-checklist.md) | 2026-08-31 | Agent，发布准备中，尚未创建 Tag |
 | [v0.5.0-alpha](v0.5.0-alpha-checklist.md) | 2026-07-25 | Connector，GitHub Pre-release 已发布 |
 | [v0.4.0-alpha](v0.4.0-alpha-checklist.md) | 2026-07-25 | Workflow，GitHub Pre-release 已发布 |
 | [v0.3.0-alpha](v0.3.0-alpha-checklist.md) | 2026-07-24 | Knowledge，GitHub Pre-release 已发布 |

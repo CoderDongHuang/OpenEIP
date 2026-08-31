@@ -18,7 +18,7 @@ v0.4 ──→ Workflow            alpha 已发布
 v0.5 ──→ Connector           alpha 已发布
          MySQL / PostgreSQL / Kafka / Git / 飞书 / 企业微信 / Email
 
-v0.6 ──→ Agent               规划中
+v0.6 ──→ Agent               发布准备中
          Tool / Memory / Planner / Multi-Agent / MCP / Evaluation
 
 v0.7 ──→ Governance          规划中
@@ -45,6 +45,7 @@ v1.0 ──→ LTS                 规划中
 | Phase 2：MVP Development | alpha 已发布，修订中 | `v0.2.0-alpha` 已于 2026-07-22 发布；Issue #63 正在补齐恢复路径、权限校验、工作台体验与发布证据 |
 | Phase 3：Knowledge | alpha 已发布 | `v0.3.0-alpha` 已于 2026-07-24 发布，交付解析、Embedding、全文/向量/混合检索与 Citation |
 | Phase 4：Workflow | alpha 已发布 | `v0.4.0-alpha` 已于 2026-07-25 发布，交付 Canvas、持久执行、Trigger、Approval、Retry 与事件集成 |
+| Phase 5：Agent | 实现已合并，发布准备中 | PR #97 已合并；发布准备 PR、独立 Review、Release workflow 和 `v0.6.0-alpha` Tag 尚未完成 |
 
 ## 当前发布边界
 
@@ -54,6 +55,7 @@ v1.0 ──→ LTS                 规划中
 - `v0.3.0-alpha` Knowledge 已于 2026-07-24 作为 GitHub Pre-release 发布；已公开标签保持不变。
 - `v0.4.0-alpha` Workflow 已于 2026-07-25 作为 GitHub Pre-release 发布；已公开标签保持不变。
 - `v0.5.0-alpha` Connector 已于 2026-07-25 作为 GitHub Pre-release 发布；已公开标签保持不变。
+- `v0.6.0-alpha` Agent 已完成实现与验证，但在发布准备 PR、独立 Review、Release workflow 和 Tag 完成前，不得宣称已发布。
 
 ## LTS 策略
 

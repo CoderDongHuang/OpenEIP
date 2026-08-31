@@ -1,6 +1,6 @@
 # Agent Platform Management UI
 
-> Version: v0.6 draft | Issue: #78
+> Version: v0.6 | Issue: #78 | Release preparation
 
 The Agent route opens a dense operational workspace with a stable left definition/version rail and a main
 editor or run view. It follows the existing shell, restrained colors, compact typography, 6 px or smaller

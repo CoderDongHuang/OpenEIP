@@ -6,6 +6,21 @@
 
 ## [Unreleased]
 
+## [0.6.0-alpha] - 2026-08-31
+
+### Added
+- v0.6 Production Agent Platform（Issue #78）：版本化 Agent 定义、候选发布、Tool 授权、Memory 治理、持久执行、Supervisor/Worker、MCP 和 Evaluation。
+- Java Agent v2 控制面、Python Agent v2 runtime，以及面向定义、运行、治理和 Evaluation 的 Frontend 工作台。
+- Agent v2 MySQL schema、迁移/回滚契约、Capability fencing、MCP trust boundary 和确定性 Evaluation benchmark。
+
+### Security
+- Agent execution 使用租户绑定、短时 capability、nonce 防重放、预算/步骤边界和显式 Tool/MCP 授权。
+- Docusaurus 的 `image-size` HIGH 风险替换为受限本地解析器；网站依赖 HIGH/CRITICAL 审计通过，剩余 18 个上游 MODERATE `uuid` 风险已记录。
+
+### Validation
+- Java、Python、Frontend、Docker Compose smoke、Playwright 和真实 Milvus/Elasticsearch 混合检索验证已完成。
+- v0.6 release preparation PR 和发布工作流仍需完成；本条目在发布 Tag 创建前不得视为已发布。
+
 ## [0.5.0-alpha] - 2026-07-25
 
 ### Added
