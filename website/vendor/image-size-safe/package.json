@@ -1,0 +1,14 @@
+{
+  "name": "image-size",
+  "version": "2.0.3",
+  "description": "Bounded image dimension parser used by OpenEIP documentation builds",
+  "main": "./index.cjs",
+  "exports": {
+    ".": "./index.cjs",
+    "./fromFile": "./fromFile.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
