@@ -1,0 +1,48 @@
+{
+  "module": "agent-v2",
+  "version": "0.6.0-alpha",
+  "operation": "capability, bounded runtime, MCP fixture discovery, and deterministic evaluation",
+  "environment": {
+    "python": "3.12.13",
+    "implementation": "CPython",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "warmups": 5,
+  "samples": {
+    "default": 100,
+    "evaluation500Cases": 30
+  },
+  "corpus": {
+    "cases": 500,
+    "repeats": 3,
+    "evaluatedCases": 1500
+  },
+  "metrics": {
+    "capabilityVerification": {
+      "p50Ms": 0.025,
+      "p95Ms": 0.028,
+      "p99Ms": 0.036,
+      "thresholdP99Ms": 25.0
+    },
+    "boundedSearchRuntime": {
+      "p50Ms": 0.01,
+      "p95Ms": 0.01,
+      "p99Ms": 0.013,
+      "thresholdP99Ms": 25.0
+    },
+    "managedMcpDiscovery": {
+      "p50Ms": 0.007,
+      "p95Ms": 0.008,
+      "p99Ms": 0.012,
+      "thresholdP99Ms": 25.0
+    },
+    "evaluation500Cases": {
+      "p50Ms": 2.031,
+      "p95Ms": 2.741,
+      "p99Ms": 3.292,
+      "thresholdP99Ms": 500.0
+    }
+  },
+  "errors": 0,
+  "result": "PASS"
+}

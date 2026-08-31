@@ -14,6 +14,7 @@ from engine_core.agent.infrastructure.tools import (
     tool_definitions,
 )
 from engine_core.agent.spi import AgentLimits
+from engine_core.agent.v2.router import build_agent_v2_router
 from engine_core.chat.api.router import build_chat_router
 from engine_core.chat.application.service import ChatService
 from engine_core.config import Settings
@@ -164,6 +165,18 @@ def create_app(
             max_body_bytes=resolved.agent_max_body_bytes,
             default_max_steps=resolved.agent_default_max_steps,
             max_steps=resolved.agent_max_steps,
+        )
+    )
+    capability_secret = resolved.agent_capability_secret.get_secret_value()
+    if not capability_secret and resolved.environment.casefold() != "production":
+        capability_secret = "local-agent-capability-secret-change-me"
+    if len(capability_secret) < 32:
+        raise ValueError("Agent v2 capability signing is not safely configured")
+    application.include_router(
+        build_agent_v2_router(
+            internal_token=internal_token,
+            capability_secret=capability_secret,
+            max_body_bytes=resolved.agent_v2_max_body_bytes,
         )
     )
     parsing_service = DocumentParsingService(

@@ -141,4 +141,161 @@ describe('API client', () => {
     });
     await expect(api.currentUser('token')).rejects.toMatchObject({ message: 'Request failed (502)', status: 502 });
   });
+
+  it('encodes Agent v2 governance, execution, and Evaluation contracts', async () => {
+    const requests: Array<[RequestInfo | URL, RequestInit | undefined]> = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        requests.push([input, init]);
+        return envelope({ items: [] });
+      }),
+    );
+    vi.stubGlobal('crypto', { randomUUID: () => '00000000-0000-4000-8000-000000000001' });
+    const token = 'agent-token';
+    const now = '2026-08-31T00:00:00Z';
+    const definition: api.AgentDefinitionV2 = {
+      id: 'agent/id',
+      ownerId: 'owner',
+      name: 'Agent',
+      type: 'CUSTOM',
+      description: '',
+      status: 'PUBLISHED',
+      draft: {},
+      draftRevision: 2,
+      publishedVersion: 1,
+      revision: 3,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const run: api.AgentRunV2 = {
+      id: 'run/id',
+      agentId: definition.id,
+      agentVersionId: 'version',
+      agentVersion: 1,
+      status: 'PAUSED',
+      resourceHandles: [],
+      budget: { maxSteps: 8, maxDurationSeconds: 60, maxToolCalls: 8, maxWorkers: 1 },
+      currentSequence: 1,
+      revision: 4,
+      failureCode: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const grant: api.AgentToolGrantV2 = {
+      id: 'grant/id',
+      agentVersionId: 'version',
+      toolVersionId: 'tool',
+      operations: ['search'],
+      resourceSelector: {},
+      approvalMode: 'NONE',
+      expiresAt: null,
+      revision: 5,
+      revokedAt: null,
+    };
+    const memory: api.AgentMemoryV2 = {
+      id: 'memory/id',
+      agentId: definition.id,
+      purpose: 'support',
+      sourceType: 'RUN',
+      sourceId: run.id,
+      sensitivity: 'INTERNAL',
+      provenance: {},
+      state: 'ACTIVE',
+      retentionDeadline: now,
+      revision: 6,
+      createdAt: now,
+    };
+    const server: api.McpServerV2 = {
+      id: 'server/id',
+      name: 'MCP',
+      transport: 'STREAMABLE_HTTP',
+      endpoint: 'https://mcp.example.test',
+      authType: 'NONE',
+      credentialConfigured: false,
+      status: 'REGISTERED',
+      revision: 7,
+      updatedAt: now,
+    };
+    const evaluation: api.EvaluationRunV2 = {
+      id: 'evaluation/id',
+      suiteVersionId: 'suite',
+      candidateAgentVersionId: 'candidate',
+      baselineAgentVersionId: 'baseline',
+      repeatCount: 3,
+      status: 'RUNNING',
+      gateStatus: null,
+      revision: 8,
+      metrics: [],
+      gates: [],
+      createdAt: now,
+    };
+
+    await Promise.all([
+      api.listAgentDefinitionsV2(token),
+      api.createAgentDefinitionV2(token, { name: 'Agent', type: 'CUSTOM', description: '' }),
+      api.updateAgentDefinitionV2(token, definition, { description: 'Updated' }),
+      api.archiveAgentDefinitionV2(token, definition),
+      api.listAgentVersionsV2(token, definition.id),
+      api.createAgentCandidateV2(token, definition),
+      api.publishAgentVersionV2(token, definition, 'evaluation'),
+      api.restoreAgentVersionV2(token, definition, 1),
+      api.listAgentRunsV2(token),
+      api.createAgentRunV2(token, definition.id, {
+        agentVersion: 1,
+        input: 'task',
+        resourceHandles: [],
+        budget: { maxSteps: 8 },
+      }),
+      api.listAgentRunEventsV2(token, run.id),
+      api.commandAgentRunV2(token, run, 'resume'),
+      api.listAgentToolsV2(token),
+      api.listAgentToolGrantsV2(token),
+      api.createAgentToolGrantV2(token, {
+        agentVersionId: 'version',
+        toolVersionId: 'tool',
+        operations: ['search'],
+        resourceSelector: {},
+        argumentConstraints: {},
+        approvalMode: 'NONE',
+      }),
+      api.revokeAgentToolGrantV2(token, grant),
+      api.listAgentMemoriesV2(token, 'ACTIVE'),
+      api.quarantineAgentMemoryV2(token, memory),
+      api.deleteAgentMemoryV2(token, memory),
+      api.exportAgentMemoriesV2(token, 'support'),
+      api.listMcpServersV2(token),
+      api.createMcpServerV2(token, server),
+      api.commandMcpServerV2(token, server, 'test'),
+      api.commandMcpServerV2(token, server, 'discover'),
+      api.disableMcpServerV2(token, server),
+      api.listEvaluationDatasetsV2(token),
+      api.createEvaluationDatasetV2(token, 'Regression', 'Pinned'),
+      api.listEvaluationSuitesV2(token),
+      api.createEvaluationRunV2(token, {
+        suiteVersionId: 'suite',
+        candidateAgentVersionId: 'candidate',
+        baselineAgentVersionId: 'baseline',
+        repeatCount: 3,
+      }),
+      api.getEvaluationRunV2(token, evaluation.id),
+      api.cancelEvaluationRunV2(token, evaluation),
+    ]);
+
+    expect(requests).toHaveLength(31);
+    expect(
+      requests.every((request) => new Headers(request[1]?.headers).get('Authorization') === `Bearer ${token}`),
+    ).toBe(true);
+    const mutations = requests.filter((request) => ['POST', 'PATCH', 'DELETE'].includes(request[1]?.method || ''));
+    expect(
+      mutations.every(
+        (request) =>
+          new Headers(request[1]?.headers).has('Idempotency-Key') ||
+          request[1]?.method === 'PATCH' ||
+          String(request[0]).endsWith('/api/v2/agents'),
+      ),
+    ).toBe(true);
+    expect(requests.some((request) => String(request[0]).includes('agent%2Fid/versions:candidate'))).toBe(true);
+    expect(requests.some((request) => String(request[0]).includes('evaluation%2Fid:cancel'))).toBe(true);
+  });
 });

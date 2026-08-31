@@ -2,11 +2,14 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Date
 
 2026-07-26
+
+Accepted by the Bootstrap Maintainer on 2026-08-31 as part of the RFC-0008 decision. The decision rationale
+is the Context, Decision, Consequences, Risks, and Alternatives Considered recorded below.
 
 ## Context
 

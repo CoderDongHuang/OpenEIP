@@ -27,7 +27,9 @@ RUN --mount=type=cache,target=/root/.gradle \
 
 FROM eclipse-temurin:21-jre-alpine@sha256:3f08b13888f595cc49edabea7250ba69499ba25602b267da591720769400e08c
 
-RUN apk upgrade --no-cache \
+ARG SECURITY_REFRESH=2026-08-31
+RUN echo "$SECURITY_REFRESH" > /dev/null \
+    && apk upgrade --no-cache \
     && apk add --no-cache wget \
     && addgroup -S openeip \
     && adduser -S openeip -G openeip \

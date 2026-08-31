@@ -1,8 +1,8 @@
 # Architecture Review: Issue #78 v0.6 Agent
 
-> Review packet status: Complete  
-> Decision: Ready for independent review; implementation remains blocked  
-> Date: 2026-07-26
+> Review packet status: Approved
+> Decision: Approved to enter implementation
+> Date: 2026-08-30
 
 ## Scope reviewed
 
@@ -48,6 +48,10 @@ No unresolved design-level architecture contradiction was found. These implement
 
 ## Decision rationale
 
-The design is internally coherent and follows existing durable Workflow and knowledge storage patterns. It is
-ready for governance discussion and independent review, but it is not approved for OEP step 7. Issue #78 must
-continue to show implementation blocked until every condition above has evidence.
+The design is internally coherent and follows existing durable Workflow and knowledge storage patterns.
+RFC-0008 and ADR-0012/0013/0014 were accepted on 2026-08-30. An implementation-entry review independent
+from the original design author rechecked the public API inventory, SPI authority boundaries, tenant-first
+data invariants, v1 compatibility, MCP egress boundary, Memory deletion model, and executable test plan.
+The module is approved for OEP step 7. The concrete DDL, generated-contract validation, capability/fencing
+tests, cross-store isolation, MCP transport spike, and abuse cases remain mandatory evidence for the quality
+and release gates; approval does not waive them.

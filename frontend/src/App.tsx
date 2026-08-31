@@ -155,7 +155,7 @@ function Workspace({ token, user, onLogout }: { token: string; user: CurrentUser
         <div className="sider-release">
           <span className="release-dot" />
           <span>
-            <strong>v0.4 alpha</strong>
+            <strong>v0.6 alpha</strong>
             <small>Single-node profile</small>
           </span>
         </div>

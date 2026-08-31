@@ -1,8 +1,8 @@
 # Security Design Review: Issue #78 v0.6 Agent
 
-> Review packet status: Complete  
-> Decision: Security controls specified; independent approval and executable evidence pending  
-> Date: 2026-07-26
+> Review packet status: Complete with moderate upstream residual risk
+> Decision: HIGH/CRITICAL security gate passed; Docusaurus development chain retains unfixable MODERATE uuid findings
+> Date: 2026-08-31
 
 ## Assets and trust boundaries
 
@@ -38,7 +38,41 @@ must inspect Java logs, Python logs, Kafka/DLQ, traces, metrics, database rows, 
 
 ## Approval gate
 
-The security design covers the required boundaries, but documentation alone is not a passed OEP security gate.
-Implementation remains blocked until RFC/ADR decisions and independent architecture/security approval. Release
-also requires executable abuse cases, dependency/container/IaC scans with no HIGH/CRITICAL finding, secret
-canary scans, and zero deterministic safety regression in Evaluation.
+The security design covers the required boundaries and was independently rechecked after the RFC/ADR
+decisions. It is approved as an implementation-entry design gate. Documentation alone is not the final OEP
+security gate: release still requires executable abuse cases, dependency/container/IaC scans with no
+HIGH/CRITICAL finding, secret canary scans, and zero deterministic safety regression in Evaluation.
+
+## Executed evidence
+
+| Area | Evidence | Result |
+|---|---|---|
+| Capability boundary | Python Agent v2 tests cover HMAC tamper rejection, expiry, nonce replay protection, narrowed grant intersection and tenant isolation | Passed |
+| Runtime bounds | Bounded Search execution and cancellation/limit paths are covered by the Python Agent v2 suite | Passed |
+| MCP boundary | Managed MCP fixture tests reject private addresses and unsafe redirects; gateway authentication and session scoping are covered | Passed |
+| Evaluation safety | Deterministic 500-case corpus, three repeats, 1,500 evaluated cases, zero errors; benchmark artifact is linked below | Passed |
+| Java persistence | MySQL 8.4 Testcontainers validates the Agent migration, tenant-first indexes, candidate lifecycle fields and rollback | Passed |
+| Source/container scan | Trivy Git-valid source snapshot: 797 files, 3.47 MB; Java and Python runtime images also scanned | Passed; zero HIGH/CRITICAL vulnerabilities, misconfigurations or secrets |
+| Python dependencies | `pip-audit -r requirements.lock` | Passed; no known vulnerabilities |
+| Frontend dependencies | Frontend `npm audit --audit-level=high` | Passed; no HIGH/CRITICAL findings |
+| Website dependencies | Local safe `image-size@2.0.3` fork removes the affected `image-size@2.0.2` graph; `npm audit --audit-level=high` exits 0 | Passed at HIGH/CRITICAL policy; 18 MODERATE `uuid` findings remain |
+
+## Residual and unexecuted checks
+
+- The local safe `image-size` fork is an interim control until Docusaurus publishes an upstream fix;
+  it must be reviewed when upgrading Docusaurus and must retain its bounded parser tests.
+- The website audit still reports 18 MODERATE `uuid` findings through the Docusaurus development
+  chain, with no available fix. They do not violate the current no-HIGH/CRITICAL release policy but
+  remain a supply-chain residual risk for explicit tracking.
+- Playwright desktop/mobile checks passed with no horizontal overflow, no broken images, one H1, and
+  successful navigation from the home page to `/OpenEIP/docs/intro`.
+- The complete Docker Compose stack passed health checks and `scripts/release_smoke.py` passed all
+  Auth, File, OCR, Parsing, Knowledge, Embedding, RAG, Chat, Agent and Workflow flows.
+- The live hybrid integration test passed against Compose Milvus 2.6.0 and Elasticsearch 8.19.0,
+  including tenant/base scoping, source traceability and document deletion.
+
+## Evidence links
+
+- Benchmark: `docs/13-testing/results/v0.6-agent-benchmark.json`
+- Test plan: `docs/13-testing/v0.6-agent-test-plan.md`
+- Quality gate: `docs/issues/issue-0078-quality-gate.md`

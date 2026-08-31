@@ -17,9 +17,9 @@
 | [ADR-0008](adr-0008-synchronous-ingestion-orchestration.md) | Synchronous Ingestion Orchestration for the Single-Node MVP | Accepted |
 | [ADR-0009](adr-0009-hybrid-retrieval-storage.md) | Milvus and Elasticsearch Hybrid Retrieval | Accepted |
 | [ADR-0010](adr-0010-durable-state-machine-outbox.md) | MySQL Durable State Machine and Transactional Outbox | Accepted |
-| [ADR-0012](adr-0012-durable-agent-execution.md) | Durable Agent Execution | Proposed |
-| [ADR-0013](adr-0013-agent-memory-governance.md) | Agent Memory Governance | Proposed |
-| [ADR-0014](adr-0014-mcp-trust-boundary.md) | MCP Trust Boundary | Proposed |
+| [ADR-0012](adr-0012-durable-agent-execution.md) | Durable Agent Execution | Accepted |
+| [ADR-0013](adr-0013-agent-memory-governance.md) | Agent Memory Governance | Accepted |
+| [ADR-0014](adr-0014-mcp-trust-boundary.md) | MCP Trust Boundary | Accepted |
 
 ## ADR 编号规则
 

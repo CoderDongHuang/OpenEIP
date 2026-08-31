@@ -5,7 +5,7 @@
 ## 可用脚本
 
 - `security-scan.ps1`：在 Windows 上创建仅包含 Git 有效文件的临时快照，并运行完整 Trivy 扫描
-- `release_smoke.py`：通过 Gateway 验证 v0.4 Auth、File、OCR、Parsing、Knowledge、Embedding、RAG、Chat、Agent 和 Workflow 整栈链路
+- `release_smoke.py`：通过 Gateway 验证当前 v0.6 Auth、File、OCR、Parsing、Knowledge、Embedding、RAG、Chat、Agent 和 Workflow 整栈链路
 
 ```powershell
 .\scripts\security-scan.ps1

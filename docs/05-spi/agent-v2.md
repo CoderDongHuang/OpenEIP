@@ -1,6 +1,6 @@
 # Agent SPI v2
 
-> Contract version: `2.0` | Runtime: Python >= 3.12 | Status: Proposed
+> Contract version: `2.0` | Runtime: Python >= 3.12 | Status: Accepted
 
 ```python
 class AgentSpiV2(ABC):

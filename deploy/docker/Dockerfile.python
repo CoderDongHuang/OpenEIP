@@ -3,14 +3,20 @@ FROM python:3.12.13-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b
 ARG PIP_INDEX_URL=https://pypi.org/simple
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_DEFAULT_TIMEOUT=120 \
+    PIP_RETRIES=10
+
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd --system openeip && useradd --system --gid openeip --create-home openeip
 WORKDIR /app
 COPY pyproject.toml ./
 COPY requirements.lock ./
 COPY engine-core/ engine-core/
-RUN pip install --index-url "$PIP_INDEX_URL" -r requirements.lock \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --index-url "$PIP_INDEX_URL" -r requirements.lock \
     && pip install --no-deps .
 USER openeip
 EXPOSE 8000
