@@ -1,6 +1,6 @@
 # Issue #99: v0.7 Governance
 
-> Status: Governance SDD accepted; API/Database/UI design pending
+> Status: API/Database/UI design accepted; architecture and security review pending
 > Release train: v0.7 Governance
 > Date: 2026-08-31
 
@@ -29,7 +29,7 @@ issue unless an accepted RFC changes the boundary.
 | 2 RFC | RFC-0009 and PR #102 | Accepted 2026-09-01 |
 | 3 ADR | ADR-0015 through ADR-0018 | Accepted 2026-09-01 |
 | 4 Module Design | Governance SDD | Complete 2026-09-01 |
-| 5 API/Database/UI Design | Governance contracts and surfaces | Not started |
+| 5 API/Database/UI Design | Governance OpenAPI v2, V2.7.0 schema, event contract, and management workspace | Complete 2026-09-01 |
 | 6 Architecture Review | Independent architecture and security review | Not started |
 | 7-13 Implementation and validation | Java/Python/Frontend and quality evidence | Not started |
 | 14-17 Delivery | Pull Request, Review, Merge, Release | Not started |
@@ -57,4 +57,20 @@ quality gate, or release requirements.
 The Governance Sub-SDD is [governance-module.md](../04-sdd/governance-module.md). It fixes the Java
 control-plane authority, tenant context propagation, audit and hash-chain boundary, model/Prompt lifecycle,
 idempotent usage/cost ledger, trace sanitization, failure policy, and the design deliverables required before
-implementation. The API, database, event, and Frontend contracts remain the next OEP stage.
+implementation.
+
+## API/Database/UI Design Record
+
+The design packet is complete:
+
+- API: [governance-v2.openapi.yaml](../06-api/governance-v2.openapi.yaml) defines additive tenant, audit,
+  model, Prompt, usage, budget, and trace endpoints with server-derived tenant scope.
+- Database: [governance-schema.md](../05-database/governance-schema.md) defines the `V2.7.0` table groups,
+  tenant-leading indexes, immutable history, idempotency keys, and migration/rollback constraints.
+- Events: [governance.event.v1.schema.json](../../contracts/events/governance.event.v1.schema.json) defines
+  sanitized policy, audit, usage, budget, and trace envelopes.
+- UI: [governance-workspace.md](../08-ui/governance-workspace.md) defines administrative surfaces, permission
+  matrix, state handling, accessibility, and data-minimization rules.
+
+Step 6, independent architecture and security review, is now the only gate before implementation design can
+be converted into Java, Python, Frontend, and migration code.

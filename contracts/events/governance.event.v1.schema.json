@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openeip.dev/contracts/events/governance.event.v1.schema.json",
+  "title": "OpenEIP governance event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "eventType", "eventVersion", "tenantId", "requestId", "traceId", "policyVersion", "timestamp", "data"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": {
+      "type": "string",
+      "enum": [
+        "governance.audit.appended",
+        "governance.policy.changed",
+        "governance.model.published",
+        "governance.model.suspended",
+        "governance.prompt.published",
+        "governance.prompt.rolled_back",
+        "governance.usage.recorded",
+        "governance.budget.denied",
+        "governance.budget.threshold_crossed",
+        "governance.trace.linked"
+      ]
+    },
+    "eventVersion": { "const": 1 },
+    "tenantId": { "type": "string", "format": "uuid" },
+    "requestId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "traceId": { "type": "string", "pattern": "^[a-f0-9]{16,32}$" },
+    "policyVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resourceType", "resourceId", "outcome"],
+      "properties": {
+        "resourceType": { "type": "string", "maxLength": 64 },
+        "resourceId": { "type": "string", "maxLength": 128 },
+        "outcome": { "type": "string", "enum": ["SUCCESS", "DENIED", "FAILURE"] },
+        "versionId": { "type": ["string", "null"], "maxLength": 128 },
+        "digest": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" },
+        "usageRevision": { "type": ["integer", "null"], "minimum": 1 },
+        "summary": { "type": ["object", "null"], "maxProperties": 16, "additionalProperties": false }
+      }
+    }
+  }
+}
