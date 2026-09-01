@@ -9,6 +9,7 @@
 - [File Upload Database Design](file-upload-schema.md)
 - [Workflow Persistence Schema](workflow-schema.md)
 - [Agent v0.6 Database Design](agent-v0.6-schema.md) (accepted; migration and rollback evidence recorded)
+- [Governance Database Design](governance-schema.md) (accepted for architecture review; migration target `V2.7.0`)
 
 ## 待完成
 

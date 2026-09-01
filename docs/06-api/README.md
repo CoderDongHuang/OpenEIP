@@ -12,6 +12,7 @@
 - [Knowledge Base and Processing API v1 OpenAPI](knowledge-base-v1.openapi.yaml)
 - [Chat API v1 OpenAPI](chat-v1.openapi.yaml)
 - [Workflow API v1 OpenAPI](workflow-v1.openapi.yaml)
+- [Governance API v2 OpenAPI](governance-v2.openapi.yaml) (accepted for architecture review; additive `/api/v2/governance`)
 
 ## 待完成
 

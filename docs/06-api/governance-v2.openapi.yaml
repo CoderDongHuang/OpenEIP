@@ -1,0 +1,407 @@
+openapi: 3.1.0
+info:
+  title: OpenEIP Governance API
+  version: 2.0.0-draft
+  description: Tenant-scoped v0.7 governance contracts for policy, audit, catalog, usage, and trace metadata.
+security:
+  - bearerAuth: []
+servers:
+  - url: /
+    description: Same-origin OpenEIP gateway
+paths:
+  /api/v2/governance/tenants:
+    get:
+      operationId: listGovernanceTenants
+      summary: List tenants visible to the caller
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200': { $ref: '#/components/responses/Page' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: createGovernanceTenant
+      summary: Create a tenant in audited system scope
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTenant' }
+      responses:
+        '201': { $ref: '#/components/responses/Object' }
+        '400': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/tenants/{tenantId}:
+    parameters: [{ $ref: '#/components/parameters/TenantId' }]
+    get:
+      operationId: getGovernanceTenant
+      summary: Get tenant policy metadata
+      responses:
+        '200': { $ref: '#/components/responses/Object' }
+        '404': { $ref: '#/components/responses/Error' }
+    patch:
+      operationId: updateGovernanceTenant
+      summary: Update tenant metadata and policy references
+      parameters: [{ $ref: '#/components/parameters/IfMatch' }]
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema: { $ref: '#/components/schemas/PatchResource' }
+      responses:
+        '200': { $ref: '#/components/responses/Object' }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '412': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/tenants/{tenantId}/memberships:
+    parameters: [{ $ref: '#/components/parameters/TenantId' }]
+    get:
+      operationId: listTenantMemberships
+      summary: List tenant memberships
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200': { $ref: '#/components/responses/Page' }
+        '403': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: createTenantMembership
+      summary: Add a principal to a tenant
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateMembership' }
+      responses:
+        '201': { $ref: '#/components/responses/Object' }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/audit-events:
+    get:
+      operationId: listAuditEvents
+      summary: Query tenant-scoped audit evidence
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - { name: action, in: query, schema: { type: string, maxLength: 96 } }
+        - { name: resourceType, in: query, schema: { type: string, maxLength: 64 } }
+        - { name: outcome, in: query, schema: { type: string, enum: [SUCCESS, DENIED, FAILURE] } }
+        - { name: from, in: query, schema: { type: string, format: date-time } }
+        - { name: to, in: query, schema: { type: string, format: date-time } }
+      responses:
+        '200': { $ref: '#/components/responses/Page' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/audit-events:verify:
+    post:
+      operationId: verifyAuditChain
+      summary: Verify an audit hash chain segment
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [from, to]
+              properties:
+                from: { type: string, format: date-time }
+                to: { type: string, format: date-time }
+      responses:
+        '200': { $ref: '#/components/responses/Object' }
+        '403': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/models:
+    get:
+      operationId: listGovernanceModels
+      summary: List tenant-visible model registrations
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - { name: capability, in: query, schema: { type: string, maxLength: 64 } }
+        - { name: state, in: query, schema: { type: string, enum: [DRAFT, REVIEWED, ENABLED, SUSPENDED, DEPRECATED] } }
+      responses:
+        '200': { $ref: '#/components/responses/Page' }
+        '403': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: createGovernanceModel
+      summary: Register model policy metadata
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateModel' }
+      responses:
+        '201': { $ref: '#/components/responses/Object' }
+        '400': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/models/{modelId}:enable:
+    post:
+      operationId: enableGovernanceModel
+      summary: Enable a reviewed model version
+      parameters:
+        - $ref: '#/components/parameters/ModelId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '200': { $ref: '#/components/responses/Object' }
+        '409': { $ref: '#/components/responses/Error' }
+        '412': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/models/{modelId}:suspend:
+    post:
+      operationId: suspendGovernanceModel
+      summary: Suspend a model for new work
+      parameters:
+        - $ref: '#/components/parameters/ModelId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '200': { $ref: '#/components/responses/Object' }
+        '409': { $ref: '#/components/responses/Error' }
+        '412': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/prompts:
+    get:
+      operationId: listGovernancePrompts
+      summary: List tenant Prompt definitions
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - { name: lifecycle, in: query, schema: { type: string, enum: [DRAFT, IN_REVIEW, EVALUATED, PUBLISHED, DEPRECATED] } }
+      responses:
+        '200': { $ref: '#/components/responses/Page' }
+        '403': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: createGovernancePrompt
+      summary: Create a Prompt definition and immutable draft version
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePrompt' }
+      responses:
+        '201': { $ref: '#/components/responses/Object' }
+        '400': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/prompts/{promptId}/versions:
+    post:
+      operationId: createPromptVersion
+      summary: Create an immutable Prompt version
+      parameters:
+        - $ref: '#/components/parameters/PromptId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePromptVersion' }
+      responses:
+        '201': { $ref: '#/components/responses/Object' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/prompts/{promptId}:publish:
+    post:
+      operationId: publishGovernancePrompt
+      summary: Publish an evaluated Prompt version
+      parameters:
+        - $ref: '#/components/parameters/PromptId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PublishPrompt' }
+      responses:
+        '201': { $ref: '#/components/responses/Object' }
+        '409': { $ref: '#/components/responses/Error' }
+        '412': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/prompts/{promptId}:rollback:
+    post:
+      operationId: rollbackGovernancePrompt
+      summary: Create a publication reference to an older immutable Prompt version
+      parameters:
+        - $ref: '#/components/parameters/PromptId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RollbackPrompt' }
+      responses:
+        '201': { $ref: '#/components/responses/Object' }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/usage:
+    get:
+      operationId: listGovernanceUsage
+      summary: Query attributed usage and cost records
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - { name: executionId, in: query, schema: { type: string, format: uuid } }
+        - { name: from, in: query, schema: { type: string, format: date-time } }
+        - { name: to, in: query, schema: { type: string, format: date-time } }
+      responses:
+        '200': { $ref: '#/components/responses/Page' }
+        '403': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/budgets:
+    get:
+      operationId: listGovernanceBudgets
+      summary: List tenant budgets and quota windows
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200': { $ref: '#/components/responses/Page' }
+        '403': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: createGovernanceBudget
+      summary: Create a budget policy
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateBudget' }
+      responses:
+        '201': { $ref: '#/components/responses/Object' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/traces/{traceId}:
+    get:
+      operationId: getGovernanceTrace
+      summary: Get bounded cross-runtime correlation metadata
+      parameters: [{ $ref: '#/components/parameters/TraceId' }]
+      responses:
+        '200': { $ref: '#/components/responses/Object' }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    TenantId: { name: tenantId, in: path, required: true, schema: { type: string, format: uuid } }
+    ModelId: { name: modelId, in: path, required: true, schema: { type: string, format: uuid } }
+    PromptId: { name: promptId, in: path, required: true, schema: { type: string, format: uuid } }
+    TraceId: { name: traceId, in: path, required: true, schema: { type: string, pattern: '^[a-f0-9]{16,32}$' } }
+    Cursor: { name: cursor, in: query, schema: { type: string, maxLength: 512 } }
+    Limit: { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, minLength: 1, maxLength: 128 } }
+  responses:
+    Object:
+      description: Resource envelope
+      headers: { ETag: { schema: { type: string } }, X-Request-Id: { schema: { type: string } } }
+      content: { application/json: { schema: { $ref: '#/components/schemas/Envelope' } } }
+    Page:
+      description: Cursor page envelope
+      content: { application/json: { schema: { $ref: '#/components/schemas/PageEnvelope' } } }
+    Error:
+      description: Stable OpenEIP error envelope
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } } }
+  schemas:
+    Envelope:
+      type: object
+      additionalProperties: false
+      required: [code, message, data, requestId, timestamp]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        data: { type: object, additionalProperties: true }
+        requestId: { type: string }
+        timestamp: { type: string, format: date-time }
+    PageEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: object
+              additionalProperties: false
+              required: [items, nextCursor]
+              properties:
+                items: { type: array, items: { type: object, additionalProperties: true } }
+                nextCursor: { type: [string, 'null'] }
+    ErrorEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data: { type: object, additionalProperties: false }
+    PatchResource:
+      type: object
+      additionalProperties: false
+      maxProperties: 16
+      properties: { displayName: { type: string, maxLength: 128 }, state: { type: string, maxLength: 32 } }
+    CreateTenant:
+      type: object
+      additionalProperties: false
+      required: [displayName]
+      properties: { displayName: { type: string, minLength: 1, maxLength: 128 } }
+    CreateMembership:
+      type: object
+      additionalProperties: false
+      required: [principalId, roles]
+      properties:
+        principalId: { type: string, format: uuid }
+        roles: { type: array, minItems: 1, maxItems: 16, items: { type: string, maxLength: 64 } }
+    CreateModel:
+      type: object
+      additionalProperties: false
+      required: [name, providerRef, capabilities, secretRef]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 128 }
+        providerRef: { type: string, maxLength: 128 }
+        capabilities: { type: array, maxItems: 32, items: { type: string, maxLength: 64 } }
+        routingLabels: { type: array, maxItems: 32, items: { type: string, maxLength: 64 } }
+        secretRef: { type: string, minLength: 1, maxLength: 256, description: Reference only; never a secret value. }
+    CreatePrompt:
+      type: object
+      additionalProperties: false
+      required: [name, purpose, content]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 128 }
+        purpose: { type: string, minLength: 1, maxLength: 128 }
+        content: { type: string, minLength: 1, maxLength: 65536 }
+    CreatePromptVersion:
+      type: object
+      additionalProperties: false
+      required: [content, compatibilityVersion]
+      properties:
+        content: { type: string, minLength: 1, maxLength: 65536 }
+        compatibilityVersion: { type: string, maxLength: 64 }
+    PublishPrompt:
+      type: object
+      additionalProperties: false
+      required: [versionId, evaluationRunId]
+      properties:
+        versionId: { type: string, format: uuid }
+        evaluationRunId: { type: string, format: uuid }
+    RollbackPrompt:
+      type: object
+      additionalProperties: false
+      required: [versionId, reason]
+      properties:
+        versionId: { type: string, format: uuid }
+        reason: { type: string, minLength: 1, maxLength: 512 }
+    CreateBudget:
+      type: object
+      additionalProperties: false
+      required: [name, currency, limit, window]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 128 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        limit: { type: number, exclusiveMinimum: 0, maximum: 1000000000 }
+        window: { type: string, enum: [DAILY, WEEKLY, MONTHLY, EXECUTION] }

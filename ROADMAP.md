@@ -21,7 +21,7 @@ v0.5 ──→ Connector           alpha 已发布
 v0.6 ──→ Agent               alpha 已发布
          Tool / Memory / Planner / Multi-Agent / MCP / Evaluation
 
-v0.7 ──→ Governance          SDD 已完成，API/DB/UI 设计中
+v0.7 ──→ Governance          API/DB/UI 设计完成，架构评审中
          多租户 / 审计 / 模型管理 / Prompt 管理 / 成本 / Trace
 
 v0.8 ──→ Marketplace         规划中
@@ -46,7 +46,7 @@ v1.0 ──→ LTS                 规划中
 | Phase 3：Knowledge | alpha 已发布 | `v0.3.0-alpha` 已于 2026-07-24 发布，交付解析、Embedding、全文/向量/混合检索与 Citation |
 | Phase 4：Workflow | alpha 已发布 | `v0.4.0-alpha` 已于 2026-07-25 发布，交付 Canvas、持久执行、Trigger、Approval、Retry 与事件集成 |
 | Phase 5：Agent | alpha 已发布 | `v0.6.0-alpha` 已于 2026-08-31 作为 GitHub Pre-release 发布；正式 Review 缺失按维护者授权记录为流程例外 |
-| Phase 6：Governance | SDD 已完成，API/DB/UI 设计中 | RFC-0009、ADR-0015 至 ADR-0018 已接受；Governance SDD 已于 2026-09-01 完成；实现尚未开始 |
+| Phase 6：Governance | API/DB/UI 设计完成，架构评审中 | RFC-0009、ADR-0015 至 ADR-0018 已接受；Governance SDD 和契约设计已完成；实现尚未开始 |
 
 ## 当前发布边界
 
