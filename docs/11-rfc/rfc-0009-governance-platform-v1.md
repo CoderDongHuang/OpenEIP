@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Abstract
 
@@ -91,11 +91,22 @@ and authorization tables. Event additions are versioned and tolerant readers are
 | Persist full Prompts and provider payloads | Easy replay | Violates data minimization and privacy boundaries |
 | Recompute cost from mutable prices | Simple storage | Historical invoices and budgets become non-reproducible |
 
+## Decision
+
+Accepted by the Bootstrap Maintainer on 2026-09-01. The decision authorizes the v0.7 Governance
+implementation within the scope and compatibility boundaries defined by this RFC. The decision is based on
+the need for one tenant and policy authority across the Java control plane, Python runtimes, asynchronous
+events, and administrative surfaces, while preserving the v0.1-v0.6 API and SPI contracts.
+
+The acceptance does not waive the remaining OEP gates: Governance SDD, API/Database/UI design, independent
+architecture and security review, implementation validation, quality gates, and release review are still
+required.
+
 ## Decision process
 
-This proposal requires public discussion and a Maintainer decision under the RFC process. It remains Proposed
-until the discussion window and required vote are complete. Implementation is blocked until RFC-0009 and its
-related ADRs are accepted and the independent architecture/security review is approved.
+The proposal was submitted through PR #102 and reviewed as the v0.7 governance baseline. The Bootstrap
+Maintainer accepted RFC-0009 on 2026-09-01. The acceptance and its implementation boundary are recorded in
+Issue #99.
 
 Discussion: Issue #99.
 

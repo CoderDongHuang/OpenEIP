@@ -1,6 +1,6 @@
 # Issue #99: v0.7 Governance
 
-> Status: Issue created; RFC and module design pending
+> Status: RFC and ADRs accepted; Governance SDD pending
 > Release train: v0.7 Governance
 > Date: 2026-08-31
 
@@ -26,8 +26,8 @@ issue unless an accepted RFC changes the boundary.
 | Step | Evidence | State |
 |---|---|---|
 | 1 Issue | GitHub #99 | Complete 2026-08-31 |
-| 2 RFC | Governance cross-cutting contracts | Not started |
-| 3 ADR | Tenant, audit, model/prompt, cost, and trace decisions | Not started |
+| 2 RFC | RFC-0009 and PR #102 | Accepted 2026-09-01 |
+| 3 ADR | ADR-0015 through ADR-0018 | Accepted 2026-09-01 |
 | 4 Module Design | Governance SDD | Not started |
 | 5 API/Database/UI Design | Governance contracts and surfaces | Not started |
 | 6 Architecture Review | Independent architecture and security review | Not started |
@@ -44,3 +44,10 @@ issue unless an accepted RFC changes the boundary.
 - Cost usage is idempotent, attributable, and tested against budget and quota boundaries.
 - Trace context survives Java-to-Python and asynchronous event boundaries.
 - CI, security, compatibility, and quality gates pass before release candidate work begins.
+
+## Decision Record
+
+RFC-0009 and ADR-0015 through ADR-0018 were accepted by the Bootstrap Maintainer on 2026-09-01. The
+acceptance authorizes the next OEP stage, Governance SDD, but does not waive API/Database/UI design,
+independent architecture/security review, implementation, testing, compatibility, security, benchmark,
+quality gate, or release requirements.
