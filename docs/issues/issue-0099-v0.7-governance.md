@@ -1,6 +1,6 @@
 # Issue #99: v0.7 Governance
 
-> Status: RFC and ADRs accepted; Governance SDD pending
+> Status: Governance SDD accepted; API/Database/UI design pending
 > Release train: v0.7 Governance
 > Date: 2026-08-31
 
@@ -28,7 +28,7 @@ issue unless an accepted RFC changes the boundary.
 | 1 Issue | GitHub #99 | Complete 2026-08-31 |
 | 2 RFC | RFC-0009 and PR #102 | Accepted 2026-09-01 |
 | 3 ADR | ADR-0015 through ADR-0018 | Accepted 2026-09-01 |
-| 4 Module Design | Governance SDD | Not started |
+| 4 Module Design | Governance SDD | Complete 2026-09-01 |
 | 5 API/Database/UI Design | Governance contracts and surfaces | Not started |
 | 6 Architecture Review | Independent architecture and security review | Not started |
 | 7-13 Implementation and validation | Java/Python/Frontend and quality evidence | Not started |
@@ -51,3 +51,10 @@ RFC-0009 and ADR-0015 through ADR-0018 were accepted by the Bootstrap Maintainer
 acceptance authorizes the next OEP stage, Governance SDD, but does not waive API/Database/UI design,
 independent architecture/security review, implementation, testing, compatibility, security, benchmark,
 quality gate, or release requirements.
+
+## Module Design Record
+
+The Governance Sub-SDD is [governance-module.md](../04-sdd/governance-module.md). It fixes the Java
+control-plane authority, tenant context propagation, audit and hash-chain boundary, model/Prompt lifecycle,
+idempotent usage/cost ledger, trace sanitization, failure policy, and the design deliverables required before
+implementation. The API, database, event, and Frontend contracts remain the next OEP stage.
