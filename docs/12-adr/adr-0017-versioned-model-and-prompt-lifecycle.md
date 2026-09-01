@@ -2,11 +2,13 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Date
 
-2026-08-31
+2026-09-01
+
+Accepted by the Bootstrap Maintainer as part of RFC-0009.
 
 ## Context
 
