@@ -39,7 +39,18 @@
         "versionId": { "type": ["string", "null"], "maxLength": 128 },
         "digest": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" },
         "usageRevision": { "type": ["integer", "null"], "minimum": 1 },
-        "summary": { "type": ["object", "null"], "maxProperties": 16, "additionalProperties": false }
+        "summary": {
+          "type": ["object", "null"],
+          "maxProperties": 16,
+          "additionalProperties": {
+            "anyOf": [
+              { "type": "string", "maxLength": 512 },
+              { "type": "number" },
+              { "type": "boolean" },
+              { "type": "null" }
+            ]
+          }
+        }
       }
     }
   }

@@ -156,6 +156,24 @@ paths:
         '409': { $ref: '#/components/responses/Error' }
         '412': { $ref: '#/components/responses/Error' }
         '422': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/models/{modelId}:review:
+    post:
+      operationId: reviewGovernanceModel
+      summary: Record a review decision for model policy metadata
+      parameters:
+        - $ref: '#/components/parameters/ModelId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReviewResource' }
+      responses:
+        '200': { $ref: '#/components/responses/Object' }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '412': { $ref: '#/components/responses/Error' }
   /api/v2/governance/models/{modelId}:suspend:
     post:
       operationId: suspendGovernanceModel
@@ -206,6 +224,40 @@ paths:
             schema: { $ref: '#/components/schemas/CreatePromptVersion' }
       responses:
         '201': { $ref: '#/components/responses/Object' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/prompts/{promptId}/versions/{versionId}:review:
+    post:
+      operationId: reviewPromptVersion
+      summary: Record review decision for an immutable Prompt version
+      parameters:
+        - $ref: '#/components/parameters/PromptId'
+        - { name: versionId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReviewResource' }
+      responses:
+        '200': { $ref: '#/components/responses/Object' }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v2/governance/prompts/{promptId}/versions/{versionId}:evaluate:
+    post:
+      operationId: evaluatePromptVersion
+      summary: Attach evaluation evidence to an immutable Prompt version
+      parameters:
+        - $ref: '#/components/parameters/PromptId'
+        - { name: versionId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EvaluateResource' }
+      responses:
+        '202': { $ref: '#/components/responses/Object' }
+        '403': { $ref: '#/components/responses/Error' }
         '409': { $ref: '#/components/responses/Error' }
   /api/v2/governance/prompts/{promptId}:publish:
     post:
@@ -382,6 +434,20 @@ components:
       properties:
         content: { type: string, minLength: 1, maxLength: 65536 }
         compatibilityVersion: { type: string, maxLength: 64 }
+    ReviewResource:
+      type: object
+      additionalProperties: false
+      required: [decision, reason]
+      properties:
+        decision: { type: string, enum: [APPROVE, REJECT] }
+        reason: { type: string, minLength: 1, maxLength: 512 }
+    EvaluateResource:
+      type: object
+      additionalProperties: false
+      required: [suiteId]
+      properties:
+        suiteId: { type: string, format: uuid }
+        baselineId: { type: [string, 'null'], format: uuid }
     PublishPrompt:
       type: object
       additionalProperties: false
