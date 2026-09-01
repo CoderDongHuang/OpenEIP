@@ -20,6 +20,10 @@
 | [ADR-0012](adr-0012-durable-agent-execution.md) | Durable Agent Execution | Accepted |
 | [ADR-0013](adr-0013-agent-memory-governance.md) | Agent Memory Governance | Accepted |
 | [ADR-0014](adr-0014-mcp-trust-boundary.md) | MCP Trust Boundary | Accepted |
+| [ADR-0015](adr-0015-tenant-context-and-isolation.md) | Tenant Context and Isolation | Proposed |
+| [ADR-0016](adr-0016-tamper-evident-audit-records.md) | Tamper-Evident Audit Records | Proposed |
+| [ADR-0017](adr-0017-versioned-model-and-prompt-lifecycle.md) | Versioned Model and Prompt Lifecycle | Proposed |
+| [ADR-0018](adr-0018-idempotent-cost-and-trace-contracts.md) | Idempotent Cost and Trace Contracts | Proposed |
 
 ## ADR 编号规则
 
