@@ -30,7 +30,7 @@ issue unless an accepted RFC changes the boundary.
 | 3 ADR | ADR-0015 through ADR-0018 | Accepted 2026-09-01 |
 | 4 Module Design | Governance SDD | Complete 2026-09-01 |
 | 5 API/Database/UI Design | Governance OpenAPI v2, V2.7.0 schema, event contract, and management workspace | Complete 2026-09-01 |
-| 6 Architecture Review | Independent architecture and security review | Not started |
+| 6 Architecture Review | [Architecture review](issue-0099-architecture-review.md) and [Security review](issue-0099-security-review.md) | Review packet ready; independent approval pending |
 | 7-13 Implementation and validation | Java/Python/Frontend and quality evidence | Not started |
 | 14-17 Delivery | Pull Request, Review, Merge, Release | Not started |
 
