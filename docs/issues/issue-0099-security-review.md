@@ -1,11 +1,12 @@
 # Security Design Review: Issue #99 v0.7 Governance
 
-> Review packet status: Ready for independent review
-> Decision: Pending independent security approval
-> Date: 2026-09-01
+> Review packet status: Approved with Conditions
+> Decision: Approved to enter implementation with conditions
+> Date: 2026-09-02
 
-This document records the threat model and required implementation evidence for v0.7 Governance. It is not a
-claim that executable security testing or an independent approval has already occurred.
+This document records the threat model and required implementation evidence for v0.7 Governance. The
+independent reviewer `WriteBigBug` recorded `Approved with Conditions` in Issue #99 on 2026-09-02. This is an
+implementation-entry approval, not a release security gate.
 
 ## Assets and trust boundaries
 
@@ -41,12 +42,13 @@ Kafka, Java-to-storage, governance-to-secret resolver, and governance-to-existin
 
 ## Approval gate
 
-An independent security reviewer must confirm the controls and record the decision in this file and Issue #99.
-Implementation may begin only after the architecture and security reviews are both approved or explicitly
-approved with conditions. Release still requires executable abuse cases, dependency/container/IaC scans with no
-HIGH/CRITICAL findings, secret-canary checks, compatibility checks, and benchmark evidence.
+The independent reviewer approved the architecture and security design with conditions: V2.7.0 DDL must pass
+tenant-isolation and rollback contract tests; implementation must preserve data minimization; and all remaining
+OEP quality and release gates remain mandatory. Release still requires executable abuse cases,
+dependency/container/IaC scans with no HIGH/CRITICAL findings, secret-canary checks, compatibility checks, and
+benchmark evidence.
 
-## Decision request
+## Decision record
 
-Independent reviewer: record `Approved`, `Approved with Conditions`, or `Rejected` with rationale. Until that
-record exists, this is a review packet, not a completed OEP step 6 security review.
+The review decision is recorded in [Issue #99](https://github.com/CoderDongHuang/OpenEIP/issues/99#issuecomment-5507449833)
+by `WriteBigBug` as `Approved with Conditions` on 2026-09-02.

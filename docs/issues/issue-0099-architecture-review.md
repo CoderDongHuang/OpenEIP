@@ -1,12 +1,11 @@
 # Architecture Review: Issue #99 v0.7 Governance
 
-> Review packet status: Ready for independent review
-> Decision: Pending independent architecture approval
-> Date: 2026-09-01
+> Review packet status: Approved with Conditions
+> Decision: Approved to enter implementation with conditions
+> Date: 2026-09-02
 
-This packet is prepared against the merged RFC, ADRs, Governance Sub-SDD, and API/Database/UI design. It is
-an implementation-entry checklist, not an approval by the design author. A Maintainer or Committer who did not
-author the packet must record the final decision before implementation begins.
+This packet was reviewed against the merged RFC, ADRs, Governance Sub-SDD, and API/Database/UI design. The
+independent reviewer `WriteBigBug` recorded `Approved with Conditions` in Issue #99 on 2026-09-02.
 
 ## Scope reviewed
 
@@ -55,7 +54,9 @@ Governance event schema, and Governance management workspace design.
 - Prove concurrent budget decisions, compensating usage records, pricing reproducibility, and alert idempotency.
 - Add contract tests for Java/Python, HTTP/SSE, Kafka, Connector, cache, and trace propagation.
 
-## Decision request
+## Decision record
 
-Independent reviewer: record `Approved`, `Approved with Conditions`, or `Rejected` with rationale in this file
-and in Issue #99. Until that record exists, OEP step 6 is not complete and implementation remains blocked.
+`WriteBigBug` approved the architecture with conditions in [Issue #99](https://github.com/CoderDongHuang/OpenEIP/issues/99#issuecomment-5507449833).
+The implementation must prove V2.7.0 tenant-isolation and rollback contract tests, preserve the documented
+data-minimization rules, and pass all remaining OEP quality and release gates. These conditions are mandatory
+and do not permit bypassing later review or release controls.

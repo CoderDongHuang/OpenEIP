@@ -1,6 +1,6 @@
 # Issue #99: v0.7 Governance
 
-> Status: API/Database/UI design accepted; architecture and security review pending
+> Status: Architecture/security review approved with conditions; implementation in progress
 > Release train: v0.7 Governance
 > Date: 2026-08-31
 
@@ -30,8 +30,8 @@ issue unless an accepted RFC changes the boundary.
 | 3 ADR | ADR-0015 through ADR-0018 | Accepted 2026-09-01 |
 | 4 Module Design | Governance SDD | Complete 2026-09-01 |
 | 5 API/Database/UI Design | Governance OpenAPI v2, V2.7.0 schema, event contract, and management workspace | Complete 2026-09-01 |
-| 6 Architecture Review | [Architecture review](issue-0099-architecture-review.md) and [Security review](issue-0099-security-review.md) | Review packet ready; independent approval pending |
-| 7-13 Implementation and validation | Java/Python/Frontend and quality evidence | Not started |
+| 6 Architecture Review | [Architecture review](issue-0099-architecture-review.md) and [Security review](issue-0099-security-review.md) | Approved with Conditions 2026-09-02 |
+| 7-13 Implementation and validation | Java/Python/Frontend and quality evidence | In progress; conditions mandatory |
 | 14-17 Delivery | Pull Request, Review, Merge, Release | Not started |
 
 ## Acceptance criteria
@@ -72,5 +72,14 @@ The design packet is complete:
 - UI: [governance-workspace.md](../08-ui/governance-workspace.md) defines administrative surfaces, permission
   matrix, state handling, accessibility, and data-minimization rules.
 
-Step 6, independent architecture and security review, is now the only gate before implementation design can
-be converted into Java, Python, Frontend, and migration code.
+With Step 6 approved with conditions, the design can now be converted into Java, Python, Frontend, and migration
+code. The conditions below remain mandatory throughout implementation and release.
+
+## Architecture/Security Decision Record
+
+Independent reviewer `WriteBigBug` recorded `Approved with Conditions` on 2026-09-02 in
+[Issue #99](https://github.com/CoderDongHuang/OpenEIP/issues/99#issuecomment-5507449833). The mandatory
+conditions are: V2.7.0 DDL must pass tenant-isolation and rollback contract tests; runtime implementation must
+preserve the documented data-minimization rules; and all remaining OEP quality and release gates remain
+mandatory. The project may enter implementation, but these conditions are tracked through the quality and
+release gates.
