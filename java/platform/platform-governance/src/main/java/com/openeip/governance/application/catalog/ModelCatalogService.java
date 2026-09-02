@@ -16,6 +16,7 @@ import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class ModelCatalogService {
   private final AuditService audit;
   private final Clock clock;
 
+  @Autowired
   public ModelCatalogService(ModelCatalogPort catalog, AuditService audit) {
     this(catalog, audit, Clock.systemUTC());
   }
