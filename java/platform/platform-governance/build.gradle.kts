@@ -4,12 +4,14 @@ dependencies {
     implementation(project(":platform-common"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework:spring-jdbc")
 
     compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.3")
 
     testImplementation("org.flywaydb:flyway-core")
     testImplementation("org.flywaydb:flyway-mysql")
     testImplementation("org.springframework:spring-jdbc")
+    testImplementation("com.h2database:h2")
     testImplementation("org.testcontainers:junit-jupiter:1.21.4")
     testImplementation("org.testcontainers:mysql:1.21.4")
     testRuntimeOnly("com.mysql:mysql-connector-j")
