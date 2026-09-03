@@ -163,6 +163,30 @@ public class JdbcPricingUsageAdapter implements PricingSnapshotPort, UsageLedger
     return jdbc.query(sql.toString(), (rs, row) -> usage(rs), arguments.toArray());
   }
 
+  @Override
+  public BigDecimal totalAmount(UUID tenantId, UUID executionId, Instant from, Instant to) {
+    StringBuilder sql =
+        new StringBuilder(
+            "SELECT COALESCE(SUM(calculated_amount), 0) FROM governance_usage_records");
+    sql.append(" WHERE tenant_id = ?");
+    List<Object> arguments = new ArrayList<>();
+    arguments.add(tenantId.toString());
+    if (executionId != null) {
+      sql.append(" AND execution_id = ?");
+      arguments.add(executionId.toString());
+    }
+    if (from != null) {
+      sql.append(" AND created_at >= ?");
+      arguments.add(timestamp(from));
+    }
+    if (to != null) {
+      sql.append(" AND created_at < ?");
+      arguments.add(timestamp(to));
+    }
+    BigDecimal result = jdbc.queryForObject(sql.toString(), BigDecimal.class, arguments.toArray());
+    return result == null ? BigDecimal.ZERO : result;
+  }
+
   private Optional<UsageRecord> usageById(UUID tenantId, UUID id) {
     return jdbc
         .query(
