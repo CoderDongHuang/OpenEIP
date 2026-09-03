@@ -76,11 +76,11 @@ public class BudgetService {
   @Transactional
   public BudgetDecisionResult decide(BudgetDecisionRequest request) {
     Context context = context(request.tenantId());
-    Budget budget = budget(context.tenantId(), request.budgetId());
+    Budget budget = budgets.lockBudget(context.tenantId(), request.budgetId());
     BudgetWindow window = window(budget.windowType(), request.now());
     BudgetDecision previous =
         budgets.latestDecision(context.tenantId(), budget.id(), request.executionId()).orElse(null);
-    validateTransition(request.type(), request.reservedAmount(), previous);
+    validateTransition(request.type(), request.reservedAmount(), request.now(), previous);
 
     Instant from = budget.windowType() == BudgetWindowType.EXECUTION ? null : window.start();
     Instant to = budget.windowType() == BudgetWindowType.EXECUTION ? null : window.end();
@@ -119,7 +119,10 @@ public class BudgetService {
   }
 
   private void validateTransition(
-      BudgetDecisionType type, BigDecimal reservedAmount, BudgetDecision previous) {
+      BudgetDecisionType type,
+      BigDecimal reservedAmount,
+      Instant requestedAt,
+      BudgetDecision previous) {
     if (type == BudgetDecisionType.START && previous != null) {
       throw GovernanceCatalogException.conflict("Execution already has a budget decision");
     }
@@ -131,6 +134,10 @@ public class BudgetService {
       if (reservedAmount.compareTo(previous.reservedAmount()) > 0) {
         throw GovernanceCatalogException.transition(
             "A checkpoint cannot increase the execution reservation");
+      }
+      if (!requestedAt.isAfter(previous.createdAt())) {
+        throw GovernanceCatalogException.transition(
+            "A checkpoint must be later than the previous budget decision");
       }
     }
   }

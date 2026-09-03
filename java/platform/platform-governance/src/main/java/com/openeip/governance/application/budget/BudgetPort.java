@@ -15,6 +15,8 @@ public interface BudgetPort {
 
   Optional<Budget> budget(UUID tenantId, UUID budgetId);
 
+  Budget lockBudget(UUID tenantId, UUID budgetId);
+
   List<Budget> budgets(UUID tenantId, int limit);
 
   Optional<BudgetDecision> latestDecision(UUID tenantId, UUID budgetId, UUID executionId);
