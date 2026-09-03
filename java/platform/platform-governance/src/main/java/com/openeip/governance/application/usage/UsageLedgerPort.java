@@ -19,4 +19,6 @@ public interface UsageLedgerPort {
       UUID tenantId, UUID executionId, String providerRequestId, long usageRevision);
 
   List<UsageRecord> usages(UUID tenantId, UUID executionId, Instant from, Instant to, int limit);
+
+  BigDecimal totalAmount(UUID tenantId, UUID executionId, Instant from, Instant to);
 }
