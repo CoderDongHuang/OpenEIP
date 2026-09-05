@@ -246,7 +246,7 @@ class JdbcPromptCatalogAdapterTest {
             "request-1",
             "0123456789abcdef0123456789abcdef",
             GovernanceScope.TENANT,
-            Instant.parse("2026-09-03T23:59:59Z")));
+            Instant.parse("2099-01-01T00:00:00Z")));
   }
 
   private void insertTenant(String id, String slug) {
