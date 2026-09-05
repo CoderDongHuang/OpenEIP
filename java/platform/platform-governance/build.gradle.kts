@@ -8,7 +8,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework:spring-jdbc")
 
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.3")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.4")
 
     testImplementation("org.flywaydb:flyway-core")
     testImplementation("org.flywaydb:flyway-mysql")

@@ -47,7 +47,7 @@ subprojects {
             mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.16")
         }
         dependencies {
-            dependency("io.netty:netty-codec:4.2.16.Final")
+            dependency("io.netty:netty-codec:4.2.17.Final")
             dependency("org.postgresql:postgresql:42.7.13")
             dependency("org.apache.tomcat.embed:tomcat-embed-core:10.1.59")
         }
