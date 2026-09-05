@@ -7,7 +7,7 @@
 |---|---|---|---|
 | Coverage | Changed module instruction coverage >= 80% | 57 Governance non-benchmark tests; 10,330 covered and 894 missed instructions; 92.03% | Passed |
 | Static analysis | Checkstyle, SpotBugs, and Spotless clean | Governance check passed; Java all-module check completed 130 tasks | Passed |
-| Benchmark | 1,000 sequential admissions P99 < 50 ms; 100 competing admissions do not oversell | P99 5.569 ms; exactly 20/100 allowed at limit 20; 434.339/s; zero errors | Passed |
+| Benchmark | 1,000 sequential admissions P99 < 50 ms; 100 competing admissions do not oversell | P99 5.427 ms; exactly 20/100 allowed at limit 20; 402.94/s; zero errors | Passed |
 | Security | No HIGH/CRITICAL vulnerability, misconfiguration, or secret finding | Project Trivy script passed all scanners over 934 Git-relevant files | Passed |
 | Database | MySQL forward migration, tenant isolation, and rollback | MySQL 8.4 Testcontainers created 20 tables, rejected cross-tenant policy FK, and rolled back to zero | Passed |
 | API documentation | Public contracts synchronized | No public HTTP/event contract change; internal application port, SDD, schema, and test plan updated | Passed |

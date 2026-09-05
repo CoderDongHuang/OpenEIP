@@ -42,13 +42,14 @@ class QuotaEnforcementServiceTest {
 
   private FakePort port;
   private QuotaEnforcementService service;
+  private AuditService audit;
   private AtomicInteger auditCount;
 
   @BeforeEach
   void setUp() {
     port = new FakePort(policy(QuotaWindowType.DAILY));
     auditCount = new AtomicInteger();
-    AuditService audit =
+    audit =
         new AuditService(
             command -> {
               auditCount.incrementAndGet();
@@ -104,6 +105,30 @@ class QuotaEnforcementServiceTest {
             error ->
                 assertThat(((GovernanceCatalogException) error).code()).isEqualTo("GOV-I-001"));
     assertThat(port.reservations).hasSize(1);
+    assertThat(auditCount).hasValue(1);
+  }
+
+  @Test
+  void returnsOriginalDecisionAfterLeaseExpiryAndPolicyContextChange() {
+    var request =
+        new QuotaAdmissionRequest(
+            TENANT,
+            POLICY_ID,
+            EXECUTION,
+            "quota-request-expired",
+            1,
+            BigDecimal.ZERO,
+            1,
+            NOW.plusSeconds(1));
+    var original = service.authorize(request);
+    bind(TENANT, "policy-new");
+    var laterService =
+        new QuotaEnforcementService(port, audit, Clock.fixed(NOW.plusSeconds(2), ZoneOffset.UTC));
+
+    var duplicate = laterService.authorize(request);
+
+    assertThat(duplicate.duplicate()).isTrue();
+    assertThat(duplicate.reservation().id()).isEqualTo(original.reservation().id());
     assertThat(auditCount).hasValue(1);
   }
 

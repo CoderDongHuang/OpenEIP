@@ -56,7 +56,6 @@ public class QuotaEnforcementService {
   public QuotaAdmissionResult authorize(QuotaAdmissionRequest request) {
     Context context = context(request.tenantId());
     Instant admittedAt = clock.instant();
-    validateLease(request.expiresAt(), admittedAt);
     QuotaPolicy policy =
         enforcement
             .lockPolicy(context.tenantId(), request.quotaPolicyId())
@@ -64,10 +63,6 @@ public class QuotaEnforcementService {
                 () ->
                     GovernanceCatalogException.invalid(
                         "Quota policy was not found in this tenant"));
-    if (!policy.policyVersion().equals(context.policyVersion())) {
-      throw GovernanceCatalogException.conflict("Quota policy version is stale");
-    }
-
     var existing =
         enforcement.reservationByIdempotency(
             context.tenantId(), request.quotaPolicyId(), request.idempotencyKey());
@@ -78,6 +73,11 @@ public class QuotaEnforcementService {
             "Quota idempotency key has different admission facts");
       }
       return result(reservation, true);
+    }
+
+    validateLease(request.expiresAt(), admittedAt);
+    if (!policy.policyVersion().equals(context.policyVersion())) {
+      throw GovernanceCatalogException.conflict("Quota policy version is stale");
     }
 
     QuotaWindow window = window(policy.windowType(), admittedAt);
