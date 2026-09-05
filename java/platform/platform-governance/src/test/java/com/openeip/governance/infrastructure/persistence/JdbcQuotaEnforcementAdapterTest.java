@@ -269,7 +269,9 @@ class JdbcQuotaEnforcementAdapterTest {
             executor.submit(
                 () -> {
                   ready.countDown();
-                  start.await(10, TimeUnit.SECONDS);
+                  if (!start.await(10, TimeUnit.SECONDS)) {
+                    throw new IllegalStateException("Concurrent quota test did not start in time");
+                  }
                   bind(TENANT_ONE);
                   try {
                     return inTransaction(
@@ -410,7 +412,12 @@ class JdbcQuotaEnforcementAdapterTest {
   }
 
   private int countReservations() {
-    return jdbc.queryForObject("SELECT COUNT(*) FROM governance_quota_reservations", Integer.class);
+    Integer count =
+        jdbc.queryForObject("SELECT COUNT(*) FROM governance_quota_reservations", Integer.class);
+    if (count == null) {
+      throw new IllegalStateException("Quota reservation count was not returned");
+    }
+    return count;
   }
 
   private static UUID execution(int value) {

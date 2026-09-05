@@ -1,0 +1,22 @@
+{
+  "schemaVersion" : 1,
+  "recordedAt" : "2026-09-05T12:56:18.271808300Z",
+  "runtime" : "21.0.4+8-LTS-274",
+  "platform" : "Windows 11 10.0",
+  "database" : "H2 MySQL mode",
+  "warmups" : 20,
+  "sequentialAdmissions" : 1000,
+  "sequentialP50Ms" : 2.378,
+  "sequentialP95Ms" : 4.205,
+  "sequentialP99Ms" : 5.569,
+  "thresholdP99Ms" : 50,
+  "competingAdmissions" : 100,
+  "competingAllowed" : 20,
+  "competingExpectedAllowed" : 20,
+  "competingWallTimeMs" : 230.235,
+  "competingThroughputPerSecond" : 434.339,
+  "reservationRows" : 1120,
+  "expectedReservationRows" : 1120,
+  "errors" : 0,
+  "result" : "PASS"
+}
