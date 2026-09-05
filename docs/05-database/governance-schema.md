@@ -22,6 +22,7 @@ or provider payloads.
 | `governance_organizations` | Tenant organization metadata | unique `(tenant_id, name)`; tenant FK |
 | `governance_memberships` | Principal membership and roles | unique `(tenant_id, principal_id)`; revisioned role set; no cross-tenant FK |
 | `governance_quota_policies` | Token, cost, request and concurrency windows | immutable policy versions; tenant-leading window indexes |
+| `governance_quota_reservations` | Runtime quota admission decisions and expiring leases | idempotent policy key; append-only decision; release timestamp only |
 | `governance_audit_records` | Append-only evidence and hash chain | unique `(tenant_id, event_id)`; immutable hash fields; sanitized summary |
 | `governance_outbox` | Transactional audit/policy event publication | unique event ID; retry state; acknowledged retention deadline |
 | `governance_providers` | Provider endpoint policy and secret reference | no credential value; tenant-scoped endpoint/capability policy |
@@ -43,7 +44,7 @@ or provider payloads.
 ```text
 tenant
   ├── organization ──< membership
-  ├── quota_policy
+  ├── quota_policy ──< quota_reservation
   ├── audit_record ──< outbox
   ├── provider ──< model ──< model_version ──> pricing_snapshot
   ├── prompt ──< prompt_version ──< prompt_review
@@ -56,7 +57,8 @@ tenant
 - Every child row includes `tenant_id`; application checks compare parent and child tenant IDs before writes.
 - `governance_audit_records`, `governance_prompt_versions`, `governance_prompt_publications`,
   `governance_model_versions`, `governance_pricing_snapshots`, `governance_usage_records`, and
-  `governance_budget_decisions` reject update/delete through application policy.
+  `governance_budget_decisions` reject update/delete through application policy. Quota reservation decision
+  facts are immutable; only the nullable release timestamp may transition once.
 - Mutable aggregates require expected `revision`; stale writes return `GOV-C-001` and do not append a second
   business result.
 - Tenant suspension rejects new Agent/Workflow/Chat work and new provider calls while allowing audited cleanup
@@ -99,6 +101,18 @@ snapshot is never updated after first use.
 usage, reserved amount, decision, and execution reference. Decisions are monotonic for an execution. Alerts use
 `(tenant_id, budget_id, window_start, threshold, crossing_revision)` as their idempotency key.
 
+`governance_quota_reservations` records one admission attempt with the policy and execution IDs, policy version,
+UTC window bounds, requested token/cost/request/concurrency units, decision, request/trace IDs, lease expiry, and
+optional release time. Its idempotency key is:
+
+```text
+(tenant_id, quota_policy_id, idempotency_key)
+```
+
+Allowed request units remain counted after release. Token, cost, and concurrency reservations contribute only
+while `released_at IS NULL AND expires_at > now`. The policy row is selected `FOR UPDATE` before aggregate reads
+and decision insertion, so competing admissions for one policy cannot oversell the same window.
+
 ## 6. Tenant and membership migration
 
 Existing single-tenant installations receive an explicit system tenant mapping through an idempotent application
@@ -115,6 +129,8 @@ Required index prefixes include:
 (tenant_id, occurred_at, id)
 (tenant_id, retention_deadline, id)
 (tenant_id, execution_id, provider_request_id, usage_revision)
+(tenant_id, quota_policy_id, window_start, decision, expires_at)
+(tenant_id, quota_policy_id, idempotency_key)
 (tenant_id, trace_id, occurred_at, id)
 ```
 
