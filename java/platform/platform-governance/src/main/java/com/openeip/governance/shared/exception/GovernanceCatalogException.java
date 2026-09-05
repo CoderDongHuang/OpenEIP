@@ -6,6 +6,7 @@ public class GovernanceCatalogException extends RuntimeException {
   public static final String TRANSITION_CODE = "GOV-C-002";
   public static final String VALIDATION_CODE = "GOV-V-001";
   public static final String BUDGET_CODE = "GOV-B-001";
+  public static final String IDEMPOTENCY_CODE = "GOV-I-001";
 
   private final String code;
 
@@ -28,6 +29,10 @@ public class GovernanceCatalogException extends RuntimeException {
 
   public static GovernanceCatalogException budgetExceeded(String message) {
     return new GovernanceCatalogException(BUDGET_CODE, message);
+  }
+
+  public static GovernanceCatalogException idempotency(String message) {
+    return new GovernanceCatalogException(IDEMPOTENCY_CODE, message);
   }
 
   public String code() {

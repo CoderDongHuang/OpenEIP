@@ -72,6 +72,55 @@ CREATE TABLE governance_quota_policies (
     CONSTRAINT ck_governance_quota_window CHECK (window_type IN ('DAILY', 'WEEKLY', 'MONTHLY', 'EXECUTION'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE governance_quota_reservations (
+    id VARCHAR(36) NOT NULL,
+    tenant_id VARCHAR(36) NOT NULL,
+    quota_policy_id VARCHAR(36) NOT NULL,
+    execution_id VARCHAR(36) NOT NULL,
+    idempotency_key VARCHAR(128) NOT NULL,
+    policy_version VARCHAR(64) NOT NULL,
+    window_type VARCHAR(16) NOT NULL,
+    window_start TIMESTAMP(6) NOT NULL,
+    window_end TIMESTAMP(6) NOT NULL,
+    requested_token_units BIGINT NOT NULL,
+    requested_cost_amount DECIMAL(20, 6) NOT NULL,
+    requested_request_units INT NOT NULL DEFAULT 1,
+    requested_concurrency_units INT NOT NULL,
+    observed_token_units BIGINT NOT NULL,
+    observed_cost_amount DECIMAL(20, 6) NOT NULL,
+    observed_request_units BIGINT NOT NULL,
+    observed_concurrency_units INT NOT NULL,
+    decision VARCHAR(16) NOT NULL,
+    request_id VARCHAR(128) NOT NULL,
+    trace_id VARCHAR(32) NOT NULL,
+    expires_at TIMESTAMP(6) NOT NULL,
+    released_at TIMESTAMP(6) NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_governance_quota_reservation_scope (tenant_id, id),
+    UNIQUE KEY uk_governance_quota_reservation_idempotency
+        (tenant_id, quota_policy_id, idempotency_key),
+    KEY idx_governance_quota_reservation_window (tenant_id, quota_policy_id, window_start, decision, expires_at),
+    KEY idx_governance_quota_reservation_execution (tenant_id, quota_policy_id, execution_id, window_start, decision),
+    CONSTRAINT fk_governance_quota_reservation_tenant FOREIGN KEY (tenant_id)
+        REFERENCES governance_tenants (id),
+    CONSTRAINT fk_governance_quota_reservation_policy FOREIGN KEY (tenant_id, quota_policy_id)
+        REFERENCES governance_quota_policies (tenant_id, id),
+    CONSTRAINT ck_governance_quota_reservation_window
+        CHECK (window_type IN ('DAILY', 'WEEKLY', 'MONTHLY', 'EXECUTION') AND window_start < window_end),
+    CONSTRAINT ck_governance_quota_reservation_requested
+        CHECK (requested_token_units >= 0 AND requested_cost_amount >= 0
+            AND requested_request_units = 1
+            AND requested_concurrency_units IN (0, 1)),
+    CONSTRAINT ck_governance_quota_reservation_observed
+        CHECK (observed_token_units >= 0 AND observed_cost_amount >= 0
+            AND observed_request_units >= 0 AND observed_concurrency_units >= 0),
+    CONSTRAINT ck_governance_quota_reservation_decision CHECK (decision IN ('ALLOW', 'DENY')),
+    CONSTRAINT ck_governance_quota_reservation_lease CHECK (expires_at > created_at),
+    CONSTRAINT ck_governance_quota_reservation_release
+        CHECK (released_at IS NULL OR (decision = 'ALLOW' AND released_at >= created_at))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE governance_audit_records (
     id VARCHAR(36) NOT NULL,
     tenant_id VARCHAR(36) NOT NULL,

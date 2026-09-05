@@ -51,6 +51,7 @@ com.openeip.governance/
 │   ├── audit/            # transactional append and query policy
 │   ├── catalog/          # model/provider and Prompt lifecycle services
 │   ├── usage/            # idempotency, pricing, budget and reconciliation
+│   ├── quota/            # runtime admission, reservations and lease release
 │   └── trace/            # propagation and bounded attribute policy
 ├── domain/
 │   ├── context/          # TenantContext, SystemScope, MembershipPolicy
@@ -75,6 +76,7 @@ types. Existing modules integrate through application ports and the shared reque
 |---|---|---|
 | Tenant / Organization | Java Governance | Tenant identity is immutable; organization membership is tenant-scoped; suspended tenants reject new work |
 | Membership / Quota | Java Governance | Membership changes are revisioned; quota windows and policy versions are explicit |
+| QuotaReservation | Java Governance | Admission is idempotent; policy-row locking serializes competing reservations; leases expire |
 | AuditRecord | Java Governance | Append-only; idempotent key; hash-chain link; sanitized payload; tenant query only |
 | Model / ProviderPolicy | Java Governance | Provider credentials are references; model capabilities and routing policy are versioned |
 | Prompt / PromptVersion | Java Governance | Version content is immutable after creation; publication requires review and evaluation evidence |
@@ -191,6 +193,36 @@ idempotent by budget window, threshold, and crossing revision.
 Quota exhaustion rejects new work with a stable error and allows only explicitly documented cleanup/cancellation
 operations. Retries may resend usage facts safely; they may not bypass a budget decision or increase an active
 execution's limit.
+
+### 7.1 Runtime quota enforcement
+
+Runtime callers request admission with a server-selected quota policy, execution ID, bounded token/cost
+reservation, one request unit, an optional concurrency unit, an idempotency key, and a lease expiry. Java derives
+the tenant and policy version from `TenantContext`; a request cannot select or widen tenant scope.
+
+The admission instant and UTC window are derived from the Java service clock rather than caller input. Lease
+expiry is bounded to 24 hours from that instant and canonicalized to the database's microsecond precision before
+idempotency comparison, preventing time-window spoofing and false conflicts after persistence.
+
+The application transaction locks the selected `governance_quota_policies` row before reading window usage and
+writing a decision. This serializes competing admissions for one policy without introducing a new service or
+distributed counter. The observed value for each dimension is:
+
+```text
+token       = persisted usage units + active token reservations
+cost        = persisted calculated cost + active cost reservations
+request     = allowed admissions in the current window
+concurrency = allowed, unreleased, unexpired leases
+```
+
+`DAILY`, `WEEKLY`, and `MONTHLY` windows use UTC boundaries. `EXECUTION` windows are additionally scoped by
+execution ID. A retry with the same idempotency key and identical facts returns the original decision; different
+facts return `GOV-I-001`. An exceeded dimension records a denied decision and returns `GOV-B-001`.
+
+Completion or cancellation releases token, cost, and concurrency reservations while retaining the admitted
+request in the window count. Expired leases stop contributing to active reservations. A stale policy version,
+missing policy, cross-tenant request, malformed lease, or missing transaction fails closed. Runtime integration
+must obtain additional admission before an execution consumes more than its active reservation.
 
 ## 8. Trace and observability model
 

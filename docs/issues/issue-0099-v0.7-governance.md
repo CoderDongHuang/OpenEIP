@@ -34,6 +34,17 @@ issue unless an accepted RFC changes the boundary.
 | 7-13 Implementation and validation | Java/Python/Frontend and quality evidence | In progress; conditions mandatory |
 | 14-17 Delivery | Pull Request, Review, Merge, Release | Not started |
 
+### Runtime quota enforcement slice
+
+Steps 7-13 are complete for runtime quota enforcement as of 2026-09-05. The slice adds atomic token, cost,
+request, and concurrency admission; expiring/releasable leases; stable `GOV-B-001` denial and `GOV-I-001`
+idempotency conflict behavior; tenant-scoped MySQL persistence; and transactional audit evidence. Its quality
+record is [issue-0099-quality-gate.md](issue-0099-quality-gate.md), and benchmark evidence is
+[v0.7-governance-quota-benchmark.json](../13-testing/results/v0.7-governance-quota-benchmark.json).
+
+This does not mark the full v0.7 Governance release train complete. Other Issue #99 slices remain in progress,
+and Pull Request, independent Review, Merge, and Release remain steps 14-17 outside this implementation branch.
+
 ## Acceptance criteria
 
 - Existing v0.1-v0.6 APIs and Agent/Workflow contracts remain backward compatible.

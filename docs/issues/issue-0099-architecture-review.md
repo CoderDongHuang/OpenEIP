@@ -60,3 +60,19 @@ Governance event schema, and Governance management workspace design.
 The implementation must prove V2.7.0 tenant-isolation and rollback contract tests, preserve the documented
 data-minimization rules, and pass all remaining OEP quality and release gates. These conditions are mandatory
 and do not permit bypassing later review or release controls.
+
+## Runtime quota enforcement conformance review
+
+The runtime quota implementation slice remains within the accepted RFC and ADR boundary:
+
+| Check | Result | Evidence |
+|---|---|---|
+| Module boundary | Pass | Governance remains the Java authority; Agent, Workflow, Chat, and Python state is not imported |
+| Concurrency | Pass with test condition | Policy-row `FOR UPDATE` lock serializes admission and must pass a competing-request integration test |
+| Tenant authority | Pass with test condition | Tenant and policy version come from `TenantContext`; negative cross-tenant tests are mandatory |
+| Persistence | Pass | One additive tenant-leading reservation table; immutable decision facts and one-way release timestamp |
+| Failure policy | Pass | Stale/missing context fails closed; exhaustion uses `GOV-B-001`; idempotency conflict uses `GOV-I-001` |
+| Compatibility | Pass | No existing API, SDK, event, or Plugin SPI signature changes; migration and rollback tests remain required |
+
+No new technology, public API, event schema, or cross-module dependency is introduced, so RFC-0009 and
+ADR-0015/0018 remain sufficient. Coding may proceed subject to the listed executable conditions.

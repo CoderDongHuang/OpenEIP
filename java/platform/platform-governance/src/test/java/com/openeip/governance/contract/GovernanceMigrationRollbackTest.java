@@ -41,10 +41,13 @@ class GovernanceMigrationRollbackTest {
 
     try (Connection connection =
         DriverManager.getConnection(MYSQL.getJdbcUrl(), MYSQL.getUsername(), MYSQL.getPassword())) {
-      assertThat(governanceTableCount(connection)).isEqualTo(19);
+      assertThat(governanceTableCount(connection)).isEqualTo(20);
       insertTenants(connection);
       insertOrganization(connection);
       assertThatThrownBy(() -> insertCrossTenantMembership(connection))
+          .isInstanceOf(Exception.class);
+      insertQuotaPolicy(connection);
+      assertThatThrownBy(() -> insertCrossTenantQuotaReservation(connection))
           .isInstanceOf(Exception.class);
       insertAuditRecords(connection);
 
@@ -105,6 +108,45 @@ class GovernanceMigrationRollbackTest {
       statement.setString(2, TENANT_TWO);
       statement.setString(3, "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa");
       statement.setString(4, "cccccccc-cccc-4ccc-8ccc-cccccccccccc");
+      statement.executeUpdate();
+    }
+  }
+
+  private static void insertQuotaPolicy(Connection connection) throws Exception {
+    try (var statement =
+        connection.prepareStatement(
+            """
+        INSERT INTO governance_quota_policies
+          (id, tenant_id, name, policy_version, token_limit, window_type, created_at, updated_at)
+        VALUES (?, ?, 'runtime-quota', 'policy-1', 100, 'DAILY',
+                CURRENT_TIMESTAMP(6), CURRENT_TIMESTAMP(6))
+        """)) {
+      statement.setString(1, "77777777-7777-4777-8777-777777777777");
+      statement.setString(2, TENANT_ONE);
+      statement.executeUpdate();
+    }
+  }
+
+  private static void insertCrossTenantQuotaReservation(Connection connection) throws Exception {
+    try (var statement =
+        connection.prepareStatement(
+            """
+        INSERT INTO governance_quota_reservations
+          (id, tenant_id, quota_policy_id, execution_id, idempotency_key, policy_version,
+           window_type, window_start, window_end, requested_token_units,
+           requested_cost_amount, requested_request_units, requested_concurrency_units,
+           observed_token_units, observed_cost_amount, observed_request_units,
+           observed_concurrency_units, decision, request_id, trace_id, expires_at, created_at)
+        VALUES (?, ?, ?, ?, 'quota-migration-test', 'policy-1', 'DAILY',
+                '2026-09-05 00:00:00', '2026-09-06 00:00:00', 1, 0, 1, 1,
+                0, 0, 0, 0, 'ALLOW', 'request-1',
+                '0123456789abcdef0123456789abcdef',
+                '2026-09-05 13:00:00', '2026-09-05 12:00:00')
+        """)) {
+      statement.setString(1, "88888888-8888-4888-8888-888888888888");
+      statement.setString(2, TENANT_TWO);
+      statement.setString(3, "77777777-7777-4777-8777-777777777777");
+      statement.setString(4, "99999999-9999-4999-8999-999999999999");
       statement.executeUpdate();
     }
   }
