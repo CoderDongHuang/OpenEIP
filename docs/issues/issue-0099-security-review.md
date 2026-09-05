@@ -52,3 +52,21 @@ benchmark evidence.
 
 The review decision is recorded in [Issue #99](https://github.com/CoderDongHuang/OpenEIP/issues/99#issuecomment-5507449833)
 by `WriteBigBug` as `Approved with Conditions` on 2026-09-02.
+
+## Runtime quota enforcement evidence
+
+The runtime quota enforcement slice completed its security validation on 2026-09-05.
+
+| Control | Implementation evidence | Result |
+|---|---|---|
+| Tenant authority | Context tenant is checked before policy lock; every reservation query, aggregate, FK, and release is tenant-leading | Passed |
+| Atomic admission | Policy row is locked `FOR UPDATE` before aggregate reads and decision insertion; 8-way integration and 100-way benchmark contention did not oversell | Passed |
+| Time authority | Java server clock selects the window and validates the `(0, 24h]` lease; caller-controlled window time is absent | Passed |
+| Idempotency | `(tenant_id, quota_policy_id, idempotency_key)` is unique; identical facts replay and changed facts return `GOV-I-001` | Passed |
+| Fail closed | Missing tenant/policy, stale policy version, invalid lease, and exhausted dimensions reject without permissive fallback | Passed |
+| Data minimization | Rows and audit summaries contain bounded identifiers, counts, decisions, and correlation metadata only | Passed |
+| Cross-tenant database guard | MySQL 8.4 rejects a tenant-two reservation referencing a tenant-one policy through the composite FK | Passed |
+| Supply chain and secret scan | Existing Trivy script scanned 934 Git-relevant files for HIGH/CRITICAL vulnerabilities, misconfiguration, and secrets | Passed |
+
+No dependency, public API, event schema, SDK, or Plugin SPI was added or changed by this slice. Release-candidate
+container and deployment checks remain part of steps 14-17 and are not claimed here.

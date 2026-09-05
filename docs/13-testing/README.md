@@ -31,6 +31,7 @@ LLM 或 Agent 质量。生产模型、Milvus 容量和多节点故障测试必�
 | Agent            | [Plan](agent-test-plan.md)            | [Result](results/agent-benchmark.json)            | Python 93.62% / Java 94.18%，完成 P99 0.116 ms        |
 | Workflow         | [Plan](v0.4-workflow-test-plan.md)    | [Result](results/workflow-benchmark.json)         | 1,000 transitions P99 36.09 ms；100 并发执行 313.94/s |
 | Agent v0.6       | [Plan](v0.6-agent-test-plan.md)       | Implementation evidence complete; release pending  | Five first-party Agents, safety, compatibility and quality gates |
+| Governance Quota | [Plan](v0.7-governance-test-plan.md)  | [Result](results/v0.7-governance-quota-benchmark.json) | 92.03%; admission P99 5.569 ms; 100-way contention safe |
 
 最终合并快照必须重新运行全量门禁；上表的模块开发数据不能替代发布候选结果。
 

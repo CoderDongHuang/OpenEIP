@@ -200,6 +200,10 @@ Runtime callers request admission with a server-selected quota policy, execution
 reservation, one request unit, an optional concurrency unit, an idempotency key, and a lease expiry. Java derives
 the tenant and policy version from `TenantContext`; a request cannot select or widen tenant scope.
 
+The admission instant and UTC window are derived from the Java service clock rather than caller input. Lease
+expiry is bounded to 24 hours from that instant and canonicalized to the database's microsecond precision before
+idempotency comparison, preventing time-window spoofing and false conflicts after persistence.
+
 The application transaction locks the selected `governance_quota_policies` row before reading window usage and
 writing a decision. This serializes competing admissions for one policy without introducing a new service or
 distributed counter. The observed value for each dimension is:
