@@ -2,6 +2,7 @@ package com.openeip.governance.domain.quota;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -25,6 +26,7 @@ public record QuotaAdmissionRequest(
     Objects.requireNonNull(idempotencyKey, "idempotencyKey is required");
     Objects.requireNonNull(requestedCost, "requestedCost is required");
     Objects.requireNonNull(expiresAt, "expiresAt is required");
+    expiresAt = expiresAt.truncatedTo(ChronoUnit.MICROS);
     if (!SAFE_KEY.matcher(idempotencyKey).matches()) {
       throw new IllegalArgumentException("idempotencyKey must be 16-128 safe characters");
     }

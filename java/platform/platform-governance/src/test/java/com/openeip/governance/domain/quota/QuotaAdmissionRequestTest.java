@@ -1,5 +1,6 @@
 package com.openeip.governance.domain.quota;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
@@ -31,6 +32,22 @@ class QuotaAdmissionRequestTest {
         .isInstanceOf(IllegalArgumentException.class);
     assertThatThrownBy(() -> request("quota-request-0004", 1, "1.000000", 2))
         .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void canonicalizesLeaseExpiryToDatabasePrecision() {
+    var request =
+        new QuotaAdmissionRequest(
+            TENANT,
+            POLICY,
+            EXECUTION,
+            "quota-request-0005",
+            1,
+            BigDecimal.ZERO,
+            0,
+            Instant.parse("2026-09-05T13:00:00.123456789Z"));
+
+    assertThat(request.expiresAt()).isEqualTo("2026-09-05T13:00:00.123456Z");
   }
 
   private QuotaAdmissionRequest request(

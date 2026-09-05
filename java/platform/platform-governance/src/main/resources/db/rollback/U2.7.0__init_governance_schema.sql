@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS governance_models;
 DROP TABLE IF EXISTS governance_providers;
 DROP TABLE IF EXISTS governance_outbox;
 DROP TABLE IF EXISTS governance_audit_records;
+DROP TABLE IF EXISTS governance_quota_reservations;
 DROP TABLE IF EXISTS governance_quota_policies;
 DROP TABLE IF EXISTS governance_memberships;
 DROP TABLE IF EXISTS governance_organizations;
