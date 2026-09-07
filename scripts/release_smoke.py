@@ -14,7 +14,8 @@ from typing import Any
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-EXPECTED_VERSION = "0.6.0-alpha"
+EXPECTED_VERSION = "0.7.0-alpha"
+GOVERNANCE_TENANT_ID = "00000000-0000-4000-8000-000000000001"
 DEFAULT_TENANT_ID = "11111111-1111-4111-8111-111111111111"
 OCR_FIXTURE = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAXAAAAAkCAAAAAC1Gj62AAABGUlEQVR4nO2a0QrDIAxFdez/"
@@ -216,6 +217,54 @@ def run(client: SmokeClient) -> None:
     if platform.get("version") != EXPECTED_VERSION:
         raise AssertionError(f"Unexpected Java version: {platform}")
     passed("registration, login, identity, RBAC, and Java version")
+
+    governance_tenants = require_envelope(
+        client.json_request("GET", "/api/v2/governance/tenants", token=token)
+    )
+    tenant_items = governance_tenants.get("items")
+    if not isinstance(tenant_items, list) or len(tenant_items) != 1:
+        raise AssertionError(f"Unexpected Governance tenants: {governance_tenants}")
+    governance_tenant = tenant_items[0]
+    if governance_tenant.get("id") != GOVERNANCE_TENANT_ID:
+        raise AssertionError(f"Unexpected Governance tenant: {governance_tenant}")
+    memberships = require_envelope(
+        client.json_request(
+            "GET",
+            f"/api/v2/governance/tenants/{GOVERNANCE_TENANT_ID}/memberships",
+            token=token,
+        )
+    ).get("items")
+    if not isinstance(memberships, list) or not any(
+        item.get("principalId") == user_id and "VIEWER" in item.get("roles", [])
+        for item in memberships
+    ):
+        raise AssertionError(f"Default Governance membership is missing: {memberships}")
+    client.json_request(
+        "GET",
+        "/api/v2/governance/tenants/99999999-9999-4999-8999-999999999999",
+        token=token,
+        expected=(403,),
+    )
+    for path in (
+        "/api/v2/governance/audit-events",
+        "/api/v2/governance/models",
+        "/api/v2/governance/prompts",
+        "/api/v2/governance/usage",
+        "/api/v2/governance/budgets",
+        "/api/v2/governance/traces/0123456789abcdef",
+    ):
+        page = require_envelope(client.json_request("GET", path, token=token))
+        if not isinstance(page.get("items"), list):
+            raise AssertionError(f"Expected a bounded Governance page from {path}: {page}")
+    client.json_request(
+        "POST",
+        "/api/v2/governance/audit-events:verify",
+        {"from": "2026-08-01T00:00:00Z", "to": "2026-08-31T00:00:00Z"},
+        token=token,
+        extra_headers={"Idempotency-Key": uuid.uuid4().hex},
+        expected=(403,),
+    )
+    passed("Governance scope, membership, isolation, read APIs, and role boundary")
 
     upload_body, upload_type = multipart_file("release-smoke.txt", "text/plain", text)
     uploaded = require_envelope(
@@ -564,7 +613,7 @@ def main() -> int:
     ) as error:
         print(f"FAIL: {error}", file=sys.stderr)
         return 1
-    print("PASS: v0.6.0-alpha full-stack release smoke", flush=True)
+    print("PASS: v0.7.0-alpha full-stack release smoke", flush=True)
     return 0
 
 

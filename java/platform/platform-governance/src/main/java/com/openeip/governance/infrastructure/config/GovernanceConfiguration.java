@@ -4,8 +4,10 @@ import com.openeip.governance.application.catalog.PromptContentCipher;
 import com.openeip.governance.application.context.TenantContextResolver;
 import com.openeip.governance.application.context.TenantMembershipPort;
 import com.openeip.governance.infrastructure.policy.AesGcmPromptContentCipher;
+import com.openeip.governance.infrastructure.web.TenantContextFilter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,9 +20,17 @@ public class GovernanceConfiguration {
   }
 
   @Bean
-  @ConditionalOnProperty(name = "openeip.governance.prompt-encryption-key-base64")
+  @ConditionalOnExpression("'${openeip.governance.prompt-encryption-key-base64:}' != ''")
   public PromptContentCipher promptContentCipher(
       @Value("${openeip.governance.prompt-encryption-key-base64}") String key) {
     return new AesGcmPromptContentCipher(key);
+  }
+
+  @Bean
+  public FilterRegistrationBean<TenantContextFilter> tenantContextFilterRegistration(
+      TenantContextFilter filter) {
+    var registration = new FilterRegistrationBean<>(filter);
+    registration.setEnabled(false);
+    return registration;
   }
 }

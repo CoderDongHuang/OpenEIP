@@ -3,9 +3,9 @@
 > Open Enterprise Intelligence Platform
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.5.0--alpha-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-v0.7.0--alpha-orange.svg)](CHANGELOG.md)
 
-OpenEIP 是一个面向企业 AI 场景的开源平台项目。最新发布版本为 `v0.5.0-alpha` Connector，在 Workflow 基线上增加 16 类外部系统连接器、凭据引用、连接测试、元数据读取和生命周期管理。
+OpenEIP 是一个面向企业 AI 场景的开源平台项目。当前发布候选为 `v0.7.0-alpha` Governance，在 Agent 基线上增加租户上下文、审计证据、模型与 Prompt 生命周期、用量/预算治理、配额准入和跨运行时 Trace 查询。
 
 该版本用于单节点内部验证。开发环境仍可使用确定性 Provider，但默认 Compose 已使用 Milvus 持久向量检索和 Elasticsearch 全文检索；生产模式拒绝确定性 Embedding 与内存检索适配器。多机部署、高可用、跨存储自动对账和真实模型质量评估不属于本次 alpha 承诺。
 
@@ -15,7 +15,7 @@ OpenEIP 是一个面向企业 AI 场景的开源平台项目。最新发布版�
 - PRD、SAD、SDD 及模块级设计、API、数据库和 SPI 契约
 - Java 21 + Spring Boot：Auth/RBAC、文件、知识库、Chat、Agent 网关与持久 Workflow 引擎
 - Python 3.12 + FastAPI：OCR、解析、Embedding、RAG、Chat 与 Agent Runtime
-- React + Vite 七页操作工作台：Overview、Documents、Knowledge、Chat、Agents、Workflows 与 Access
+- React + Vite 八页操作工作台：Overview、Documents、Knowledge、Chat、Agents、Workflows、Access 与 Governance
 - Docusaurus 文档站
 - Docker Compose 本地运行入口
 - GitHub Actions 构建、测试、格式和安全检查

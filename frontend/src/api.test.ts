@@ -298,4 +298,66 @@ describe('API client', () => {
     expect(requests.some((request) => String(request[0]).includes('agent%2Fid/versions:candidate'))).toBe(true);
     expect(requests.some((request) => String(request[0]).includes('evaluation%2Fid:cancel'))).toBe(true);
   });
+
+  it('encodes tenant-scoped Governance v2 contracts', async () => {
+    const requests: Array<[RequestInfo | URL, RequestInit | undefined]> = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        requests.push([input, init]);
+        return envelope({ items: [] });
+      }),
+    );
+    vi.stubGlobal('crypto', { randomUUID: () => '00000000-0000-4000-8000-000000000001' });
+    const token = 'governance-token';
+    const now = '2026-09-06T00:00:00Z';
+    const model: api.GovernanceModel = {
+      id: 'model/id',
+      tenantId: 'tenant',
+      providerId: 'provider',
+      name: 'Model',
+      state: 'DRAFT',
+      currentVersion: 'v1',
+      revision: 3,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await Promise.all([
+      api.listGovernanceTenants(token),
+      api.listGovernanceMemberships(token, 'tenant/id'),
+      api.listGovernanceAuditEvents(token),
+      api.verifyGovernanceAudit(token, now, now),
+      api.listGovernanceModels(token),
+      api.createGovernanceModel(token, {
+        name: 'Model',
+        providerRef: 'provider',
+        capabilities: ['CHAT'],
+        routingLabels: [],
+        secretRef: 'secret://env/MODEL_KEY',
+      }),
+      api.reviewGovernanceModel(token, model),
+      api.enableGovernanceModel(token, model),
+      api.suspendGovernanceModel(token, model),
+      api.listGovernancePrompts(token),
+      api.createGovernancePrompt(token, { name: 'Prompt', purpose: 'chat', content: 'private' }),
+      api.listGovernanceUsage(token),
+      api.listGovernanceBudgets(token),
+      api.createGovernanceBudget(token, { name: 'Monthly', currency: 'USD', limit: 10, window: 'MONTHLY' }),
+      api.getGovernanceTrace(token, '0123456789abcdef'),
+    ]);
+
+    expect(requests).toHaveLength(15);
+    expect(requests.every((call) => new Headers(call[1]?.headers).get('Authorization') === `Bearer ${token}`)).toBe(
+      true,
+    );
+    expect(requests.some((call) => String(call[0]).includes('tenant%2Fid/memberships'))).toBe(true);
+    const mutations = requests.filter((call) => call[1]?.method === 'POST');
+    expect(mutations.every((call) => new Headers(call[1]?.headers).has('Idempotency-Key'))).toBe(true);
+    expect(
+      mutations
+        .filter((call) => String(call[0]).includes('model%2Fid'))
+        .every((call) => new Headers(call[1]?.headers).get('If-Match') === '3'),
+    ).toBe(true);
+  });
 });

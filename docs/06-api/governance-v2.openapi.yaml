@@ -1,8 +1,13 @@
 openapi: 3.1.0
 info:
   title: OpenEIP Governance API
-  version: 2.0.0-draft
-  description: Tenant-scoped v0.7 governance contracts for policy, audit, catalog, usage, and trace metadata.
+  version: 2.0.0-alpha
+  description: >-
+    Tenant-scoped v0.7.0-alpha governance contracts for server-derived scope,
+    audit, catalog, Prompt lifecycle, usage, budgets, and trace metadata. Tenant
+    creation, tenant mutation, and membership administration remain a follow-up
+    release; this alpha provisions the default Governance tenant and exposes it
+    read-only to authenticated principals.
 security:
   - bearerAuth: []
 servers:
@@ -20,21 +25,6 @@ paths:
         '200': { $ref: '#/components/responses/Page' }
         '401': { $ref: '#/components/responses/Error' }
         '403': { $ref: '#/components/responses/Error' }
-    post:
-      operationId: createGovernanceTenant
-      summary: Create a tenant in audited system scope
-      parameters:
-        - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/CreateTenant' }
-      responses:
-        '201': { $ref: '#/components/responses/Object' }
-        '400': { $ref: '#/components/responses/Error' }
-        '403': { $ref: '#/components/responses/Error' }
-        '409': { $ref: '#/components/responses/Error' }
   /api/v2/governance/tenants/{tenantId}:
     parameters: [{ $ref: '#/components/parameters/TenantId' }]
     get:
@@ -43,20 +33,6 @@ paths:
       responses:
         '200': { $ref: '#/components/responses/Object' }
         '404': { $ref: '#/components/responses/Error' }
-    patch:
-      operationId: updateGovernanceTenant
-      summary: Update tenant metadata and policy references
-      parameters: [{ $ref: '#/components/parameters/IfMatch' }]
-      requestBody:
-        required: true
-        content:
-          application/merge-patch+json:
-            schema: { $ref: '#/components/schemas/PatchResource' }
-      responses:
-        '200': { $ref: '#/components/responses/Object' }
-        '403': { $ref: '#/components/responses/Error' }
-        '404': { $ref: '#/components/responses/Error' }
-        '412': { $ref: '#/components/responses/Error' }
   /api/v2/governance/tenants/{tenantId}/memberships:
     parameters: [{ $ref: '#/components/parameters/TenantId' }]
     get:
@@ -68,19 +44,6 @@ paths:
       responses:
         '200': { $ref: '#/components/responses/Page' }
         '403': { $ref: '#/components/responses/Error' }
-    post:
-      operationId: createTenantMembership
-      summary: Add a principal to a tenant
-      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/CreateMembership' }
-      responses:
-        '201': { $ref: '#/components/responses/Object' }
-        '403': { $ref: '#/components/responses/Error' }
-        '409': { $ref: '#/components/responses/Error' }
   /api/v2/governance/audit-events:
     get:
       operationId: listAuditEvents
@@ -392,23 +355,6 @@ components:
         - type: object
           properties:
             data: { type: object, additionalProperties: false }
-    PatchResource:
-      type: object
-      additionalProperties: false
-      maxProperties: 16
-      properties: { displayName: { type: string, maxLength: 128 }, state: { type: string, maxLength: 32 } }
-    CreateTenant:
-      type: object
-      additionalProperties: false
-      required: [displayName]
-      properties: { displayName: { type: string, minLength: 1, maxLength: 128 } }
-    CreateMembership:
-      type: object
-      additionalProperties: false
-      required: [principalId, roles]
-      properties:
-        principalId: { type: string, format: uuid }
-        roles: { type: array, minItems: 1, maxItems: 16, items: { type: string, maxLength: 64 } }
     CreateModel:
       type: object
       additionalProperties: false

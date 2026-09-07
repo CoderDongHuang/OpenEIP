@@ -11,6 +11,8 @@ import com.openeip.auth.infrastructure.security.JwtAuthenticationFilter;
 import com.openeip.auth.infrastructure.web.ApiErrorWriter;
 import com.openeip.common.web.RequestIdFilter;
 import jakarta.servlet.DispatcherType;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /** Stateless Spring Security configuration for the Auth service. */
 @Configuration
@@ -36,6 +39,7 @@ public class SecurityConfig {
       RequestIdFilter requestIdFilter,
       AuthRateLimitFilter rateLimitFilter,
       JwtAuthenticationFilter jwtAuthenticationFilter,
+      @Qualifier("tenantContextFilter") ObjectProvider<OncePerRequestFilter> tenantContextFilter,
       JsonAuthenticationEntryPoint authenticationEntryPoint,
       JsonAccessDeniedHandler accessDeniedHandler)
       throws Exception {
@@ -72,6 +76,8 @@ public class SecurityConfig {
         .addFilterBefore(requestIdFilter, UsernamePasswordAuthenticationFilter.class)
         .addFilterAfter(rateLimitFilter, RequestIdFilter.class)
         .addFilterAfter(jwtAuthenticationFilter, AuthRateLimitFilter.class);
+    tenantContextFilter.ifAvailable(
+        filter -> http.addFilterAfter(filter, JwtAuthenticationFilter.class));
     return http.build();
   }
 

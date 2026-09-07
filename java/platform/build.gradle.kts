@@ -3,6 +3,7 @@ import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.quality.CheckstyleExtension
 import org.gradle.api.tasks.testing.Test
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
@@ -16,7 +17,7 @@ plugins {
 }
 
 group = "com.openeip"
-version = "0.6.0-alpha"
+version = "0.7.0-alpha"
 
 subprojects {
     apply(plugin = "java")
@@ -33,6 +34,10 @@ subprojects {
         toolchain {
             languageVersion = JavaLanguageVersion.of(21)
         }
+    }
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.add("-parameters")
     }
 
     repositories {

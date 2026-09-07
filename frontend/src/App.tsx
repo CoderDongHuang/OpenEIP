@@ -8,6 +8,7 @@ import {
   MenuFoldOutlined,
   MessageOutlined,
   RobotOutlined,
+  SafetyCertificateOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -42,6 +43,9 @@ const WorkflowView = lazy(() => import('./views/WorkflowView').then((module) => 
 const ConnectorsView = lazy(() =>
   import('./views/ConnectorsView').then((module) => ({ default: module.ConnectorsView })),
 );
+const GovernanceView = lazy(() =>
+  import('./views/GovernanceView').then((module) => ({ default: module.GovernanceView })),
+);
 
 const { Header, Sider, Content } = Layout;
 const { Text, Title } = Typography;
@@ -55,6 +59,7 @@ const navigation = [
   { key: '/agents', icon: <RobotOutlined />, label: 'Agents' },
   { key: '/workflows', icon: <ApartmentOutlined />, label: 'Workflows' },
   { key: '/connectors', icon: <ApiOutlined />, label: 'Connectors' },
+  { key: '/governance', icon: <SafetyCertificateOutlined />, label: 'Governance' },
   { key: '/users', icon: <TeamOutlined />, label: 'Access' },
 ];
 
@@ -155,7 +160,7 @@ function Workspace({ token, user, onLogout }: { token: string; user: CurrentUser
         <div className="sider-release">
           <span className="release-dot" />
           <span>
-            <strong>v0.6 alpha</strong>
+            <strong>v0.7 alpha</strong>
             <small>Single-node profile</small>
           </span>
         </div>
@@ -197,6 +202,7 @@ function Workspace({ token, user, onLogout }: { token: string; user: CurrentUser
               <Route path="/agents" element={<AgentView token={token} />} />
               <Route path="/workflows" element={<WorkflowView token={token} />} />
               <Route path="/connectors" element={<ConnectorsView token={token} />} />
+              <Route path="/governance" element={<GovernanceView token={token} user={user} />} />
               <Route path="/users" element={<UsersView token={token} user={user} />} />
               <Route path="*" element={<Navigate to="/overview" replace />} />
             </Routes>

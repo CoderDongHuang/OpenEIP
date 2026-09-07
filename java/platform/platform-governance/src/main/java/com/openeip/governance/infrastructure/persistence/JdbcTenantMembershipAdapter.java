@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Reads the server-selected active membership without accepting a client tenant identifier. */
 @Repository
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Repository;
     value = "EI_EXPOSE_REP2",
     justification = "JdbcTemplate and ObjectMapper are application-scoped collaborators.")
 public class JdbcTenantMembershipAdapter implements TenantMembershipPort {
+  private static final UUID DEFAULT_TENANT_ID =
+      UUID.fromString("00000000-0000-4000-8000-000000000001");
   private final JdbcTemplate jdbc;
   private final ObjectMapper mapper;
 
@@ -48,6 +52,47 @@ public class JdbcTenantMembershipAdapter implements TenantMembershipPort {
       return Optional.empty();
     }
     return memberships.getFirst();
+  }
+
+  @Override
+  @Transactional
+  public Optional<TenantMembership> provisionDefault(UUID principalId, Set<String> roles) {
+    if (principalId == null || roles == null || roles.isEmpty()) {
+      return Optional.empty();
+    }
+    Optional<TenantMembership> existing = findActiveByPrincipal(principalId);
+    if (existing.isPresent()) {
+      return existing;
+    }
+    Set<String> governanceRoles =
+        roles.contains("ROLE_ADMIN")
+            ? Set.of("GOVERNANCE_ADMIN", "OPERATOR", "VIEWER")
+            : Set.of("VIEWER");
+    try {
+      jdbc.update(
+          """
+          INSERT INTO governance_memberships
+            (id, tenant_id, organization_id, principal_id, roles_json, state,
+             policy_version, revision, created_at, updated_at)
+          VALUES (?, ?, NULL, ?, ?, 'ACTIVE', 'governance-v1', 0,
+                  CURRENT_TIMESTAMP(6), CURRENT_TIMESTAMP(6))
+          """,
+          UUID.randomUUID().toString(),
+          DEFAULT_TENANT_ID.toString(),
+          principalId.toString(),
+          rolesJson(governanceRoles));
+    } catch (DuplicateKeyException ignored) {
+      // A concurrent authenticated request may have provisioned the same principal.
+    }
+    return findActiveByPrincipal(principalId);
+  }
+
+  private String rolesJson(Set<String> roles) {
+    try {
+      return mapper.writeValueAsString(roles.stream().sorted().toList());
+    } catch (JsonProcessingException exception) {
+      throw new IllegalArgumentException("Governance roles cannot be serialized", exception);
+    }
   }
 
   private Optional<TenantMembership> toMembership(java.sql.ResultSet resultSet) {
