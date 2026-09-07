@@ -35,6 +35,7 @@ services:
       CHAT_PYTHON_URL: http://python:8000
       AGENT_PYTHON_URL: http://python:8000
       AGENT_CAPABILITY_SECRET: ${AGENT_CAPABILITY_SECRET:-local-agent-capability-secret-change-me}
+      GOVERNANCE_PROMPT_ENCRYPTION_KEY_BASE64: ${GOVERNANCE_PROMPT_ENCRYPTION_KEY_BASE64:-bG9jYWwtZ292ZXJuYW5jZS1wcm9tcHQta2V5LTAwMDE=}
       OPENEIP_INTERNAL_API_TOKEN: ${OPENEIP_INTERNAL_API_TOKEN:-local-openeip-internal-token}
     depends_on:
       mysql:

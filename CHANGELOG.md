@@ -6,6 +6,19 @@
 
 ## [Unreleased]
 
+## [0.7.0-alpha] - 2026-09-06
+
+### Added
+- v0.7 Governance（Issue #99）：服务端派生租户上下文、默认租户成员资格、不可篡改审计查询与链校验、模型注册、Prompt 版本生命周期、用量/预算读取、配额准入和 Trace 关联查询。
+- Governance Java REST 控制面与 React 管理工作台；Prompt 内容保持加密，API/UI 仅暴露受限元数据。
+- Compose 发布冒烟覆盖 Governance 默认成员资格、租户隔离、只读边界和版本健康检查。
+
+### Compatibility
+- v0.7.0-alpha 的租户创建、租户修改和成员管理写接口暂不开放；默认 Governance 租户由迁移创建，成员资格由认证用户首次访问时安全补齐。管理写接口保留在后续版本范围，不影响现有 v0.1-v0.6 API、SDK、数据库和 Plugin SPI。
+
+### Validation
+- Java 全量 `check` 通过；Python、Frontend、Website、Compose、Playwright、依赖/容器安全扫描和真实外部服务验证作为发布候选门禁记录在 v0.7 checklist。
+
 ## [0.6.0-alpha] - 2026-08-31
 
 ### Added

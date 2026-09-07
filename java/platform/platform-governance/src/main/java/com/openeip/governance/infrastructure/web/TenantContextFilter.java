@@ -12,11 +12,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /** Establishes a server-derived Governance context at the HTTP boundary. */
+@Component
 public class TenantContextFilter extends OncePerRequestFilter {
   private static final String GOVERNANCE_PATH = "/api/v2/governance/";
   private static final String TRACEPARENT_HEADER = "traceparent";
@@ -42,7 +45,11 @@ public class TenantContextFilter extends OncePerRequestFilter {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     UUID principalId = principalId(authentication);
     String traceId = TraceContext.resolveTraceId(request.getHeader(TRACEPARENT_HEADER));
-    var context = resolver.resolve(principalId, RequestIdFilter.get(request), traceId);
+    var roles =
+        authentication.getAuthorities().stream()
+            .map(authority -> authority.getAuthority())
+            .collect(Collectors.toUnmodifiableSet());
+    var context = resolver.resolve(principalId, roles, RequestIdFilter.get(request), traceId);
     TenantContextHolder.bind(context);
     try {
       chain.doFilter(request, response);

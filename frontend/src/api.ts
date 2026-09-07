@@ -137,6 +137,121 @@ export interface CursorPage<T> {
   nextCursor?: string | null;
 }
 
+export interface GovernanceTenant {
+  id: string;
+  displayName: string;
+  slug: string;
+  state: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED';
+  policyVersion: string;
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GovernanceMembership {
+  id: string;
+  principalId: string;
+  organizationId?: string | null;
+  roles: string[];
+  state: string;
+  policyVersion: string;
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GovernanceAuditEvent {
+  id: string;
+  eventId: string;
+  principalId: string;
+  action: string;
+  resourceType: string;
+  resourceId: string;
+  outcome: 'SUCCESS' | 'DENIED' | 'FAILURE';
+  requestId: string;
+  traceId: string;
+  policyVersion: string;
+  schemaVersion: string;
+  occurredAt: string;
+  previousHash?: string | null;
+  recordHash: string;
+  summary: Record<string, unknown>;
+}
+
+export interface GovernanceModel {
+  id: string;
+  tenantId: string;
+  providerId: string;
+  name: string;
+  state: 'DRAFT' | 'REVIEWED' | 'ENABLED' | 'SUSPENDED' | 'DEPRECATED';
+  currentVersion: string;
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GovernancePrompt {
+  id: string;
+  tenantId: string;
+  name: string;
+  purpose: string;
+  activePublicationId?: string | null;
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+  state: 'DRAFT' | 'IN_REVIEW' | 'EVALUATED' | 'PUBLISHED' | 'DEPRECATED';
+}
+
+export interface GovernanceUsage {
+  id: string;
+  executionId: string;
+  providerRequestId: string;
+  usageRevision: number;
+  pricingSnapshotId: string;
+  unitType: string;
+  inputUnits: number;
+  outputUnits: number;
+  currency: string;
+  calculatedAmount: number;
+  requestId: string;
+  traceId: string;
+  sourceRef: string;
+  createdAt: string;
+}
+
+export interface GovernanceBudget {
+  id: string;
+  tenantId: string;
+  name: string;
+  currency: string;
+  limitAmount: number;
+  windowType: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'EXECUTION';
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GovernanceTraceLink {
+  id: string;
+  traceId: string;
+  requestId: string;
+  executionId?: string | null;
+  module: string;
+  operation: string;
+  outcome: string;
+  durationMs?: number | null;
+  attributes: Record<string, unknown>;
+  occurredAt: string;
+}
+
+export interface GovernanceAuditVerification {
+  valid: boolean;
+  recordCount: number;
+  from: string;
+  to: string;
+  lastHash?: string | null;
+}
+
 export interface AgentDefinitionV2 {
   id: string;
   ownerId: string;
@@ -849,3 +964,64 @@ export const cancelEvaluationRunV2 = (token: string, value: EvaluationRunV2) =>
     agentMutation('POST', undefined, value.revision),
     token,
   );
+
+const governanceMutation = (body?: unknown, revision?: number): RequestInit => {
+  const headers: Record<string, string> = { 'Idempotency-Key': crypto.randomUUID() };
+  if (revision !== undefined) headers['If-Match'] = String(revision);
+  return { ...json('POST', body), headers };
+};
+
+export const listGovernanceTenants = (token: string) =>
+  request<CursorPage<GovernanceTenant>>('/api/v2/governance/tenants?limit=20', {}, token);
+export const listGovernanceMemberships = (token: string, tenantId: string) =>
+  request<CursorPage<GovernanceMembership>>(
+    `/api/v2/governance/tenants/${encodeURIComponent(tenantId)}/memberships?limit=100`,
+    {},
+    token,
+  );
+export const listGovernanceAuditEvents = (token: string) =>
+  request<CursorPage<GovernanceAuditEvent>>('/api/v2/governance/audit-events?limit=100', {}, token);
+export const verifyGovernanceAudit = (token: string, from: string, to: string) =>
+  request<GovernanceAuditVerification>(
+    '/api/v2/governance/audit-events:verify',
+    governanceMutation({ from, to }),
+    token,
+  );
+export const listGovernanceModels = (token: string) =>
+  request<CursorPage<GovernanceModel>>('/api/v2/governance/models?limit=100', {}, token);
+export const createGovernanceModel = (
+  token: string,
+  value: { name: string; providerRef: string; capabilities: string[]; routingLabels: string[]; secretRef: string },
+) => request<GovernanceModel>('/api/v2/governance/models', governanceMutation(value), token);
+export const reviewGovernanceModel = (token: string, model: GovernanceModel) =>
+  request<GovernanceModel>(
+    `/api/v2/governance/models/${encodeURIComponent(model.id)}:review`,
+    governanceMutation({ decision: 'APPROVE', reason: 'Approved in Governance workspace' }, model.revision),
+    token,
+  );
+export const enableGovernanceModel = (token: string, model: GovernanceModel) =>
+  request<GovernanceModel>(
+    `/api/v2/governance/models/${encodeURIComponent(model.id)}:enable`,
+    governanceMutation(undefined, model.revision),
+    token,
+  );
+export const suspendGovernanceModel = (token: string, model: GovernanceModel) =>
+  request<GovernanceModel>(
+    `/api/v2/governance/models/${encodeURIComponent(model.id)}:suspend`,
+    governanceMutation(undefined, model.revision),
+    token,
+  );
+export const listGovernancePrompts = (token: string) =>
+  request<CursorPage<GovernancePrompt>>('/api/v2/governance/prompts?limit=100', {}, token);
+export const createGovernancePrompt = (token: string, value: { name: string; purpose: string; content: string }) =>
+  request<GovernancePrompt>('/api/v2/governance/prompts', governanceMutation(value), token);
+export const listGovernanceUsage = (token: string) =>
+  request<CursorPage<GovernanceUsage>>('/api/v2/governance/usage?limit=100', {}, token);
+export const listGovernanceBudgets = (token: string) =>
+  request<CursorPage<GovernanceBudget>>('/api/v2/governance/budgets?limit=100', {}, token);
+export const createGovernanceBudget = (
+  token: string,
+  value: { name: string; currency: string; limit: number; window: GovernanceBudget['windowType'] },
+) => request<GovernanceBudget>('/api/v2/governance/budgets', governanceMutation(value), token);
+export const getGovernanceTrace = (token: string, traceId: string) =>
+  request<CursorPage<GovernanceTraceLink>>(`/api/v2/governance/traces/${encodeURIComponent(traceId)}`, {}, token);

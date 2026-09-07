@@ -16,13 +16,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /** Application service for encrypted, reviewed, evaluated, and published Prompt versions. */
 @Service
-@ConditionalOnBean(PromptContentCipher.class)
+@ConditionalOnProperty(
+    name = "openeip.governance.prompt-encryption-key-base64",
+    matchIfMissing = false)
 @SuppressFBWarnings(
     value = "EI_EXPOSE_REP2",
     justification = "Catalog, audit, and cipher ports are application-scoped collaborators.")

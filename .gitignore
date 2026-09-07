@@ -64,6 +64,7 @@ spike/**/build/
 spike/**/__pycache__/
 
 # Temporary
+artifacts/
 **/data/files/
 tmp/
 temp/

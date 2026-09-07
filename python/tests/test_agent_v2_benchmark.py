@@ -80,7 +80,7 @@ async def test_agent_v2_control_plane_benchmark() -> None:
             json.dumps(
                 {
                     "module": "agent-v2",
-                    "version": "0.6.0-alpha",
+                    "version": "0.7.0-alpha",
                     "operation": "capability, bounded runtime, MCP fixture discovery, and deterministic evaluation",
                     "environment": {
                         "python": platform.python_version(),

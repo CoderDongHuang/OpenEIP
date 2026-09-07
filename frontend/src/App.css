@@ -1127,6 +1127,60 @@ textarea {
   display: none;
 }
 
+.governance-page {
+  min-width: 0;
+}
+.governance-heading {
+  align-items: center;
+}
+.governance-tabs {
+  min-width: 0;
+  background: #fff;
+  border: 1px solid #dce2df;
+  border-radius: 7px;
+}
+.governance-tabs > .ant-tabs-nav {
+  margin: 0;
+  padding: 0 16px;
+  background: #f8faf9;
+}
+.governance-tabs > .ant-tabs-content-holder {
+  min-width: 0;
+}
+.governance-surface {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  overflow-x: auto;
+}
+.governance-surface-header {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.governance-surface-header h4 {
+  margin: 0;
+  font-size: 16px;
+}
+.governance-surface > .ant-table-wrapper {
+  box-shadow: none;
+}
+.governance-membership-table .ant-table-cell {
+  white-space: nowrap;
+}
+.governance-search {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.governance-search .ant-form-item {
+  min-width: 240px;
+  flex: 1;
+}
+
 .workflow-page {
   height: calc(100vh - 112px);
   display: flex;
@@ -1332,6 +1386,9 @@ textarea {
   }
   .workflow-page {
     height: auto;
+  }
+  .governance-tabs > .ant-tabs-nav {
+    overflow-x: auto;
   }
   .workflow-workspace {
     grid-template-columns: 190px minmax(400px, 1fr);
@@ -1541,6 +1598,21 @@ textarea {
   .workflow-toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+  .governance-surface {
+    padding: 12px;
+  }
+  .governance-surface-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .governance-search {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .governance-search .ant-form-item,
+  .governance-search .ant-btn {
+    width: 100%;
   }
   .workflow-toolbar > .ant-space {
     display: grid;

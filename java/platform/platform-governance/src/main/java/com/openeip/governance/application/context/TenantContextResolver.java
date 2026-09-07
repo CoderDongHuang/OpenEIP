@@ -10,6 +10,8 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -41,18 +43,35 @@ public class TenantContextResolver {
 
   /** Resolves the only tenant context selected by the server for a principal. */
   public TenantContext resolve(UUID principalId, String requestId, String traceId) {
+    return resolve(principalId, Set.of(), requestId, traceId, false);
+  }
+
+  /** Resolves or provisions the server-owned compatibility tenant for an authenticated user. */
+  public TenantContext resolve(
+      UUID principalId, Set<String> roles, String requestId, String traceId) {
+    return resolve(principalId, roles, requestId, traceId, true);
+  }
+
+  private TenantContext resolve(
+      UUID principalId,
+      Set<String> roles,
+      String requestId,
+      String traceId,
+      boolean allowProvisioning) {
     if (principalId == null) {
       throw GovernanceAuthorizationException.invalidContext("principalId is required");
     }
     requireCorrelation(requestId, "requestId");
     requireCorrelation(traceId, "traceId");
+    Optional<TenantMembership> selected = memberships.findActiveByPrincipal(principalId);
+    if (selected.isEmpty() && allowProvisioning) {
+      selected = memberships.provisionDefault(principalId, roles);
+    }
     TenantMembership membership =
-        memberships
-            .findActiveByPrincipal(principalId)
-            .orElseThrow(
-                () ->
-                    GovernanceAuthorizationException.invalidContext(
-                        "Active tenant membership not found"));
+        selected.orElseThrow(
+            () ->
+                GovernanceAuthorizationException.invalidContext(
+                    "Active tenant membership not found"));
     if (!principalId.equals(membership.principalId())) {
       throw GovernanceAuthorizationException.invalidContext("Tenant membership principal mismatch");
     }

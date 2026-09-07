@@ -75,6 +75,8 @@ openeip:
       requests: ${WORKFLOW_WEBHOOK_RATE_LIMIT_REQUESTS:60}
       window-seconds: ${WORKFLOW_WEBHOOK_RATE_LIMIT_WINDOW_SECONDS:60}
       max-keys: ${WORKFLOW_WEBHOOK_RATE_LIMIT_MAX_KEYS:10000}
+  governance:
+    prompt-encryption-key-base64: ${GOVERNANCE_PROMPT_ENCRYPTION_KEY_BASE64:}
 
 logging:
   level:

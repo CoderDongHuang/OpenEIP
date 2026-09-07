@@ -12,9 +12,14 @@ import com.openeip.governance.domain.catalog.ProviderState;
 import com.openeip.governance.shared.exception.GovernanceAuditException;
 import com.openeip.governance.shared.exception.GovernanceCatalogException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +44,42 @@ public class ModelCatalogService {
     this.catalog = catalog;
     this.audit = audit;
     this.clock = clock;
+  }
+
+  @Transactional
+  public Model registerModelPolicy(
+      String name,
+      String providerRef,
+      String secretRef,
+      Set<String> capabilities,
+      Set<String> routingLabels) {
+    Context context = context(null);
+    Provider provider =
+        catalog
+            .providerByName(context.tenantId(), providerRef)
+            .orElseGet(
+                () ->
+                    registerProvider(
+                        new ProviderRegistration(
+                            context.tenantId(),
+                            providerRef,
+                            Map.of("reference", providerRef),
+                            secretRef,
+                            capabilities,
+                            clock.instant())));
+    if (provider.state() == ProviderState.DRAFT) {
+      provider = enableProvider(provider.id(), provider.revision());
+    }
+    return registerModel(
+        new ModelRegistration(
+            context.tenantId(),
+            provider.id(),
+            name,
+            digest(providerRef, name, capabilities, routingLabels),
+            capabilities,
+            routingLabels,
+            null,
+            clock.instant()));
   }
 
   @Transactional
@@ -217,6 +258,27 @@ public class ModelCatalogService {
       return exception;
     }
     return GovernanceCatalogException.invalid("Catalog operation is invalid");
+  }
+
+  private static String digest(
+      String providerRef, String name, Set<String> capabilities, Set<String> routingLabels) {
+    try {
+      String canonical =
+          providerRef
+              + "\n"
+              + name
+              + "\n"
+              + capabilities.stream().sorted().toList()
+              + "\n"
+              + routingLabels.stream().sorted().toList();
+      return "sha256:"
+          + HexFormat.of()
+              .formatHex(
+                  MessageDigest.getInstance("SHA-256")
+                      .digest(canonical.getBytes(StandardCharsets.UTF_8)));
+    } catch (NoSuchAlgorithmException exception) {
+      throw new IllegalStateException("SHA-256 is unavailable", exception);
+    }
   }
 
   private record Context(

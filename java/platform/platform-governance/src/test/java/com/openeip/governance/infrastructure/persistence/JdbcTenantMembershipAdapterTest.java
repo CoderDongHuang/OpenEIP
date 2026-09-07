@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import java.util.UUID;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,6 +83,28 @@ class JdbcTenantMembershipAdapterTest {
     insertMembership(secondTenant);
 
     assertThat(adapter.findActiveByPrincipal(PRINCIPAL_ID)).isEmpty();
+  }
+
+  @Test
+  void provisionsServerOwnedDefaultMembershipFromAuthenticatedRoles() {
+    String defaultTenant = "00000000-0000-4000-8000-000000000001";
+    jdbc.update(
+        """
+        INSERT INTO governance_tenants
+          (id, tenant_id, display_name, slug, state, policy_version, created_at, updated_at)
+        VALUES (?, ?, 'Default', 'default', 'ACTIVE', 'governance-v1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """,
+        defaultTenant,
+        defaultTenant);
+
+    var result = adapter.provisionDefault(PRINCIPAL_ID, Set.of("ROLE_ADMIN"));
+
+    assertThat(result).isPresent();
+    assertThat(result.orElseThrow().tenantId()).isEqualTo(UUID.fromString(defaultTenant));
+    assertThat(result.orElseThrow().roles())
+        .containsExactlyInAnyOrder("GOVERNANCE_ADMIN", "OPERATOR", "VIEWER");
+    assertThat(adapter.provisionDefault(PRINCIPAL_ID, Set.of("ROLE_ADMIN")))
+        .contains(result.orElseThrow());
   }
 
   private void insertMembership(String tenantId) {
