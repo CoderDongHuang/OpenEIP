@@ -22,8 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /** Application service for encrypted, reviewed, evaluated, and published Prompt versions. */
 @Service
-@ConditionalOnExpression(
-    "'${openeip.governance.prompt-encryption-key-base64:}' != ''")
+@ConditionalOnExpression("'${openeip.governance.prompt-encryption-key-base64:}' != ''")
 @SuppressFBWarnings(
     value = "EI_EXPOSE_REP2",
     justification = "Catalog, audit, and cipher ports are application-scoped collaborators.")
