@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":platform-workflow"))
     implementation(project(":platform-connector"))
     implementation(project(":platform-governance"))
+    implementation(project(":platform-marketplace"))
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("com.mysql:mysql-connector-j")

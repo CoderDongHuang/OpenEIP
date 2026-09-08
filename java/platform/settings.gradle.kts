@@ -10,5 +10,6 @@ include(
     "platform-agent",
     "platform-workflow",
     "platform-connector",
-    "platform-governance"
+    "platform-governance",
+    "platform-marketplace"
 )
