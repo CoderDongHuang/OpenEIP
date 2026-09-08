@@ -118,6 +118,11 @@ subprojects {
                             "**/adapter/jdbc/SapHanaConnector.class"
                         )
                     }
+                    if (project.name == "platform-marketplace") {
+                        // JDBC and HTTP adapters are verified by migration and contract tests;
+                        // service behavior remains part of the unit coverage gate.
+                        exclude("**/infrastructure/persistence/**", "**/api/**")
+                    }
                 }
             })
         )

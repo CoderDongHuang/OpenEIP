@@ -24,7 +24,7 @@ v0.6 ──→ Agent               alpha 已发布
 v0.7 ──→ Governance          架构/安全评审通过，开发中
          多租户 / 审计 / 模型管理 / Prompt 管理 / 成本 / Trace
 
-v0.8 ──→ Marketplace         规划中
+v0.8 ──→ Marketplace         首个 alpha 切片开发中
          Plugin / SDK / Connector Market / Agent Market
 
 v0.9 ──→ Performance         规划中
@@ -47,6 +47,7 @@ v1.0 ──→ LTS                 规划中
 | Phase 4：Workflow | alpha 已发布 | `v0.4.0-alpha` 已于 2026-07-25 发布，交付 Canvas、持久执行、Trigger、Approval、Retry 与事件集成 |
 | Phase 5：Agent | alpha 已发布 | `v0.6.0-alpha` 已于 2026-08-31 作为 GitHub Pre-release 发布；正式 Review 缺失按维护者授权记录为流程例外 |
 | Phase 6：Governance | 架构/安全评审通过，开发中 | `Approved with Conditions` 已由独立评审者于 2026-09-02 记录；实现条件和后续质量门禁仍必须满足 |
+| Phase 7：Marketplace | 首个切片开发中 | Plugin / Connector / Agent 包目录、版本审核发布生命周期与公开发现 |
 
 ## 当前发布边界
 
