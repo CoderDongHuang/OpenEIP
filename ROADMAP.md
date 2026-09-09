@@ -21,10 +21,10 @@ v0.5 ──→ Connector           alpha 已发布
 v0.6 ──→ Agent               alpha 已发布
          Tool / Memory / Planner / Multi-Agent / MCP / Evaluation
 
-v0.7 ──→ Governance          架构/安全评审通过，开发中
+v0.7 ──→ Governance          架构/安全评审通过，alpha 已发布
          多租户 / 审计 / 模型管理 / Prompt 管理 / 成本 / Trace
 
-v0.8 ──→ Marketplace         首个 alpha 切片开发中
+v0.8 ──→ Marketplace         首个 alpha 切片已发布
          Plugin / SDK / Connector Market / Agent Market
 
 v0.9 ──→ Performance         规划中

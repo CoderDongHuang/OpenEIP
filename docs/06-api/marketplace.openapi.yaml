@@ -2,6 +2,10 @@ openapi: 3.1.0
 info:
   title: OpenEIP Marketplace API
   version: 0.8.0-alpha
+servers:
+  - url: /
+security:
+  - bearerAuth: []
 paths:
   /api/v1/marketplace/public/packages:
     get:
@@ -10,33 +14,128 @@ paths:
         - {name: type, in: query, schema: {type: string, enum: [PLUGIN, CONNECTOR, AGENT]}}
         - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}
       responses:
-        '200': {description: Published package page}
+        '200':
+          description: Published package page
+          content:
+            application/json: {schema: {$ref: '#/components/schemas/Page'}}
+        '400': {$ref: '#/components/responses/InvalidRequest'}
   /api/v1/marketplace/packages:
     get:
       summary: List packages in the current tenant
+      parameters:
+        - {$ref: '#/components/parameters/Type'}
+        - {$ref: '#/components/parameters/State'}
+        - {$ref: '#/components/parameters/Limit'}
       responses:
-        '200': {description: Tenant package page}
+        '200':
+          description: Tenant package page
+          content:
+            application/json: {schema: {$ref: '#/components/schemas/Page'}}
+        '400': {$ref: '#/components/responses/InvalidRequest'}
     post:
       summary: Register a package
-      parameters:
-        - {name: Idempotency-Key, in: header, required: true, schema: {type: string, minLength: 16, maxLength: 128}}
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/CreatePackageRequest'}}}}
       responses:
-        '201': {description: Package created}
+        '201': {description: Package created, content: {application/json: {schema: {$ref: '#/components/schemas/Envelope'}}}}
+        '400': {$ref: '#/components/responses/InvalidRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
   /api/v1/marketplace/packages/{packageId}/versions:
+    parameters: [{$ref: '#/components/parameters/PackageId'}]
+    get:
+      summary: List versions in a tenant package
+      parameters: [{$ref: '#/components/parameters/Limit'}]
+      responses:
+        '200': {description: Package version page, content: {application/json: {schema: {$ref: '#/components/schemas/Page'}}}}
+        '400': {$ref: '#/components/responses/InvalidRequest'}
     post:
       summary: Register an immutable package artifact
-      parameters:
-        - {name: packageId, in: path, required: true, schema: {type: string, format: uuid}}
-        - {name: Idempotency-Key, in: header, required: true, schema: {type: string}}
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/CreateVersionRequest'}}}}
       responses:
-        '201': {description: Version created}
+        '201': {description: Version created, content: {application/json: {schema: {$ref: '#/components/schemas/Envelope'}}}}
+        '400': {$ref: '#/components/responses/InvalidRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /api/v1/marketplace/packages/{packageId}/versions/{versionId}:review:
+    parameters: [{$ref: '#/components/parameters/PackageId'}, {$ref: '#/components/parameters/VersionId'}]
+    post:
+      summary: Review a draft version
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}, {$ref: '#/components/parameters/IfMatch'}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ReviewRequest'}}}}
+      responses:
+        '200': {description: Reviewed version, content: {application/json: {schema: {$ref: '#/components/schemas/Envelope'}}}}
+        '400': {$ref: '#/components/responses/InvalidRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
   /api/v1/marketplace/packages/{packageId}/versions/{versionId}:publish:
+    parameters: [{$ref: '#/components/parameters/PackageId'}, {$ref: '#/components/parameters/VersionId'}]
     post:
       summary: Publish a reviewed version
-      parameters:
-        - {name: packageId, in: path, required: true, schema: {type: string, format: uuid}}
-        - {name: versionId, in: path, required: true, schema: {type: string, format: uuid}}
-        - {name: Idempotency-Key, in: header, required: true, schema: {type: string}}
-        - {name: If-Match, in: header, required: true, schema: {type: string}}
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}, {$ref: '#/components/parameters/IfMatch'}]
       responses:
-        '200': {description: Published version}
+        '200': {description: Published version, content: {application/json: {schema: {$ref: '#/components/schemas/Envelope'}}}}
+        '400': {$ref: '#/components/responses/InvalidRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /api/v1/marketplace/packages/{packageId}/versions/{versionId}:suspend:
+    parameters: [{$ref: '#/components/parameters/PackageId'}, {$ref: '#/components/parameters/VersionId'}]
+    post:
+      summary: Suspend a published version
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}, {$ref: '#/components/parameters/IfMatch'}]
+      responses:
+        '200': {description: Suspended version, content: {application/json: {schema: {$ref: '#/components/schemas/Envelope'}}}}
+        '400': {$ref: '#/components/responses/InvalidRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}
+  parameters:
+    Type: {name: type, in: query, schema: {type: string, enum: [PLUGIN, CONNECTOR, AGENT]}}
+    State: {name: state, in: query, schema: {type: string, enum: [DRAFT, REVIEWED, PUBLISHED, SUSPENDED]}}
+    Limit: {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}
+    PackageId: {name: packageId, in: path, required: true, schema: {type: string, format: uuid}}
+    VersionId: {name: versionId, in: path, required: true, schema: {type: string, format: uuid}}
+    IdempotencyKey: {name: Idempotency-Key, in: header, required: true, schema: {type: string, pattern: '^[A-Za-z0-9._:-]{16,128}$'}}
+    IfMatch: {name: If-Match, in: header, required: true, schema: {type: string, pattern: '^"?[0-9]+"?$'}}
+  responses:
+    InvalidRequest: {description: Invalid request}
+    Forbidden: {description: Marketplace administrator role is required}
+    Conflict: {description: Conflict or invalid lifecycle transition}
+  schemas:
+    Envelope:
+      type: object
+      required: [code, message, requestId, timestamp]
+      properties:
+        code: {oneOf: [{type: integer}, {type: string}]}
+        message: {type: string}
+        data: {}
+        requestId: {type: string}
+        timestamp: {type: string, format: date-time}
+    Page:
+      type: object
+      required: [items]
+      properties: {items: {type: array, items: {}}, nextCursor: {type: string, nullable: true}}
+    CreatePackageRequest:
+      type: object
+      required: [type, slug, displayName, description]
+      properties:
+        type: {type: string, enum: [PLUGIN, CONNECTOR, AGENT]}
+        slug: {type: string, maxLength: 128, pattern: '^[a-z0-9](?:[a-z0-9-]{0,126}[a-z0-9])?$'}
+        displayName: {type: string, maxLength: 128}
+        description: {type: string, maxLength: 2048}
+    CreateVersionRequest:
+      type: object
+      required: [version, artifactUri, sha256, runtime, manifest]
+      properties:
+        version: {type: string, maxLength: 32, pattern: '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*)|[0-9A-Za-z-]+)(\.((0|[1-9][0-9]*)|[0-9A-Za-z-]+))*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'}
+        artifactUri: {type: string, maxLength: 1024, format: uri}
+        sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        runtime: {type: string, maxLength: 64}
+        manifest: {type: object, minProperties: 1}
+    ReviewRequest:
+      type: object
+      required: [note]
+      properties: {note: {type: string, maxLength: 512}}

@@ -11,6 +11,7 @@ CREATE TABLE marketplace_packages (
     created_at TIMESTAMP(6) NOT NULL,
     updated_at TIMESTAMP(6) NOT NULL,
     PRIMARY KEY (id),
+    UNIQUE KEY uk_marketplace_package_tenant_id (tenant_id, id),
     UNIQUE KEY uk_marketplace_package_slug (tenant_id, slug),
     KEY idx_marketplace_package_public (package_type, state, updated_at),
     CONSTRAINT ck_marketplace_package_type CHECK (package_type IN ('PLUGIN', 'CONNECTOR', 'AGENT')),
