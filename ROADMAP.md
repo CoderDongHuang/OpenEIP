@@ -27,8 +27,8 @@ v0.7 ──→ Governance          架构/安全评审通过，alpha 已发布
 v0.8 ──→ Marketplace         首个 alpha 切片已发布
          Plugin / SDK / Connector Market / Agent Market
 
-v0.9 ──→ Performance         规划中
-         压测 / 调优 / 高可用 / 扩容 / 稳定性
+v0.9 ──→ Performance         基线切片开发中
+         可复现 HTTP 压测 / 性能证据（HA、扩容与混沌测试待后续）
 
 v1.0 ──→ LTS                 规划中
          SSO / LDAP / K8S / 对象存储 / 安全合规 / 24 个月支持
@@ -46,8 +46,9 @@ v1.0 ──→ LTS                 规划中
 | Phase 3：Knowledge | alpha 已发布 | `v0.3.0-alpha` 已于 2026-07-24 发布，交付解析、Embedding、全文/向量/混合检索与 Citation |
 | Phase 4：Workflow | alpha 已发布 | `v0.4.0-alpha` 已于 2026-07-25 发布，交付 Canvas、持久执行、Trigger、Approval、Retry 与事件集成 |
 | Phase 5：Agent | alpha 已发布 | `v0.6.0-alpha` 已于 2026-08-31 作为 GitHub Pre-release 发布；正式 Review 缺失按维护者授权记录为流程例外 |
-| Phase 6：Governance | 架构/安全评审通过，开发中 | `Approved with Conditions` 已由独立评审者于 2026-09-02 记录；实现条件和后续质量门禁仍必须满足 |
-| Phase 7：Marketplace | 首个切片开发中 | Plugin / Connector / Agent 包目录、版本审核发布生命周期与公开发现 |
+| Phase 6：Governance | alpha 已发布 | `v0.7.0-alpha` 已发布；后续标准审计修复已合并到 `main` |
+| Phase 7：Marketplace | 首个切片已发布 | Plugin / Connector / Agent 包目录、版本审核发布生命周期与公开发现 |
+| Phase 8：Performance | 基线切片开发中 | 可复现 HTTP 压测、机器可读性能证据；生产 HA/扩容不在本 alpha 承诺内 |
 
 ## 当前发布边界
 

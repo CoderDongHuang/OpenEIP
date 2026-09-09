@@ -8,6 +8,7 @@
 | 版本 | 日期 | 说明 |
 |---|---|---|
 | [v0.8.0-alpha](v0.8.0-alpha-checklist.md) | 2026-09-08 | Marketplace，GitHub Pre-release 已发布 |
+| [v0.9.0-alpha](v0.9.0-alpha-checklist.md) | 待发布 | Performance 基线与 HTTP 压测工具，发布准备中 |
 | [v0.7.0-alpha](v0.7.0-alpha-checklist.md) | 2026-09-08 | Governance，GitHub Pre-release 已发布 |
 | [v0.6.0-alpha](v0.6.0-alpha-checklist.md) | 2026-08-31 | Agent，GitHub Pre-release 已发布 |
 | [v0.5.0-alpha](v0.5.0-alpha-checklist.md) | 2026-07-25 | Connector，GitHub Pre-release 已发布 |
