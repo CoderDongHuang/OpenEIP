@@ -17,6 +17,6 @@ dependencies {
     testImplementation("org.testcontainers:mysql:1.21.4")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
 
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.3")
-    testCompileOnly("com.github.spotbugs:spotbugs-annotations:4.10.3")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.4")
+    testCompileOnly("com.github.spotbugs:spotbugs-annotations:4.10.4")
 }
