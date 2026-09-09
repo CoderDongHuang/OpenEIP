@@ -41,7 +41,7 @@ issue unless an accepted RFC changes the boundary.
 | 14 Pull Request | Implementation PRs #102/#118/#120 | Complete |
 | 15 Code Review | GitHub review records for the implementation and standards-audit PRs | Pending external verification; merge history alone is not review evidence |
 | 16 Merge | PR #120 merged to `main` as `b373a15` | Complete 2026-09-08 |
-| 17 Release | `v0.7.0-alpha` GitHub Pre-release | Complete 2026-09-08; tag is immutable and must not be rewritten |
+| 17 Release | `v0.7.0-alpha` GitHub Pre-release | Historical release exists; post-tag standards-audit publication gates remain open in the checklist |
 
 ### Runtime quota enforcement slice
 

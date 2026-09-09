@@ -11,11 +11,14 @@ scaling, or resilience under node failure.
 ## Design
 
 `benchmark/run_benchmark.py` uses only the Python 3.12 standard library. A
-thread pool provides bounded concurrency. Each request has an explicit timeout
-and reads at most `maxResponseBytes + 1` bytes, so an unexpectedly large body is
-classified without being persisted. Response bodies, headers, credentials, and
-payloads are never included in evidence. Automatic redirects are disabled, so
-3xx responses are recorded as failures rather than silently changing the target.
+thread pool provides bounded concurrency. DNS is resolved once before the run
+and the resulting address is pinned to the TCP/TLS connection, preventing a
+second resolution from being redirected to a different network. Each request
+has an explicit timeout and reads in bounded chunks up to
+`maxResponseBytes + 1`, so an unexpectedly large body is classified without
+being persisted. Response bodies, headers, credentials, and payloads are never
+included in evidence. Automatic redirects are disabled, so 3xx responses are
+recorded as failures rather than silently changing the target.
 
 The target URL is mandatory, limited to HTTP(S), and cannot contain user
 credentials or fragments. DNS-resolved private, loopback, link-local,

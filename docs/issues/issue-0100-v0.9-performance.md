@@ -16,7 +16,7 @@
 | 9 Integration Test | Local loopback HTTP fixture only | Partial; deployment/Compose integration missing |
 | 10 Benchmark | 200 requests, 4-way concurrency, P99 19.203 ms, zero errors | Complete for local deterministic fixture only |
 | 11 Security Review | URL, private-network, redirect, timeout, body-limit tests | Partial; independent review and repository scans pending |
-| 12 Quality Gate | No standalone v0.9 quality-gate record | Gap |
+| 12 Quality Gate | [v0.9 Quality Gate](issue-0100-quality-gate.md) | Established; local gates passed, release rows pending |
 | 13 Docs Update | SDD, test plan, result JSON, release checklist and changelog | Complete for current slice |
 | 14 Pull Request | [PR #122](https://github.com/CoderDongHuang/OpenEIP/pull/122) | Complete |
 | 15 Code Review | GitHub formal review not verified | Pending external verification |

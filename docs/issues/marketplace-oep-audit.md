@@ -16,7 +16,7 @@
 | 9 Integration Test | Migration/rollback and tenant-context rerun listed as pending in v0.8 checklist | Gap: rerun and attach output |
 | 10 Benchmark | No Marketplace-specific benchmark result | Gap or approved not-applicable record required |
 | 11 Security Review | Dependency/security fixes merged in PR #120; no standalone Marketplace review packet | Partial |
-| 12 Quality Gate | No standalone Marketplace quality-gate record | Gap |
+| 12 Quality Gate | v0.8 release checklist and Java quality evidence | Partial; standalone Marketplace quality-gate record still required |
 | 13 Docs Update | SDD, OpenAPI and release checklist exist | Partial: add this audit and missing records |
 | 14 Pull Request | PR #118 and standards-audit PR #120 | Complete |
 | 15 Code Review | Review evidence must be verified on PR #118/#120; repository snapshot does not prove reviewer identity | Pending external verification |

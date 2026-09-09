@@ -18,6 +18,7 @@ class FakeResponse:
     def __init__(self, status: int = 200, body: bytes = b"ok", content_length: str | None = None) -> None:
         self.status = status
         self._body = body
+        self._offset = 0
         self.headers = {"Content-Length": content_length} if content_length else {}
 
     def __enter__(self) -> "FakeResponse":
@@ -30,7 +31,11 @@ class FakeResponse:
         return self.status
 
     def read(self, amount: int = -1) -> bytes:
-        return self._body[:amount] if amount >= 0 else self._body
+        if amount < 0:
+            amount = len(self._body) - self._offset
+        chunk = self._body[self._offset : self._offset + amount]
+        self._offset += len(chunk)
+        return chunk
 
 
 def fake_opener(response: FakeResponse):
@@ -125,6 +130,13 @@ def test_http_error_keeps_status_code() -> None:
 
 def test_redirect_handler_does_not_follow_redirects() -> None:
     assert benchmark._NoRedirectHandler().redirect_request(None) is None
+
+
+def test_read_limited_consumes_short_chunks_until_limit_or_eof() -> None:
+    response = FakeResponse(body=b"0123456789")
+    assert benchmark._read_limited(response, 10) == b"0123456789"
+    oversized = FakeResponse(body=b"01234567890")
+    assert benchmark._read_limited(oversized, 10) == b"01234567890"
 
 
 def test_percentiles_use_nearest_rank_for_all_samples() -> None:

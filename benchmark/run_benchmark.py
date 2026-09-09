@@ -13,6 +13,7 @@ import ipaddress
 import json
 import platform
 import socket
+import ssl
 import sys
 import time
 from collections import Counter
@@ -20,6 +21,7 @@ from collections.abc import Callable, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from http.client import HTTPConnection, HTTPSConnection
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -44,6 +46,55 @@ def _urlopen_no_redirect(request: Request, timeout: float) -> Any:
     return _NO_REDIRECT_OPENER.open(request, timeout=timeout)
 
 
+class _PinnedHTTPConnection(HTTPConnection):
+    def __init__(self, host: str, port: int, resolved_ip: str, timeout: float) -> None:
+        super().__init__(host, port, timeout=timeout)
+        self._resolved_ip = resolved_ip
+
+    def connect(self) -> None:
+        self.sock = socket.create_connection((self._resolved_ip, self.port), self.timeout)
+
+
+class _PinnedHTTPSConnection(HTTPSConnection):
+    def __init__(self, host: str, port: int, resolved_ip: str, timeout: float) -> None:
+        super().__init__(host, port, timeout=timeout, context=ssl.create_default_context())
+        self._resolved_ip = resolved_ip
+
+    def connect(self) -> None:
+        raw_socket = socket.create_connection((self._resolved_ip, self.port), self.timeout)
+        self.sock = self._context.wrap_socket(raw_socket, server_hostname=self.host)
+
+
+def _pinned_opener(target_url: str, resolved_ip: str) -> Callable[..., Any]:
+    parsed = urlparse(target_url)
+    if parsed.hostname is None:
+        raise ValueError("target URL must include a hostname")
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+
+    def opener(request: Request, timeout: float) -> Any:
+        connection_type = _PinnedHTTPSConnection if parsed.scheme == "https" else _PinnedHTTPConnection
+        connection = connection_type(parsed.hostname, port, resolved_ip, timeout)
+        path = parsed.path or "/"
+        if parsed.query:
+            path += "?" + parsed.query
+        connection.request(request.method, path, headers=dict(request.header_items()))
+        return connection.getresponse()
+
+    return opener
+
+
+def _read_limited(response: Any, max_response_bytes: int) -> bytes:
+    chunks: list[bytes] = []
+    remaining = max_response_bytes + 1
+    while remaining > 0:
+        chunk = response.read(min(65_536, remaining))
+        if not chunk:
+            break
+        chunks.append(chunk)
+        remaining -= len(chunk)
+    return b"".join(chunks)
+
+
 @dataclass(frozen=True)
 class RequestResult:
     latency_ms: float
@@ -51,27 +102,43 @@ class RequestResult:
     status_code: int | None
 
 
-def validate_target_url(target_url: str, allow_private_network: bool = False) -> str:
+def validate_target_url(
+    target_url: str,
+    allow_private_network: bool = False,
+    resolved_addresses: Sequence[str] | None = None,
+) -> str:
     """Validate a target URL and reject accidental private-network traffic."""
 
     parsed = urlparse(target_url)
+    _validate_url_syntax(parsed)
+    addresses = (
+        tuple(resolved_addresses) if resolved_addresses is not None else _resolve_target_addresses(parsed.hostname)
+    )
+    if not allow_private_network and any(_is_private_address(address) for address in addresses):
+        raise ValueError("target resolves to a private or loopback address; pass --allow-private-network")
+    return target_url
+
+
+def _validate_url_syntax(parsed: Any) -> None:
     if parsed.scheme not in {"http", "https"} or not parsed.hostname:
         raise ValueError("target URL must use http or https and include a hostname")
     if parsed.username or parsed.password:
         raise ValueError("target URL must not contain credentials")
     if parsed.fragment:
         raise ValueError("target URL must not contain a fragment")
-    if not allow_private_network and _resolves_to_private_address(parsed.hostname):
-        raise ValueError("target resolves to a private or loopback address; pass --allow-private-network")
-    return target_url
+
+
+def _resolve_target_addresses(hostname: str) -> tuple[str, ...]:
+    try:
+        return tuple(
+            dict.fromkeys(entry[4][0] for entry in socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM))
+        )
+    except socket.gaierror as exc:
+        raise ValueError(f"target hostname cannot be resolved: {hostname}") from exc
 
 
 def _resolves_to_private_address(hostname: str) -> bool:
-    try:
-        addresses = {entry[4][0] for entry in socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM)}
-    except socket.gaierror as exc:
-        raise ValueError(f"target hostname cannot be resolved: {hostname}") from exc
-    return any(_is_private_address(address) for address in addresses)
+    return any(_is_private_address(address) for address in _resolve_target_addresses(hostname))
 
 
 def _is_private_address(address: str) -> bool:
@@ -108,7 +175,7 @@ def _one_request(
     try:
         with opener(request, timeout=timeout) as response:
             status_code = getattr(response, "status", None) or response.getcode()
-            body = response.read(max_response_bytes + 1)
+            body = _read_limited(response, max_response_bytes)
             if status_code < 200 or status_code >= 300:
                 outcome = "http_error"
             else:
@@ -198,15 +265,22 @@ def run_benchmark(
     _validate_p99_threshold(max_p99_ms)
     if not 0 <= warmups <= 1000:
         raise ValueError("warmups must be between 0 and 1000")
-    validated_url = validate_target_url(target_url, allow_private_network)
+    parsed_target = urlparse(target_url)
+    _validate_url_syntax(parsed_target)
+    resolved_addresses = _resolve_target_addresses(parsed_target.hostname)
+    validated_url = validate_target_url(target_url, allow_private_network, resolved_addresses)
+    request_opener = opener
+    if opener is _urlopen_no_redirect:
+        request_opener = _pinned_opener(validated_url, resolved_addresses[0])
     for _ in range(warmups):
-        _one_request(validated_url, timeout, max_response_bytes, opener)
+        _one_request(validated_url, timeout, max_response_bytes, request_opener)
 
     started = time.perf_counter()
     results: list[RequestResult] = []
     with ThreadPoolExecutor(max_workers=min(concurrency, requests), thread_name_prefix="openeip-bench") as pool:
         futures = [
-            pool.submit(_one_request, validated_url, timeout, max_response_bytes, opener) for _ in range(requests)
+            pool.submit(_one_request, validated_url, timeout, max_response_bytes, request_opener)
+            for _ in range(requests)
         ]
         for future in as_completed(futures):
             results.append(future.result())
