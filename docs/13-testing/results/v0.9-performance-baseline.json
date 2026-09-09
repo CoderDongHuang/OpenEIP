@@ -1,14 +1,14 @@
 {
   "schemaVersion": "1.0",
   "sampleCount": 200,
-  "elapsedSeconds": 0.177367,
-  "throughputRequestsPerSecond": 1127.603,
+  "elapsedSeconds": 0.22114,
+  "throughputRequestsPerSecond": 904.406,
   "latencyMs": {
-    "p50": 3.262,
-    "p95": 4.864,
-    "p99": 6.681,
-    "min": 2.006,
-    "max": 17.514
+    "p50": 3.495,
+    "p95": 8.581,
+    "p99": 19.203,
+    "min": 1.657,
+    "max": 23.237
   },
   "outcomes": {
     "success": 200
@@ -21,7 +21,7 @@
   "thresholds": {
     "maxP99Ms": 100
   },
-  "generatedAt": "2026-09-09T13:16:30.241785Z",
+  "generatedAt": "2026-09-09T13:24:06.816096Z",
   "environment": {
     "python": "3.12.14",
     "platform": "Windows-11-10.0.26200-SP0"
@@ -35,5 +35,5 @@
   "timeoutSeconds": 2.0,
   "maxResponseBytes": 1048576,
   "warmups": 10,
-  "commit": "b373a15f1814061ea28e867d0f6c1369076a2359"
+  "commit": "1090d15"
 }
