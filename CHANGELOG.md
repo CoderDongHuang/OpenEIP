@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+### Added
+- v0.9 Performance baseline slice: dependency-free bounded HTTP GET benchmark with explicit target validation, private-network opt-in, redirect blocking, timeout/body-size limits, P50/P95/P99 metrics, error classification, and optional P99 gate.
+- Machine-readable local fixture evidence and SDD, test plan, and alpha release checklist for the performance boundary.
+
+### Security
+- Benchmark evidence redacts response content and credentials, never follows redirects, and records only the target scheme and hostname.
+
 ## [0.7.0-alpha] - 2026-09-06
 
 ### Added

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0",
+  "sampleCount": 200,
+  "elapsedSeconds": 0.22114,
+  "throughputRequestsPerSecond": 904.406,
+  "latencyMs": {
+    "p50": 3.495,
+    "p95": 8.581,
+    "p99": 19.203,
+    "min": 1.657,
+    "max": 23.237
+  },
+  "outcomes": {
+    "success": 200
+  },
+  "statusCodes": {
+    "200": 200
+  },
+  "errorCount": 0,
+  "result": "PASS",
+  "thresholds": {
+    "maxP99Ms": 100
+  },
+  "generatedAt": "2026-09-09T13:24:06.816096Z",
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "target": {
+    "scheme": "http",
+    "host": "127.0.0.1"
+  },
+  "requests": 200,
+  "concurrency": 4,
+  "timeoutSeconds": 2.0,
+  "maxResponseBytes": 1048576,
+  "warmups": 10,
+  "commit": "1090d15"
+}
