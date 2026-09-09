@@ -31,8 +31,17 @@ issue unless an accepted RFC changes the boundary.
 | 4 Module Design | Governance SDD | Complete 2026-09-01 |
 | 5 API/Database/UI Design | Governance OpenAPI v2, V2.7.0 schema, event contract, and management workspace | Complete 2026-09-01 |
 | 6 Architecture Review | [Architecture review](issue-0099-architecture-review.md) and [Security review](issue-0099-security-review.md) | Approved with Conditions 2026-09-02 |
-| 7-13 Implementation and validation | Java/Python/Frontend and quality evidence | In progress; conditions mandatory |
-| 14-17 Delivery | Pull Request, Review, Merge, Release | Not started |
+| 7 Implementation | Java Governance control plane, Python/Frontend compatibility, migrations and runtime quota slice | Complete; standards-audit fixes merged in PR #120 |
+| 8 Unit Test | Governance unit/contract suites and coverage | Complete; 57 non-benchmark tests, 92.03% changed-module coverage |
+| 9 Integration Test | H2/MySQL migration, rollback, tenant FK and Compose/release smoke | Complete for recorded release evidence; rerun required for any post-tag patch |
+| 10 Benchmark | Quota admission and contention benchmark | Complete; P99 5.427 ms, 20/100 allowed at limit, zero oversell |
+| 11 Security Review | Governance threat model, abuse cases, Trivy and secret scans | Complete with conditions; post-audit scan evidence must remain attached to patch release |
+| 12 Quality Gate | [Quality gate](issue-0099-quality-gate.md) | Complete for implementation slice; release gate is tracked in [v0.7 checklist](../14-release/v0.7.0-alpha-checklist.md) |
+| 13 Docs Update | RFC/ADR/SDD/API/DB/UI/test/release metadata | Complete; release checklist retains historical pending items where rerun evidence is absent |
+| 14 Pull Request | Implementation PRs #102/#118/#120 | Complete |
+| 15 Code Review | GitHub review records for the implementation and standards-audit PRs | Pending external verification; merge history alone is not review evidence |
+| 16 Merge | PR #120 merged to `main` as `b373a15` | Complete 2026-09-08 |
+| 17 Release | `v0.7.0-alpha` GitHub Pre-release | Complete 2026-09-08; tag is immutable and must not be rewritten |
 
 ### Runtime quota enforcement slice
 
@@ -42,8 +51,9 @@ idempotency conflict behavior; tenant-scoped MySQL persistence; and transactiona
 record is [issue-0099-quality-gate.md](issue-0099-quality-gate.md), and benchmark evidence is
 [v0.7-governance-quota-benchmark.json](../13-testing/results/v0.7-governance-quota-benchmark.json).
 
-This does not mark the full v0.7 Governance release train complete. Other Issue #99 slices remain in progress,
-and Pull Request, independent Review, Merge, and Release remain steps 14-17 outside this implementation branch.
+The full v0.7 release record is maintained in the release checklist. Any later
+standards-audit fix must use a new immutable patch/pre-release tag; it must not
+move or rewrite `v0.7.0-alpha`.
 
 ## Acceptance criteria
 

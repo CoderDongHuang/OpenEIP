@@ -24,6 +24,8 @@
 | [ADR-0016](adr-0016-tamper-evident-audit-records.md) | Tamper-Evident Audit Records | Accepted |
 | [ADR-0017](adr-0017-versioned-model-and-prompt-lifecycle.md) | Versioned Model and Prompt Lifecycle | Accepted |
 | [ADR-0018](adr-0018-idempotent-cost-and-trace-contracts.md) | Idempotent Cost and Trace Contracts | Accepted |
+| [ADR-0019](adr-0019-marketplace-external-artifacts.md) | Marketplace Metadata and External Artifact Storage | Proposed |
+| [ADR-0020](adr-0020-bounded-http-benchmark.md) | Dependency-Free Bounded HTTP Benchmark | Proposed |
 
 ## ADR 编号规则
 

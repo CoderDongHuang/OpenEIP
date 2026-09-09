@@ -15,6 +15,8 @@
 | [RFC-0006](rfc-0006-durable-workflow-orchestration.md) | Durable Workflow Orchestration | Accepted |
 | [RFC-0008](rfc-0008-agent-platform-v2.md) | Production Agent Platform v2 | Accepted |
 | [RFC-0009](rfc-0009-governance-platform-v1.md) | Enterprise Governance Platform v1 | Accepted |
+| [RFC-0010](rfc-0010-marketplace-catalog.md) | Tenant-Scoped Marketplace Catalog | Proposed |
+| [RFC-0011](rfc-0011-performance-evidence.md) | Reproducible Performance Evidence | Proposed |
 
 ## RFC 编号规则
 
