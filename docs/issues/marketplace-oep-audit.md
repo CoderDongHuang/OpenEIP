@@ -5,7 +5,7 @@
 
 | Step | Evidence | State |
 |---|---|---|
-| 1 Issue | No canonical Marketplace GitHub Issue record found in this repository | Gap: external issue link required |
+| 1 Issue | [GitHub Issue #123](https://github.com/CoderDongHuang/OpenEIP/issues/123) | Complete 2026-09-09 |
 | 2 RFC | [RFC-0010](../11-rfc/rfc-0010-marketplace-catalog.md) | Proposed; maintainer acceptance required |
 | 3 ADR | [ADR-0019](../12-adr/adr-0019-marketplace-external-artifacts.md) | Proposed; architecture-owner acceptance required |
 | 4 Module Design | [Marketplace SDD](../04-sdd/marketplace-module.md) | Complete |

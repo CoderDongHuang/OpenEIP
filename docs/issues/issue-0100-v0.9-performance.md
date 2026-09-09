@@ -5,7 +5,7 @@
 
 | Step | Evidence | State |
 |---|---|---|
-| 1 Issue | No v0.9 Performance GitHub Issue created | Gap |
+| 1 Issue | [GitHub Issue #124](https://github.com/CoderDongHuang/OpenEIP/issues/124) | Complete 2026-09-09 |
 | 2 RFC | [RFC-0011](../11-rfc/rfc-0011-performance-evidence.md) | Proposed; maintainer acceptance required |
 | 3 ADR | [ADR-0020](../12-adr/adr-0020-bounded-http-benchmark.md) | Proposed; architecture-owner acceptance required |
 | 4 Module Design | [Performance SDD](../04-sdd/performance-module.md) | Complete |
