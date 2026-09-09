@@ -9,7 +9,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-mysql")
 
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.3")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.4")
     runtimeOnly("com.mysql:mysql-connector-j")
 
     testImplementation("org.springframework.security:spring-security-test")
