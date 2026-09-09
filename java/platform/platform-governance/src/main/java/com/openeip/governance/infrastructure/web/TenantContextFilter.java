@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
@@ -21,7 +22,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /** Establishes a server-derived Governance context at the HTTP boundary. */
 @Component
 public class TenantContextFilter extends OncePerRequestFilter {
-  private static final String GOVERNANCE_PATH = "/api/v2/governance/";
+  private static final Set<String> GOVERNED_PATHS =
+      Set.of("/api/v2/governance", "/api/v1/marketplace");
   private static final String TRACEPARENT_HEADER = "traceparent";
 
   private final TenantContextResolver resolver;
@@ -35,7 +37,12 @@ public class TenantContextFilter extends OncePerRequestFilter {
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
-    return !request.getRequestURI().startsWith(GOVERNANCE_PATH);
+    String requestUri = request.getRequestURI();
+    return GOVERNED_PATHS.stream().noneMatch(path -> matchesPath(requestUri, path));
+  }
+
+  private static boolean matchesPath(String requestUri, String path) {
+    return requestUri.equals(path) || requestUri.startsWith(path + "/");
   }
 
   @Override

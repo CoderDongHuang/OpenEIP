@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
     value = "EI_EXPOSE_REP2",
     justification = "Injected Spring service is an application-scoped collaborator.")
 public class MarketplaceController {
+  private static final Pattern IDEMPOTENCY_KEY = Pattern.compile("[A-Za-z0-9._:-]{16,128}");
   private final MarketplaceService service;
 
   public MarketplaceController(MarketplaceService service) {
@@ -151,14 +153,18 @@ public class MarketplaceController {
   }
 
   private static void requireKey(String key) {
-    if (key == null || key.isBlank() || key.length() < 16 || key.length() > 128) {
+    if (key == null || !IDEMPOTENCY_KEY.matcher(key).matches()) {
       throw MarketplaceException.invalid("Idempotency-Key is invalid");
     }
   }
 
   private static long revision(String value) {
     try {
-      return Long.parseLong(value.replace("\"", ""));
+      long revision = Long.parseLong(value == null ? "" : value.replace("\"", ""));
+      if (revision < 0) {
+        throw new NumberFormatException("negative revision");
+      }
+      return revision;
     } catch (RuntimeException exception) {
       throw MarketplaceException.invalid("If-Match revision is invalid");
     }

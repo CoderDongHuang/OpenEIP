@@ -113,9 +113,13 @@ public class JdbcMarketplaceAdapter implements MarketplacePort {
   public List<MarketplacePackage> listPublicPackages(PackageType type, int limit) {
     return jdbc.query(
         """
-        SELECT * FROM marketplace_packages
-        WHERE state = 'PUBLISHED' AND (? IS NULL OR package_type = ?)
-        ORDER BY updated_at DESC, id DESC LIMIT ?
+        SELECT p.* FROM marketplace_packages p
+        WHERE p.state = 'PUBLISHED' AND (? IS NULL OR p.package_type = ?)
+          AND EXISTS (
+            SELECT 1 FROM marketplace_package_versions v
+            WHERE v.tenant_id = p.tenant_id AND v.package_id = p.id AND v.state = 'PUBLISHED'
+          )
+        ORDER BY p.updated_at DESC, p.id DESC LIMIT ?
         """,
         (rs, row) -> packageRow(rs),
         type == null ? null : type.name(),

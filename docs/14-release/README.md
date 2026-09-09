@@ -7,7 +7,8 @@
 
 | 版本 | 日期 | 说明 |
 |---|---|---|
-| [v0.7.0-alpha](v0.7.0-alpha-checklist.md) | 2026-09-06 | Governance，发布准备中 |
+| [v0.8.0-alpha](v0.8.0-alpha-checklist.md) | 2026-09-08 | Marketplace，GitHub Pre-release 已发布 |
+| [v0.7.0-alpha](v0.7.0-alpha-checklist.md) | 2026-09-08 | Governance，GitHub Pre-release 已发布 |
 | [v0.6.0-alpha](v0.6.0-alpha-checklist.md) | 2026-08-31 | Agent，GitHub Pre-release 已发布 |
 | [v0.5.0-alpha](v0.5.0-alpha-checklist.md) | 2026-07-25 | Connector，GitHub Pre-release 已发布 |
 | [v0.4.0-alpha](v0.4.0-alpha-checklist.md) | 2026-07-25 | Workflow，GitHub Pre-release 已发布 |

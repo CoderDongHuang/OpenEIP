@@ -47,7 +47,7 @@ class MarketplaceServiceTest {
             "request-1",
             "trace-1",
             GovernanceScope.TENANT,
-            Instant.parse("2026-09-09T00:00:00Z")));
+            Instant.parse("2030-01-01T00:00:00Z")));
   }
 
   @AfterEach
@@ -68,6 +68,28 @@ class MarketplaceServiceTest {
                     Map.of("id", "x")))
         .isInstanceOf(MarketplaceException.class)
         .hasMessageContaining("SemVer");
+  }
+
+  @Test
+  void rejectsSemVerLeadingZerosAndNullDigestWithoutThrowingNpe() {
+    assertThatThrownBy(
+            () ->
+                service.addVersion(
+                    PACKAGE,
+                    "01.0.0",
+                    "oci://example/plugin",
+                    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "java-21",
+                    Map.of("id", "x")))
+        .isInstanceOf(MarketplaceException.class)
+        .hasMessageContaining("SemVer");
+
+    assertThatThrownBy(
+            () ->
+                service.addVersion(
+                    PACKAGE, "1.0.0", "oci://example/plugin", null, "java-21", Map.of("id", "x")))
+        .isInstanceOf(MarketplaceException.class)
+        .hasMessageContaining("sha256");
   }
 
   @Test

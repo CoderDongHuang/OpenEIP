@@ -22,7 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class MarketplaceService {
   private static final Pattern SLUG = Pattern.compile("[a-z0-9](?:[a-z0-9-]{0,126}[a-z0-9])?");
   private static final Pattern VERSION =
-      Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?");
+      Pattern.compile(
+          "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)"
+              + "(?:-((?:0|[1-9][0-9]*|[0-9A-Za-z-]+)(?:\\.(?:0|[1-9][0-9]*|[0-9A-Za-z-]+))*))?"
+              + "(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$");
   private static final Pattern SHA256 = Pattern.compile("[a-f0-9]{64}");
   private final MarketplacePort catalog;
   private final AuditService audit;
@@ -81,10 +84,10 @@ public class MarketplaceService {
       Map<String, Object> manifest) {
     Context context = context();
     requireAdmin();
-    if (!VERSION.matcher(version).matches()) {
+    if (version == null || !VERSION.matcher(version).matches()) {
       throw MarketplaceException.invalid("version must be SemVer");
     }
-    if (!SHA256.matcher(sha256).matches()) {
+    if (sha256 == null || !SHA256.matcher(sha256).matches()) {
       throw MarketplaceException.invalid("sha256 must be lowercase hex");
     }
     requireLength(artifactUri, 1024, "artifactUri");

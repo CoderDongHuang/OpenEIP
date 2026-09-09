@@ -27,4 +27,4 @@
 - [x] [Operational Frontend Workspace SDD](operational-frontend-module.md)
 - [x] [Governance SDD](governance-module.md) (accepted; RFC-0009 and ADR-0015/0016/0017/0018 approved)
 - [ ] BI SDD
-- [ ] Marketplace SDD
+- [x] [Marketplace SDD](marketplace-module.md) (v0.8.0-alpha)

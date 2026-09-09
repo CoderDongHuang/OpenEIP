@@ -48,12 +48,44 @@ class TenantContextFilterTest {
   }
 
   @Test
+  void bindsGovernanceContextForMarketplaceRequestsAndClearsAfterChain() throws Exception {
+    var filter = new TenantContextFilter(new TenantContextResolver(id -> membership()));
+    var request = request("/api/v1/marketplace/packages");
+    SecurityContextHolder.getContext()
+        .setAuthentication(
+            new UsernamePasswordAuthenticationToken(PRINCIPAL_ID.toString(), null, List.of()));
+    AtomicReference<Object> observed = new AtomicReference<>();
+
+    filter.doFilter(
+        request,
+        new MockHttpServletResponse(),
+        (ignoredRequest, ignoredResponse) -> observed.set(TenantContextHolder.required()));
+
+    assertThat(observed.get()).isNotNull();
+    assertThat(TenantContextHolder.current()).isEmpty();
+  }
+
+  @Test
   void ignoresNonGovernanceRequests() throws Exception {
     var filter = new TenantContextFilter(new TenantContextResolver(id -> Optional.empty()));
     AtomicReference<Boolean> called = new AtomicReference<>(false);
 
     filter.doFilter(
         request("/api/v1/chat/sessions"),
+        new MockHttpServletResponse(),
+        (ignoredRequest, ignoredResponse) -> called.set(true));
+
+    assertThat(called).hasValue(true);
+    assertThat(TenantContextHolder.current()).isEmpty();
+  }
+
+  @Test
+  void doesNotTreatLookalikePathAsGoverned() throws Exception {
+    var filter = new TenantContextFilter(new TenantContextResolver(id -> Optional.empty()));
+    AtomicReference<Boolean> called = new AtomicReference<>(false);
+
+    filter.doFilter(
+        request("/api/v1/marketplaceevil/packages"),
         new MockHttpServletResponse(),
         (ignoredRequest, ignoredResponse) -> called.set(true));
 
