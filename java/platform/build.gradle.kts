@@ -1,5 +1,6 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.quality.CheckstyleExtension
 import org.gradle.api.tasks.testing.Test
@@ -18,6 +19,8 @@ plugins {
 
 group = "com.openeip"
 version = "0.7.0-alpha"
+
+val nettyVersion = "4.1.137.Final"
 
 subprojects {
     apply(plugin = "java")
@@ -47,13 +50,49 @@ subprojects {
         mavenCentral()
     }
 
+    // Netty requires all modules on one release line to preserve binary compatibility.
+    configurations.configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "io.netty") {
+                useVersion(nettyVersion)
+                because("Netty modules must use the same patched release")
+            }
+        }
+    }
+
+    val verifyNettyAlignment = tasks.register("verifyNettyAlignment") {
+        group = "verification"
+        description = "Verifies that resolved Netty modules use the approved release."
+        doLast {
+            val unexpectedModules = listOf("runtimeClasspath", "testRuntimeClasspath")
+                .mapNotNull(configurations::findByName)
+                .flatMap { configuration ->
+                    configuration.incoming.resolutionResult.allComponents.mapNotNull { component ->
+                        val id = component.id as? ModuleComponentIdentifier
+                        if (id?.group == "io.netty" && id.version != nettyVersion) {
+                            "${configuration.name}:${id.displayName}"
+                        } else {
+                            null
+                        }
+                    }
+                }
+            check(unexpectedModules.isEmpty()) {
+                "Netty modules must resolve to $nettyVersion: ${unexpectedModules.joinToString()}"
+            }
+        }
+    }
+
+    tasks.named("check") {
+        dependsOn(verifyNettyAlignment)
+    }
+
     extensions.configure<DependencyManagementExtension> {
         imports {
             mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.16")
         }
         dependencies {
-            dependency("io.netty:netty-codec:4.2.17.Final")
-            dependency("io.netty:netty-handler:4.2.17.Final")
+            dependency("io.netty:netty-codec:$nettyVersion")
+            dependency("io.netty:netty-handler:$nettyVersion")
             dependency("org.postgresql:postgresql:42.7.13")
             dependency("org.apache.tomcat.embed:tomcat-embed-core:10.1.59")
         }
