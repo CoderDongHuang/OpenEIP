@@ -21,9 +21,10 @@ updates:
       - dependency-name: "com.github.spotbugs"
         update-types:
           - "version-update:semver-minor"
-    labels:
-      - "dependencies"
-      - "java"
+      - dependency-name: "io.netty:*"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
 
   # Python (pip)
   - package-ecosystem: "pip"
@@ -43,9 +44,6 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
-    labels:
-      - "dependencies"
-      - "python"
 
   # Frontend (npm)
   - package-ecosystem: "npm"
@@ -65,9 +63,6 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
-    labels:
-      - "dependencies"
-      - "frontend"
 
   # Website (npm)
   - package-ecosystem: "npm"
@@ -87,9 +82,6 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
-    labels:
-      - "dependencies"
-      - "website"
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
@@ -101,6 +93,3 @@ updates:
       actions-maintenance:
         patterns:
           - "*"
-    labels:
-      - "dependencies"
-      - "ci"
