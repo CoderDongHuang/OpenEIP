@@ -71,7 +71,7 @@ lxml==6.1.1
     # via
     #   python-docx
     #   python-pptx
-mcp==1.29.1
+mcp==1.30.0
     # via openeip-engine (pyproject.toml)
 numpy==2.5.1
     # via pandas

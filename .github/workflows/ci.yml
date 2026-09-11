@@ -51,10 +51,15 @@ jobs:
         with:
           python-version: '3.12'
           cache: pip
-      - name: Install dependencies
+      - name: Install and verify production dependencies
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps -e .
+          pip check
+      - name: Install and verify development dependencies
         run: |
           pip install -r requirements-dev.lock
-          pip install --no-deps -e .
+          pip check
       - name: Ruff Lint
         run: ruff check .
       - name: Ruff Format
