@@ -15,6 +15,11 @@
 ### Security
 - Benchmark evidence redacts response content and credentials, never follows redirects, and records only the target scheme and hostname.
 
+### Validation
+- PR #127 was formally approved and merged as `993569a`; all six main-branch CI jobs passed in run `34688340556`.
+- The merged-main benchmark completed 200/200 requests with P99 34.292 ms against a 100 ms threshold and zero errors.
+- Publication remains blocked until RFC-0011, ADR-0020, and independent architecture/security decisions are recorded.
+
 ## [0.7.0-alpha] - 2026-09-06
 
 ### Added
