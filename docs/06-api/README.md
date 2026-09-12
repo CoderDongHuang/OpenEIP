@@ -14,6 +14,7 @@
 - [Workflow API v1 OpenAPI](workflow-v1.openapi.yaml)
 - [Governance API v2 OpenAPI](governance-v2.openapi.yaml) (accepted for architecture review; additive `/api/v2/governance`)
 - [Marketplace API v1 OpenAPI](marketplace.openapi.yaml) (v0.8.0-alpha)
+- [Performance Benchmark Contract v1](performance-benchmark.md) (CLI/JSON; no REST, DB, UI, or SPI surface)
 
 ## 待完成
 

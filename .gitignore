@@ -26,6 +26,7 @@ python/**/.eggs/
 python/**/dist/
 python/**/.venv/
 python/**/venv/
+.venv-v09/
 python/**/.pytest_cache/
 python/**/.coverage
 python/**/htmlcov/

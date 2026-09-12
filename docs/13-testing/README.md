@@ -33,7 +33,7 @@ LLM 或 Agent 质量。生产模型、Milvus 容量和多节点故障测试必�
 | Agent v0.6       | [Plan](v0.6-agent-test-plan.md)       | Implementation evidence complete; release pending  | Five first-party Agents, safety, compatibility and quality gates |
 | Governance Quota | [Plan](v0.7-governance-test-plan.md)  | [Result](results/v0.7-governance-quota-benchmark.json) | 92.03%; admission P99 5.427 ms; 100-way contention safe |
 | Governance v0.7  | [Plan](v0.7-governance-test-plan.md)  | Release-candidate evidence in checklist | Tenant scope, audit, catalog, Prompt lifecycle, cost, quota, and trace controls |
-| Performance v0.9 | [Plan](v0.9-performance-test-plan.md) | [Result](results/v0.9-performance-baseline.json) | 200 requests, P99 19.203 ms, 4-way concurrency, zero errors |
+| Performance v0.9 | [Plan](v0.9-performance-test-plan.md) | [Result](results/v0.9-performance-baseline.json) | Commit `40364d0`: 200 requests, P99 28.553 ms, 4-way concurrency, zero errors |
 
 最终合并快照必须重新运行全量门禁；上表的模块开发数据不能替代发布候选结果。
 

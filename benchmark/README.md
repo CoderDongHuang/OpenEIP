@@ -17,11 +17,24 @@
 
 也可以直接运行 `python3 benchmark/run_benchmark.py --help` 查看全部参数。
 
+使用仓库自带的确定性 fixture 重现本地基线（另开一个终端运行 benchmark）：
+
+```bash
+python3 benchmark/local_fixture.py --host 127.0.0.1 --port 8000
+./benchmark/run-benchmark.sh http://127.0.0.1:8000/health benchmark-result.json \
+  --allow-private-network --requests 200 --concurrency 4 --warmups 10 \
+  --timeout 2 --max-p99-ms 100
+```
+
 ## 结果契约
 
 输出 JSON 包含 `schemaVersion`、请求配置、脱敏目标、P50/P95/P99/min/max、
 吞吐量、状态码、错误分类和 `result`。错误、非 2xx 或超出
 `--max-p99-ms` 时结果为 `FAIL`。响应体只读取到配置上限，且不会写入结果。
+结果契约见
+[`contracts/performance/performance-benchmark-result.v1.schema.json`](../contracts/performance/performance-benchmark-result.v1.schema.json)，
+CLI/无 REST、数据库、UI、SDK、SPI 的边界见
+[`docs/06-api/performance-benchmark.md`](../docs/06-api/performance-benchmark.md)。
 
 ## 既有基准
 
