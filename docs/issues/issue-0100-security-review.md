@@ -19,11 +19,11 @@
 
 ## Scan Boundary
 
-The utility adds no production dependency. In pre-PR CI run
-[34686830287](https://github.com/CoderDongHuang/OpenEIP/actions/runs/34686830287),
+The utility adds no production dependency. In merged-main CI run
+[34688340556](https://github.com/CoderDongHuang/OpenEIP/actions/runs/34688340556),
 the repository plus unpacked Java and Python runtime scans passed, and the
-Python dependency audit passed. Release-environment scans must still run on the
-release commit; these automated results do not replace independent approval.
+Python dependency audit passed. Tag-triggered release verification must still
+pass; these automated results do not replace independent approval.
 
 ## Required Independent Decision
 

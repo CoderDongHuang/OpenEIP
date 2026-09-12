@@ -67,10 +67,11 @@ external decision.
 
 ## Discussion Record
 
-The repository records the implementation and its local evidence. The required
-one-week public discussion and the maintainer vote (at least two-thirds
-approval) remain external governance actions and are intentionally not claimed
-as complete by this document.
+Public discussion is recorded in
+[GitHub Discussion #128](https://github.com/CoderDongHuang/OpenEIP/discussions/128).
+It opened on 2026-09-12 at 10:44 UTC, so the earliest conforming decision date
+is 2026-09-19. The maintainer vote (at least two-thirds approval) and final
+decision remain pending and are intentionally not claimed as complete.
 
 ## References
 
@@ -78,3 +79,4 @@ as complete by this document.
 - [Performance Benchmark Contract](../06-api/performance-benchmark.md)
 - [Performance Test Plan](../13-testing/v0.9-performance-test-plan.md)
 - [ADR-0020](../12-adr/adr-0020-bounded-http-benchmark.md)
+- [Public Discussion #128](https://github.com/CoderDongHuang/OpenEIP/discussions/128)
