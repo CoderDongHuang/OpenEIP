@@ -26,7 +26,7 @@ from http.client import HTTPConnection, HTTPSConnection
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
+from urllib.parse import ParseResult, urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 DEFAULT_TIMEOUT_SECONDS = 10.0
@@ -60,28 +60,30 @@ class _PinnedHTTPConnection(HTTPConnection):
 
 class _PinnedHTTPSConnection(HTTPSConnection):
     def __init__(self, host: str, port: int, resolved_ip: str, timeout: float) -> None:
-        super().__init__(host, port, timeout=timeout, context=ssl.create_default_context())
+        self._ssl_context = ssl.create_default_context()
+        super().__init__(host, port, timeout=timeout, context=self._ssl_context)
         self._resolved_ip = resolved_ip
 
     def connect(self) -> None:
         raw_socket = socket.create_connection((self._resolved_ip, self.port), self.timeout)
-        self.sock = self._context.wrap_socket(raw_socket, server_hostname=self.host)
+        self.sock = self._ssl_context.wrap_socket(raw_socket, server_hostname=self.host)
 
 
 def _pinned_opener(target_url: str, resolved_ip: str) -> Callable[..., Any]:
     parsed = urlparse(target_url)
-    if parsed.hostname is None:
+    hostname = parsed.hostname
+    if hostname is None:
         raise ValueError("target URL must include a hostname")
     port = parsed.port or (443 if parsed.scheme == "https" else 80)
 
     def opener(request: Request, timeout: float) -> Any:
         connection_type = _PinnedHTTPSConnection if parsed.scheme == "https" else _PinnedHTTPConnection
-        connection = connection_type(parsed.hostname, port, resolved_ip, timeout)
+        connection = connection_type(hostname, port, resolved_ip, timeout)
         path = parsed.path or "/"
         if parsed.query:
             path += "?" + parsed.query
         try:
-            connection.request(request.method, path, headers=dict(request.header_items()))
+            connection.request(request.get_method(), path, headers=dict(request.header_items()))
             return connection.getresponse()
         except Exception:
             connection.close()
@@ -121,17 +123,20 @@ def validate_target_url(
 
     parsed = urlparse(target_url)
     _validate_url_syntax(parsed)
+    hostname = parsed.hostname
+    if hostname is None:
+        raise ValueError("target URL must include a hostname")
     addresses = (
-        tuple(resolved_addresses) if resolved_addresses is not None else _resolve_target_addresses(parsed.hostname)
+        tuple(resolved_addresses) if resolved_addresses is not None else _resolve_target_addresses(hostname)
     )
     if not addresses:
-        raise ValueError(f"target hostname cannot be resolved: {parsed.hostname}")
+        raise ValueError(f"target hostname cannot be resolved: {hostname}")
     if not allow_private_network and any(_is_private_address(address) for address in addresses):
         raise ValueError("target resolves to a private or loopback address; pass --allow-private-network")
     return target_url
 
 
-def _validate_url_syntax(parsed: Any) -> None:
+def _validate_url_syntax(parsed: ParseResult) -> None:
     if parsed.scheme not in {"http", "https"} or not parsed.hostname:
         raise ValueError("target URL must use http or https and include a hostname")
     if parsed.username or parsed.password:
@@ -151,7 +156,7 @@ def _validate_url_syntax(parsed: Any) -> None:
 def _resolve_target_addresses(hostname: str) -> tuple[str, ...]:
     try:
         addresses = tuple(
-            dict.fromkeys(entry[4][0] for entry in socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM))
+            dict.fromkeys(str(entry[4][0]) for entry in socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM))
         )
     except OSError as exc:
         raise ValueError(f"target hostname cannot be resolved: {hostname}") from exc
@@ -298,7 +303,10 @@ def run_benchmark(
         raise ValueError(f"warmups must be between 0 and {MAX_WARMUPS}")
     parsed_target = urlparse(target_url)
     _validate_url_syntax(parsed_target)
-    resolved_addresses = _resolve_target_addresses(parsed_target.hostname)
+    hostname = parsed_target.hostname
+    if hostname is None:
+        raise ValueError("target URL must include a hostname")
+    resolved_addresses = _resolve_target_addresses(hostname)
     validated_url = validate_target_url(target_url, allow_private_network, resolved_addresses)
     request_opener = opener
     if opener is _urlopen_no_redirect:

@@ -12,7 +12,7 @@
 | 5 API/DB/UI Design | CLI/JSON contract, Schema, and explicit no-REST/DB/UI/SPI decision | Complete |
 | 6 Architecture Review | No independent architecture review | Gap |
 | 7 Implementation | `benchmark/run_benchmark.py`, shell wrapper and tests | Complete |
-| 8 Unit Test | 25/25 focused tests passed on Python 3.12.14; module coverage 87% | Complete locally |
+| 8 Unit Test | 25/25 focused tests passed on Python 3.12.14; module coverage 86% | Complete locally |
 | 9 Integration Test | Automated loopback health/404 and pinned HTTP transport | Complete for module boundary; deployment/Compose release smoke remains pending |
 | 10 Benchmark | Commit `40364d0`: 200 requests, 4-way concurrency, P99 28.553 ms, zero errors | Complete locally; release-commit rerun required before tag |
 | 11 Security Review | URL, private-network, redirect, timeout, body-limit tests | Partial; independent review and repository scans pending |
