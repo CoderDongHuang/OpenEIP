@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   workflow_call:
   push:
     branches: [main]
@@ -72,6 +73,18 @@ jobs:
         run: ruff format --check --config python/pyproject.toml spike
       - name: Mypy
         run: mypy engine-core/src
+      - name: Performance Static Analysis
+        working-directory: .
+        run: |
+          ruff check --config python/pyproject.toml benchmark
+          ruff format --check --config python/pyproject.toml benchmark
+          mypy --config-file python/pyproject.toml benchmark/run_benchmark.py benchmark/local_fixture.py
+      - name: Performance Benchmark Contract Tests
+        run: pytest tests/test_performance_benchmark.py --no-cov
+      - name: Performance Benchmark Coverage
+        run: |
+          python -m coverage run --source=../benchmark -m pytest tests/test_performance_benchmark.py --no-cov
+          python -m coverage report --fail-under=80
       - name: OCR Benchmark
         run: pytest -m benchmark --no-cov
       - name: Unit Test

@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import ipaddress
 import json
+import math
 import platform
 import socket
 import ssl
@@ -32,6 +33,8 @@ DEFAULT_TIMEOUT_SECONDS = 10.0
 DEFAULT_MAX_RESPONSE_BYTES = 1_048_576
 MAX_REQUESTS = 100_000
 MAX_CONCURRENCY = 256
+MAX_WARMUPS = 1_000
+MAX_RESPONSE_BYTES = 16 * 1024 * 1024
 
 
 class _NoRedirectHandler(HTTPRedirectHandler):
@@ -77,22 +80,29 @@ def _pinned_opener(target_url: str, resolved_ip: str) -> Callable[..., Any]:
         path = parsed.path or "/"
         if parsed.query:
             path += "?" + parsed.query
-        connection.request(request.method, path, headers=dict(request.header_items()))
-        return connection.getresponse()
+        try:
+            connection.request(request.method, path, headers=dict(request.header_items()))
+            return connection.getresponse()
+        except Exception:
+            connection.close()
+            raise
 
     return opener
 
 
 def _read_limited(response: Any, max_response_bytes: int) -> bytes:
-    chunks: list[bytes] = []
-    remaining = max_response_bytes + 1
-    while remaining > 0:
-        chunk = response.read(min(65_536, remaining))
+    """Read at most ``max_response_bytes + 1`` bytes for overflow detection."""
+
+    limit = max_response_bytes + 1
+    body = bytearray()
+    while len(body) < limit:
+        chunk = response.read(min(65_536, limit - len(body)))
         if not chunk:
             break
-        chunks.append(chunk)
-        remaining -= len(chunk)
-    return b"".join(chunks)
+        if not isinstance(chunk, (bytes, bytearray, memoryview)):
+            raise TypeError("response.read() must return bytes")
+        body.extend(chunk[: limit - len(body)])
+    return bytes(body)
 
 
 @dataclass(frozen=True)
@@ -114,6 +124,8 @@ def validate_target_url(
     addresses = (
         tuple(resolved_addresses) if resolved_addresses is not None else _resolve_target_addresses(parsed.hostname)
     )
+    if not addresses:
+        raise ValueError(f"target hostname cannot be resolved: {parsed.hostname}")
     if not allow_private_network and any(_is_private_address(address) for address in addresses):
         raise ValueError("target resolves to a private or loopback address; pass --allow-private-network")
     return target_url
@@ -126,15 +138,26 @@ def _validate_url_syntax(parsed: Any) -> None:
         raise ValueError("target URL must not contain credentials")
     if parsed.fragment:
         raise ValueError("target URL must not contain a fragment")
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        if "out of range" in str(exc):
+            raise ValueError("target URL port must be between 1 and 65535") from exc
+        raise ValueError("target URL contains an invalid port") from exc
+    if port is not None and not 1 <= port <= 65_535:
+        raise ValueError("target URL port must be between 1 and 65535")
 
 
 def _resolve_target_addresses(hostname: str) -> tuple[str, ...]:
     try:
-        return tuple(
+        addresses = tuple(
             dict.fromkeys(entry[4][0] for entry in socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM))
         )
-    except socket.gaierror as exc:
+    except OSError as exc:
         raise ValueError(f"target hostname cannot be resolved: {hostname}") from exc
+    if not addresses:
+        raise ValueError(f"target hostname cannot be resolved: {hostname}")
+    return addresses
 
 
 def _resolves_to_private_address(hostname: str) -> bool:
@@ -153,8 +176,8 @@ def _validate_limits(requests: int, concurrency: int, timeout: float, max_respon
         raise ValueError(f"concurrency must be between 1 and {MAX_CONCURRENCY}")
     if not 0.001 <= timeout <= 300.0:
         raise ValueError("timeout must be between 0.001 and 300 seconds")
-    if not 1 <= max_response_bytes <= 16 * 1024 * 1024:
-        raise ValueError("max response bytes must be between 1 and 16777216")
+    if not 1 <= max_response_bytes <= MAX_RESPONSE_BYTES:
+        raise ValueError(f"max response bytes must be between 1 and {MAX_RESPONSE_BYTES}")
 
 
 def _validate_p99_threshold(max_p99_ms: float | None) -> None:
@@ -174,7 +197,11 @@ def _one_request(
     status_code: int | None = None
     try:
         with opener(request, timeout=timeout) as response:
-            status_code = getattr(response, "status", None) or response.getcode()
+            status_code = getattr(response, "status", None)
+            if status_code is None:
+                status_code = response.getcode()
+            if not isinstance(status_code, int):
+                raise TypeError("response status must be an integer")
             body = _read_limited(response, max_response_bytes)
             if status_code < 200 or status_code >= 300:
                 outcome = "http_error"
@@ -194,9 +221,13 @@ def _one_request(
         outcome = "http_error"
     except TimeoutError:
         outcome = "timeout"
-    except URLError:
+    except URLError as exc:
+        outcome = "timeout" if isinstance(exc.reason, TimeoutError) else "connection_error"
+    except (OSError, TypeError, ValueError):
         outcome = "connection_error"
-    except (OSError, ValueError):
+    except Exception:
+        # The opener is a transport boundary; adapter failures become failed
+        # samples instead of aborting the entire benchmark.
         outcome = "connection_error"
     latency_ms = (time.perf_counter() - started) * 1000
     return RequestResult(round(latency_ms, 3), outcome, status_code)
@@ -210,7 +241,7 @@ def percentile(values: Sequence[float], ratio: float) -> float:
     if not 0 < ratio <= 1:
         raise ValueError("percentile ratio must be in (0, 1]")
     ordered = sorted(values)
-    index = max(0, min(len(ordered) - 1, int(len(ordered) * ratio + 0.999999) - 1))
+    index = max(0, min(len(ordered) - 1, math.ceil(len(ordered) * ratio) - 1))
     return ordered[index]
 
 
@@ -263,8 +294,8 @@ def run_benchmark(
 
     _validate_limits(requests, concurrency, timeout, max_response_bytes)
     _validate_p99_threshold(max_p99_ms)
-    if not 0 <= warmups <= 1000:
-        raise ValueError("warmups must be between 0 and 1000")
+    if not 0 <= warmups <= MAX_WARMUPS:
+        raise ValueError(f"warmups must be between 0 and {MAX_WARMUPS}")
     parsed_target = urlparse(target_url)
     _validate_url_syntax(parsed_target)
     resolved_addresses = _resolve_target_addresses(parsed_target.hostname)
@@ -320,7 +351,7 @@ def _parse_args(argv: Sequence[str]) -> argparse.Namespace:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    args = _parse_args(argv or sys.argv[1:])
+    args = _parse_args(sys.argv[1:] if argv is None else argv)
     try:
         result = run_benchmark(
             args.target_url,

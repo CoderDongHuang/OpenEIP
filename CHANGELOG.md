@@ -9,6 +9,8 @@
 ### Added
 - v0.9 Performance baseline slice: dependency-free bounded HTTP GET benchmark with explicit target validation, private-network opt-in, redirect blocking, timeout/body-size limits, P50/P95/P99 metrics, error classification, and optional P99 gate.
 - Machine-readable local fixture evidence and SDD, test plan, and alpha release checklist for the performance boundary.
+- Versioned Performance Benchmark Result v1 JSON Schema, explicit CLI/API non-applicability contract,
+  bounded transport hardening, local HTTP fixture coverage, and a dedicated CI focused-test gate.
 
 ### Security
 - Benchmark evidence redacts response content and credentials, never follows redirects, and records only the target scheme and hostname.
