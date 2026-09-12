@@ -126,9 +126,7 @@ def validate_target_url(
     hostname = parsed.hostname
     if hostname is None:
         raise ValueError("target URL must include a hostname")
-    addresses = (
-        tuple(resolved_addresses) if resolved_addresses is not None else _resolve_target_addresses(hostname)
-    )
+    addresses = tuple(resolved_addresses) if resolved_addresses is not None else _resolve_target_addresses(hostname)
     if not addresses:
         raise ValueError(f"target hostname cannot be resolved: {hostname}")
     if not allow_private_network and any(_is_private_address(address) for address in addresses):
