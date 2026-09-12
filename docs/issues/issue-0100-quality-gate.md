@@ -5,7 +5,7 @@
 | Focused tests | Boundary and contract tests pass | 25/25 passed on Python 3.12.14; module coverage 87% | Passed locally |
 | Full Python tests | Existing suite remains green | Historical baseline: 190 passed, 1 skipped; 89.40% coverage | Rerun pending |
 | Static analysis | Ruff and strict Mypy clean | Historical baseline only; current patch not run in local Python 3.10 environment | Rerun pending |
-| Benchmark evidence | Machine-readable, reproducible, bounded | Existing 200-request evidence; repository fixture now available for release rerun | Rerun pending |
+| Benchmark evidence | Machine-readable, reproducible, bounded | Commit `40364d0`: 200 requests, P99 28.553 ms, zero errors, threshold 100 ms | Passed locally; release-commit rerun required |
 | Integration | Intended deployment boundary exercised | No Compose/multi-node run attached | Pending |
 | Security | Independent review, dependency/container/secret scans | Local abuse tests only | Pending |
 | Documentation | SDD, test plan, result, checklist synchronized | Present in repository | Passed |
