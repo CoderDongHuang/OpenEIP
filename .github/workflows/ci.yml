@@ -77,7 +77,7 @@ jobs:
         working-directory: .
         run: |
           ruff check --config python/pyproject.toml benchmark
-          ruff format --check --config python/pyproject.toml benchmark
+          ruff format --diff --config python/pyproject.toml benchmark
           mypy --config-file python/pyproject.toml benchmark/run_benchmark.py benchmark/local_fixture.py
       - name: Performance Benchmark Contract Tests
         run: pytest tests/test_performance_benchmark.py --no-cov
