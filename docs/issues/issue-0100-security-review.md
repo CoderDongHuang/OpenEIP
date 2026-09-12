@@ -19,10 +19,11 @@
 
 ## Scan Boundary
 
-The utility adds no production dependency. Repository, dependency, container,
-IaC, secret, and external-target scans remain release-environment checks and
-must be attached to the release commit. The local machine used for this change
-does not have Docker/Trivy available, so no scan result is claimed here.
+The utility adds no production dependency. In pre-PR CI run
+[34686830287](https://github.com/CoderDongHuang/OpenEIP/actions/runs/34686830287),
+the repository plus unpacked Java and Python runtime scans passed, and the
+Python dependency audit passed. Release-environment scans must still run on the
+release commit; these automated results do not replace independent approval.
 
 ## Required Independent Decision
 

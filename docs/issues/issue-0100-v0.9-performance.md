@@ -12,15 +12,15 @@
 | 5 API/DB/UI Design | CLI/JSON contract, Schema, and explicit no-REST/DB/UI/SPI decision | Complete |
 | 6 Architecture Review | No independent architecture review | Gap |
 | 7 Implementation | `benchmark/run_benchmark.py`, shell wrapper and tests | Complete |
-| 8 Unit Test | 25/25 focused tests passed on Python 3.12.14; module coverage 86% | Complete locally |
-| 9 Integration Test | Automated loopback health/404 and pinned HTTP transport | Complete for module boundary; deployment/Compose release smoke remains pending |
+| 8 Unit Test | 25/25 focused tests passed on Python 3.12.14; module coverage 86%; [CI run 34686830287](https://github.com/CoderDongHuang/OpenEIP/actions/runs/34686830287) | Complete |
+| 9 Integration Test | Automated loopback health/404 and pinned HTTP transport passed in CI run 34686830287 | Complete for module boundary; multi-node release claims remain out of scope |
 | 10 Benchmark | Commit `40364d0`: 200 requests, 4-way concurrency, P99 28.553 ms, zero errors | Complete locally; release-commit rerun required before tag |
-| 11 Security Review | URL, private-network, redirect, timeout, body-limit tests | Partial; independent review and repository scans pending |
-| 12 Quality Gate | [v0.9 Quality Gate](issue-0100-quality-gate.md) | Established; focused rerun and release rows pending |
+| 11 Security Review | Abuse tests and repository/Java/Python runtime scans passed in CI run 34686830287 | Partial; independent security approval pending |
+| 12 Quality Gate | [v0.9 Quality Gate](issue-0100-quality-gate.md) and six successful CI jobs in run 34686830287 | Complete for implementation slice; release gate pending |
 | 13 Docs Update | SDD, test plan, result JSON, release checklist and changelog | Complete for current slice |
-| 14 Pull Request | [PR #122](https://github.com/CoderDongHuang/OpenEIP/pull/122) | Baseline PR merged; current hardening/docs changes require a new PR |
-| 15 Code Review | PR #122 has no formal review; current PR requires at least one approval | Pending |
-| 16 Merge | PR #122 merged 2026-09-09; current hardening PR not created | Pending current PR |
+| 14 Pull Request | [PR #127](https://github.com/CoderDongHuang/OpenEIP/pull/127) | Open for current hardening review |
+| 15 Code Review | PR #127 requires at least one formal approval | Pending |
+| 16 Merge | PR #127 is not merged | Pending |
 | 17 Release | No v0.9.0-alpha tag or release | Not started |
 
 ## Release Decision
