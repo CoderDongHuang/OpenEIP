@@ -20,7 +20,7 @@ plugins {
 group = "com.openeip"
 version = "0.7.0-alpha"
 
-val nettyVersion = "4.1.137.Final"
+val nettyVersion = "4.1.138.Final"
 
 subprojects {
     apply(plugin = "java")
