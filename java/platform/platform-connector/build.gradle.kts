@@ -13,7 +13,7 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.oracle.database.jdbc:ojdbc11")
-    runtimeOnly("com.sap.cloud.db.jdbc:ngdbc:2.29.11")
+    runtimeOnly("com.sap.cloud.db.jdbc:ngdbc:2.30.7")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("com.h2database:h2")
 }
