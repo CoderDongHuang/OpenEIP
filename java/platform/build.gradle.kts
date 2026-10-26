@@ -59,9 +59,10 @@ subprojects {
                 useVersion(nettyVersion)
                 because("Netty modules must use the same patched release")
             }
-            if (requested.group?.startsWith("com.fasterxml.jackson") == true) {
+            if (requested.group == "com.fasterxml.jackson.core"
+                && requested.name in setOf("jackson-core", "jackson-databind")) {
                 useVersion(jacksonVersion)
-                because("Jackson modules must use the patched release")
+                because("Jackson core and databind must use the patched release")
             }
             if (requested.group == "at.yawk.lz4") {
                 useVersion(lz4Version)

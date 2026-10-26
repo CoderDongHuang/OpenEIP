@@ -45,7 +45,7 @@ Security Scan 的仓库扫描与 Python runtime 未报告阻断项，但 Java ru
 - Jackson `2.21.4` → `2.21.7` 可修复的 HIGH；
 - Spring Framework `6.2.19` 的 `CVE-2026-47884`（CRITICAL）与 `CVE-2026-47890`（CRITICAL）。公开公告当前只给出 Spring 7.0.9 的修复版本，未提供 Spring 6.2.x 修复版本。
 
-本分支已加入 Jackson/LZ4 统一解析约束，并将文档站已有的 typecheck 与安全解析器测试纳入 CI；Spring 7 迁移不在此次依赖维护范围内，须先另行完成 RFC/ADR、架构审查、兼容性测试和用户审批。不能以 Trivy 忽略项或降低门禁代替修复。因此在 Spring 迁移完成前，Security Quality Gate 仍未通过，替代 PR 只能供审查，不能声称可合并。
+本分支已加入 Jackson core/databind 与 LZ4 的统一解析约束，并将文档站已有的 typecheck 与安全解析器测试纳入 CI；Spring 7 迁移不在此次依赖维护范围内，须先另行完成 RFC/ADR、架构审查、兼容性测试和用户审批。不能以 Trivy 忽略项或降低门禁代替修复。因此在 Spring 迁移完成前，Security Quality Gate 仍未通过，替代 PR 只能供审查，不能声称可合并。
 
 本地 Gradle 验证因 Gradle Wrapper 下载的证书链失败而未完成；本地 Python 全量依赖安装也因镜像网络中断未形成独立通过结论。上述限制不覆盖 GitHub CI 的实际结果。
 
