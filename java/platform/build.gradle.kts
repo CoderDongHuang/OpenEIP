@@ -21,6 +21,8 @@ group = "com.openeip"
 version = "0.7.0-alpha"
 
 val nettyVersion = "4.1.139.Final"
+val jacksonVersion = "2.21.7"
+val lz4Version = "1.11.4"
 
 subprojects {
     apply(plugin = "java")
@@ -56,6 +58,14 @@ subprojects {
             if (requested.group == "io.netty") {
                 useVersion(nettyVersion)
                 because("Netty modules must use the same patched release")
+            }
+            if (requested.group?.startsWith("com.fasterxml.jackson") == true) {
+                useVersion(jacksonVersion)
+                because("Jackson modules must use the patched release")
+            }
+            if (requested.group == "at.yawk.lz4") {
+                useVersion(lz4Version)
+                because("lz4-java must use the patched release")
             }
         }
     }

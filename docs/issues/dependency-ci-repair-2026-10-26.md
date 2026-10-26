@@ -37,6 +37,17 @@ Discussions 用于方案讨论与维护者决定；PR 用于审查和合并代�
 
 ## 验证与合并记录
 
-验证进行中。后续补入当前提交的实测及 CI 链接；没有执行的项目不得写为通过。
+修复分支提交 `60ea5ed` 的 CI（[run 40338311820](https://github.com/CoderDongHuang/OpenEIP/actions/runs/40338311820)）已实际通过 Python Lint & Test、Frontend Lint & Build、Documentation Build、Foundation Configuration；Java Build & Test 当时仍在运行。
+
+Security Scan 的仓库扫描与 Python runtime 未报告阻断项，但 Java runtime 仍报告：
+
+- `at.yawk.lz4:lz4-java:1.10.1` → `1.11.4` 可修复的 HIGH；
+- Jackson `2.21.4` → `2.21.7` 可修复的 HIGH；
+- Spring Framework `6.2.19` 的 `CVE-2026-47884`（CRITICAL）与 `CVE-2026-47890`（CRITICAL）。公开公告当前只给出 Spring 7.0.9 的修复版本，未提供 Spring 6.2.x 修复版本。
+
+本分支已加入 Jackson/LZ4 统一解析约束，并将文档站已有的 typecheck 与安全解析器测试纳入 CI；Spring 7 迁移不在此次依赖维护范围内，须先另行完成 RFC/ADR、架构审查、兼容性测试和用户审批。不能以 Trivy 忽略项或降低门禁代替修复。因此在 Spring 迁移完成前，Security Quality Gate 仍未通过，替代 PR 只能供审查，不能声称可合并。
+
+本地 Gradle 验证因 Gradle Wrapper 下载的证书链失败而未完成；本地 Python 全量依赖安装也因镜像网络中断未形成独立通过结论。上述限制不覆盖 GitHub CI 的实际结果。
+
 替代 PR、关闭操作与最终合并由真实 GitHub 状态记录，不登记自动 Approval。
 用户负责审批、合并；本轮不发布版本、不移动既有 tag。
