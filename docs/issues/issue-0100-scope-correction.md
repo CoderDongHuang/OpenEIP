@@ -77,6 +77,17 @@ Discussion #128 在实现合并后才创建；截至本次核查没有评论或�
 
 上述命令、状态对应包含本记录的纠偏提交；GitHub CI 另以该 PR 的实际 head SHA 为准。
 
+### 推送后 CI 复核
+
+纠偏设计提交 `efcb40ae4369ec1b66a19faa7d86e6c5e6993ae6` 的
+[run 40323315821](https://github.com/CoderDongHuang/OpenEIP/actions/runs/40323315821)
+最终 Failure：Java、前端、文档和配置 job 通过；Python 测试199 passed、1 skipped、
+7 deselected、覆盖率89.40%，但随后依赖审计报告4包56条漏洞；
+Trivy 仓库扫描报告 frontend 2 HIGH、website 12 HIGH/4 CRITICAL。
+后续运行时扫描未执行，整栈仍按分支条件跳过。
+明细及依赖修复验证要求见[安全审查](issue-0100-security-review.md)，
+六项门禁仍未通过；本记录的后续文档提交不继承该 CI 结果。
+
 ## 可用于项目记录的文字
 
 2026-10-26 对第九模块 Performance 重新核查，确认此前仅完成 bounded HTTP benchmark，
@@ -85,3 +96,5 @@ Discussion #128 在实现合并后才创建；截至本次核查没有评论或�
 形成需求追踪、完整设计、状态/接口、部署、测试及发布门禁方案。新增功能实施须先取得完整设计
 的 RFC/ADR 与架构审批；真实实现、测试、安全审查、质量门禁、PR Review、合并和发布分别记录，
 不以旧 fixture 数据或单次 CI 成功替代完整验收。
+纠偏设计提交的本轮 CI 另发现依赖审计与高危/严重漏洞扫描失败，已记录为实际阻断；
+尚未修复、复验或发布，完整模块仍未完成。

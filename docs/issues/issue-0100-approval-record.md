@@ -22,7 +22,7 @@
 | ADR-0021 接受 | Pending | 架构负责人、审查 SHA、时间及决定 |
 | OEP Step 6 编码前架构审批 | Pending | [架构清单](issue-0100-architecture-review.md)逐项结论与外部记录 |
 | 完整实现独立安全审批 | Pending | 候选 SHA、[安全审查](issue-0100-security-review.md)、扫描/演练证据 |
-| 六项质量门禁 | Pending | [质量门禁](issue-0100-quality-gate.md)及最终候选验证 |
+| 六项质量门禁 | 未通过 | [质量门禁](issue-0100-quality-gate.md)：纠偏设计提交 CI 依赖审计、安全扫描 Failure；完整候选验收仍待 |
 | 完整实现 PR Review/合并 | Pending | 正式 Approval、处理意见、main commit |
 | 发布 | Pending | 不可变 tag、该 tag 的 CI、三类镜像 digest/attestation、Release |
 

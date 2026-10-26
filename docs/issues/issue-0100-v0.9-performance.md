@@ -16,7 +16,7 @@
 | 9 Integration Test | 真实 MySQL/Redis、多副本、整栈与恢复 | 仅旧 loopback 集成通过；完整矩阵待执行 |
 | 10 Benchmark | 业务基准、三轮前后对比、长稳/扩容证据 | 旧 fixture 200/200、P99 34.292ms；不证明业务或 HA |
 | 11 Security Review | 完整威胁模型、候选扫描、独立安全决定 | [安全清单](issue-0100-security-review.md)已补；新增面与独立审批待验证 |
-| 12 Quality Gate | 六项门禁在最终候选全部通过 | [门禁](issue-0100-quality-gate.md)未通过，旧六项 job 成功不代表整栈已执行 |
+| 12 Quality Gate | 六项门禁在最终候选全部通过 | [门禁](issue-0100-quality-gate.md)未通过；纠偏设计提交 CI 的依赖审计、安全扫描已失败，旧六项 job 成功不代表整栈已执行 |
 | 13 Docs Update | 全范围设计/契约/部署/测试/发布记录一致 | 本轮纠偏设计包；最终实现与实测数据仍待同步 |
 | 14 Pull Request | 完整实现满足门禁后提交 PR | [#127](https://github.com/CoderDongHuang/OpenEIP/pull/127)是旧 GET；[#129](https://github.com/CoderDongHuang/OpenEIP/pull/129)作为纠偏设计包待审 |
 | 15 Code Review | 实现 PR 至少一个正式 Approve，处理意见 | 仅 #127 获 WriteBigBug Approval；不覆盖新设计/未来代码 |
