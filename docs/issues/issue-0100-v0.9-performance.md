@@ -6,7 +6,7 @@
 | Step | 完整模块所需证据 | 当前状态 |
 |---|---|---|
 | 1 Issue | PERF-001～009 范围与验收 | [纠偏记录](issue-0100-scope-correction.md)已补；原 [#124](https://github.com/CoderDongHuang/OpenEIP/issues/124)仅覆盖 GET，完整范围的公开跟踪待补 |
-| 2 RFC | 完整范围公开讨论至少一周，≥2/3 Maintainer 赞成并记录理由 | [RFC-0012](../11-rfc/rfc-0012-performance-reliability.md) Proposed，未公开决定；旧 Discussion #128 无投票，不能替代 |
+| 2 RFC | 完整范围公开讨论至少一周，≥2/3 Maintainer 赞成并记录理由 | [RFC-0012](../11-rfc/rfc-0012-performance-reliability.md) Proposed；[Discussion #139](https://github.com/CoderDongHuang/OpenEIP/discussions/139) 于 2026-10-26 13:22:18 UTC 创建，最早 2026-11-02 同时刻满一周；无接受决定，旧 #128 不能替代 |
 | 3 ADR | 关键共享状态、HA、调优决策接受 | [ADR-0021](../12-adr/adr-0021-performance-shared-state-ha.md) Proposed；ADR-0020 也无接受记录 |
 | 4 Module Design | 用户故事、边界、数据流、并发与故障设计 | [SDD](../04-sdd/performance-module.md)完整范围提案已补，待审 |
 | 5 API/DB/UI Design | 运维 OpenAPI、证据 Schema、状态/迁移、管理 UI 设计 | [运维契约](../06-api/performance-operations.md)、[状态设计](../05-database/performance-state.md)已补提案；实际 Migration、仪表盘实现待审后交付 |

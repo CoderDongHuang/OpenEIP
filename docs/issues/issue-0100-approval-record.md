@@ -17,7 +17,7 @@
 
 | 决定 | 状态 | 必须补入 |
 |---|---|---|
-| RFC-0012 公开讨论 ≥一周 | Pending | 新讨论 URL、公开时间；不得沿用 #128 的讨论期 |
+| RFC-0012 公开讨论 ≥一周 | 进行中 | [Discussion #139](https://github.com/CoderDongHuang/OpenEIP/discussions/139)，2026-10-26 13:22:18 UTC 创建；最早 2026-11-02 13:22:18 UTC 满一周，不得沿用 #128 的讨论期 |
 | ≥2/3 Maintainer 赞成及理由 | Pending | 有资格维护者名单、票数/分母、理由与决定链接 |
 | ADR-0021 接受 | Pending | 架构负责人、审查 SHA、时间及决定 |
 | OEP Step 6 编码前架构审批 | Pending | [架构清单](issue-0100-architecture-review.md)逐项结论与外部记录 |
