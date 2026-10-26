@@ -28,7 +28,7 @@ cachecontrol==0.14.4
     #   pip-audit
 cachetools==7.1.6
     # via pymilvus
-certifi==2026.6.17
+certifi==2026.10.23
     # via
     #   elastic-transport
     #   httpcore
@@ -124,7 +124,7 @@ pandas==3.0.5
     # via pymilvus
 pathspec==1.1.1
     # via mypy
-pillow==12.3.0
+pillow==13.0.0
     # via
     #   openeip-engine (pyproject.toml)
     #   python-pptx
@@ -162,7 +162,7 @@ pygments==2.20.0
     # via
     #   pytest
     #   rich
-pyjwt==2.13.0
+pyjwt==2.15.1
     # via mcp
 pymilvus==2.6.17
     # via openeip-engine (pyproject.toml)
@@ -252,7 +252,7 @@ typing-inspection==0.4.2
     #   pydantic-settings
 tzdata==2026.3
     # via pandas
-urllib3==2.7.0
+urllib3==2.8.0
     # via
     #   elastic-transport
     #   requests
