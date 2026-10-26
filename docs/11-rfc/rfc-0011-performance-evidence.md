@@ -2,7 +2,9 @@
 
 ## Status
 
-Proposed; implementation-ready local slice. Scope: v0.9 Performance baseline.
+Proposed; historical GET subcomponent only. No recorded acceptance; not authorization for complete v0.9 implementation.
+
+2026-10-26 correction: complete-module scope and decisions are proposed in [RFC-0012](rfc-0012-performance-reliability.md). Existing implementation does not establish prior RFC acceptance.
 
 ## Abstract
 
@@ -35,10 +37,10 @@ The CLI/JSON contract and non-applicability decision are documented in
 
 | Alternative | Benefit | Reason not selected |
 |---|---|---|
-| Locust/k6/JMeter runtime dependency | Rich load models | Adds supply-chain/runtime requirements and exceeds the v0.9 control-plane scope |
+| Locust/k6/JMeter runtime dependency | Rich load models | Adds supply-chain/runtime requirements and exceeds this bounded GET utility's scope; business workloads belong to RFC-0012 |
 | `urllib` with default DNS/redirect behavior | Small implementation | Does not provide DNS rebinding or redirect boundary guarantees |
 | Prometheus-only metrics | Integrates with operations | Does not produce a self-contained reproducible request sample |
-| Full HA/chaos/capacity suite | Production confidence | Requires deployment topology and infrastructure outside this alpha |
+| Full HA/chaos/capacity suite | Production confidence | Requires the full topology and validation now included in RFC-0012; omission was not completion of v0.9 |
 
 ## Impact
 

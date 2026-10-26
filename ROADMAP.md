@@ -27,8 +27,8 @@ v0.7 ──→ Governance          架构/安全评审通过，alpha 已发布
 v0.8 ──→ Marketplace         首个 alpha 切片已发布
          Plugin / SDK / Connector Market / Agent Market
 
-v0.9 ──→ Performance         基线切片开发中
-         可复现 HTTP 压测 / 性能证据（HA、扩容与混沌测试待后续）
+v0.9 ──→ Performance         完整范围纠偏设计待审，未发布
+         压测 / 调优 / 高可用 / 扩容 / 稳定性
 
 v1.0 ──→ LTS                 规划中
          SSO / LDAP / K8S / 对象存储 / 安全合规 / 24 个月支持
@@ -48,7 +48,7 @@ v1.0 ──→ LTS                 规划中
 | Phase 5：Agent | alpha 已发布 | `v0.6.0-alpha` 已于 2026-08-31 作为 GitHub Pre-release 发布；正式 Review 缺失按维护者授权记录为流程例外 |
 | Phase 6：Governance | alpha 已发布 | `v0.7.0-alpha` 已发布；后续标准审计修复已合并到 `main` |
 | Phase 7：Marketplace | 首个切片已发布 | Plugin / Connector / Agent 包目录、版本审核发布生命周期与公开发现 |
-| Phase 8：Performance | 基线切片开发中 | 可复现 HTTP 压测、机器可读性能证据；生产 HA/扩容不在本 alpha 承诺内 |
+| Phase 8：Performance | 完整模块未完成 | GET 子组件已合并；完整五项范围须先通过 RFC/ADR/架构审查，再交付实现及真实多副本/数据 HA/长稳验收，见[纠偏记录](docs/issues/issue-0100-scope-correction.md) |
 
 ## 当前发布边界
 

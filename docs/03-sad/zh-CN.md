@@ -700,6 +700,19 @@ MySQL / ES / Milvus / Neo4j → 使用 Helm Chart 或外部托管
 
 ---
 
+### 9.4 v0.9 Performance 实施设计状态（Proposed，2026-10-26）
+
+第九模块须落实9.2/9.3的应用多副本、HPA与数据层HA，并补齐11章的性能可观测性。
+现有Compose仍是单节点开发拓扑；GET工具已合并不能证明HA或扩容实现。
+完整方案见[Performance SDD](../04-sdd/performance-module.md)和
+[部署设计](../10-deployment/v0.9-performance-ha.md)，待RFC-0012/ADR-0021及架构审查接受。
+
+数据所有权保持Java/MySQL权威、Python执行面、Redis限流/协调与ES/Milvus检索副本。
+新增共享限流、调度租约/fencing、稳定密钥、HA RWX文件、依赖readiness、OTel/Prometheus/Grafana；
+最小Kubernetes部署在v0.9实现HA/HPA，完整Helm分发与LTS归v1.0。
+MySQL/Redis/Kafka/Milvus/ES/MinIO/RWX的拓扑、切换与恢复证据属于本模块验收，
+不能通过声明外部依赖而省略。未新增第二套SPI或Python直写Java业务表。
+
 ## 第十章：安全架构
 
 ### 10.1 安全分层

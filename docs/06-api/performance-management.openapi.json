@@ -1,0 +1,272 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "OpenEIP v0.9 Management API (Proposed)",
+    "version": "0.9.0-design",
+    "description": "Design only; not implemented. Paths are relative to each runtime's private management listener (Python health/metrics or Java actuator). NetworkPolicy and management-network isolation are mandatory. Public gateway/Ingress must not expose these paths; status-only probes use network authorization. Existing Python /health response remains unchanged. Readiness per-dependency deadline <=1s, total <=2s, cache <=2s; SIGTERM unsets readiness."
+  },
+  "servers": [
+    {
+      "url": "https://management.invalid",
+      "description": "Non-resolving placeholder; supply the private runtime-specific management origin for tests."
+    }
+  ],
+  "paths": {
+    "/health/live": {
+      "get": {
+        "operationId": "pythonLiveness",
+        "summary": "Python process/event-loop liveness; no external dependency probe",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Process live or dependencies ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "UP"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Not live/ready; no dependency details or secrets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "DOWN"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "pythonReadiness",
+        "summary": "Python required configuration, Redis, Elasticsearch and Milvus readiness",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Process live or dependencies ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "UP"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Not live/ready; no dependency details or secrets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "DOWN"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/actuator/health/liveness": {
+      "get": {
+        "operationId": "javaLiveness",
+        "summary": "Java process liveness; no external dependency probe",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Process live or dependencies ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "UP"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Not live/ready; no dependency details or secrets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "DOWN"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/actuator/health/readiness": {
+      "get": {
+        "operationId": "javaReadiness",
+        "summary": "Java MySQL, shared-state and file-dependency readiness",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Process live or dependencies ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "UP"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Not live/ready; no dependency details or secrets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "DOWN"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "operationId": "pythonMetrics",
+        "summary": "Management-network Prometheus scrape; never routed by public gateway",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Prometheus exposition; bounded labels, no credentials or document text",
+            "content": {
+              "text/plain; version=0.0.4; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Metrics temporarily unavailable"
+          }
+        }
+      }
+    },
+    "/actuator/prometheus": {
+      "get": {
+        "operationId": "javaPrometheus",
+        "summary": "Management-network Prometheus scrape; never routed by public gateway",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Prometheus exposition; bounded labels, no credentials or document text",
+            "content": {
+              "text/plain; version=0.0.4; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Metrics temporarily unavailable"
+          }
+        }
+      }
+    }
+  }
+}

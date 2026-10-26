@@ -26,6 +26,7 @@
 | [ADR-0018](adr-0018-idempotent-cost-and-trace-contracts.md) | Idempotent Cost and Trace Contracts | Accepted |
 | [ADR-0019](adr-0019-marketplace-external-artifacts.md) | Marketplace Metadata and External Artifact Storage | Proposed |
 | [ADR-0020](adr-0020-bounded-http-benchmark.md) | Dependency-Free Bounded HTTP Benchmark | Proposed |
+| [ADR-0021](adr-0021-performance-shared-state-ha.md) | Performance 共享状态与 HA | Proposed；架构接受待记录 |
 
 ## ADR 编号规则
 

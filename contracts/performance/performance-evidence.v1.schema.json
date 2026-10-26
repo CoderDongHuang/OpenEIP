@@ -1,0 +1,813 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openeip.org/contracts/performance/performance-evidence.v1.schema.json",
+  "title": "Complete Performance evidence v1 (Proposed)",
+  "$comment": "Design contract only. Runtime producers are not implemented. Semantic PASS/FAIL/INCOMPLETE rules, timestamp ordering, count identities, round uniqueness, threshold and hash/environment equality must also be checked by the future validator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "commit",
+    "generatedAt",
+    "environmentId",
+    "datasetSha256",
+    "topologySha256",
+    "configurationSha256",
+    "versions",
+    "resources",
+    "result",
+    "reasons",
+    "payload"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "kind": {
+      "enum": [
+        "business-workload",
+        "performance-comparison",
+        "reliability-experiment"
+      ]
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "environmentId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,64}$"
+    },
+    "datasetSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "topologySha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "configurationSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "versions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "component",
+          "version"
+        ],
+        "properties": {
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodes",
+        "cpuCores",
+        "memoryMiB"
+      ],
+      "properties": {
+        "nodes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "cpuCores": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1000000
+        },
+        "memoryMiB": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000000000
+        }
+      }
+    },
+    "result": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INCOMPLETE"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      }
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "kind": {
+          "const": "business-workload"
+        },
+        "payload": {
+          "$ref": "#/$defs/workload"
+        }
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "performance-comparison"
+        },
+        "payload": {
+          "$ref": "#/$defs/comparison"
+        }
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "reliability-experiment"
+        },
+        "payload": {
+          "$ref": "#/$defs/reliability"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "latency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "p50",
+        "p95",
+        "p99"
+      ],
+      "properties": {
+        "p50": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "p95": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "p99": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requests",
+        "succeeded",
+        "failed",
+        "cancelled"
+      ],
+      "properties": {
+        "requests": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000000
+        },
+        "succeeded": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000000
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000000
+        },
+        "cancelled": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000000
+        }
+      }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario",
+        "round",
+        "concurrency",
+        "counts",
+        "statusCounts",
+        "elapsedSeconds",
+        "throughputPerSecond",
+        "latencyMs",
+        "sse",
+        "correctnessPassed",
+        "cleanupPassed"
+      ],
+      "properties": {
+        "scenario": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "round": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "concurrency": {
+          "enum": [
+            1,
+            4,
+            16
+          ]
+        },
+        "counts": {
+          "$ref": "#/$defs/counts"
+        },
+        "statusCounts": {
+          "type": "array",
+          "maxItems": 600,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "count"
+            ],
+            "properties": {
+              "status": {
+                "type": "integer",
+                "minimum": 100,
+                "maximum": 599
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000000000
+              }
+            }
+          }
+        },
+        "elapsedSeconds": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "throughputPerSecond": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "latencyMs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/latency"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sse": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "firstTokenLatencyMs",
+                "totalLatencyMs",
+                "doneCount",
+                "brokenCount"
+              ],
+              "properties": {
+                "firstTokenLatencyMs": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/latency"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "totalLatencyMs": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/latency"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "doneCount": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000000000000
+                },
+                "brokenCount": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000000000000
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "correctnessPassed": {
+          "type": "boolean"
+        },
+        "cleanupPassed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "comparisonRound": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "round",
+        "requestCount",
+        "p99Ms",
+        "throughputPerSecond",
+        "unexpectedErrors"
+      ],
+      "properties": {
+        "round": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "requestCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000000
+        },
+        "p99Ms": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "throughputPerSecond": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unexpectedErrors": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000000
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "p99Ms",
+        "throughputPerSecond"
+      ],
+      "properties": {
+        "p99Ms": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "throughputPerSecond": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario",
+        "concurrency",
+        "referenceCommit",
+        "candidateCommit",
+        "environmentMatched",
+        "referenceRounds",
+        "candidateRounds",
+        "referenceMedian",
+        "candidateMedian",
+        "p99ChangePercent",
+        "throughputChangePercent",
+        "thresholds"
+      ],
+      "properties": {
+        "scenario": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "concurrency": {
+          "enum": [
+            1,
+            4,
+            16
+          ]
+        },
+        "referenceCommit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "candidateCommit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "environmentMatched": {
+          "type": "boolean"
+        },
+        "referenceRounds": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/comparisonRound"
+          }
+        },
+        "candidateRounds": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/comparisonRound"
+          }
+        },
+        "referenceMedian": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/summary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidateMedian": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/summary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "p99ChangePercent": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": -100,
+              "maximum": 1000000000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "throughputChangePercent": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": -100,
+              "maximum": 1000000000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "thresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maxP99IncreasePercent",
+            "maxThroughputDecreasePercent"
+          ],
+          "properties": {
+            "maxP99IncreasePercent": {
+              "const": 0
+            },
+            "maxThroughputDecreasePercent": {
+              "const": 0
+            }
+          }
+        }
+      }
+    },
+    "phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "startedAt",
+        "endedAt",
+        "counts",
+        "successRate"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "baseline",
+            "fault",
+            "recovery"
+          ]
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "endedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "counts": {
+          "$ref": "#/$defs/counts"
+        },
+        "successRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "reliability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "experimentId",
+        "scenario",
+        "fault",
+        "phases",
+        "rtoSeconds",
+        "rpoSeconds",
+        "lostDurableRecords",
+        "duplicateCommits",
+        "integrityPassed",
+        "permissionsPassed",
+        "cleanupPassed",
+        "thresholds",
+        "soak"
+      ],
+      "properties": {
+        "experimentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "scenario": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "fault": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "target",
+                "action",
+                "injectedAt",
+                "removedAt"
+              ],
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "action": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "injectedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "Z$"
+                },
+                "removedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "Z$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "phases": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/phase"
+          }
+        },
+        "rtoSeconds": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rpoSeconds": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lostDurableRecords": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000000
+        },
+        "duplicateCommits": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000000
+        },
+        "integrityPassed": {
+          "type": "boolean"
+        },
+        "permissionsPassed": {
+          "type": "boolean"
+        },
+        "cleanupPassed": {
+          "type": "boolean"
+        },
+        "thresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maxRtoSeconds",
+            "maxRpoSeconds"
+          ],
+          "properties": {
+            "maxRtoSeconds": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            "maxRpoSeconds": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            }
+          }
+        },
+        "soak": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "durationSeconds",
+                "firstSixHoursMedianRssMiB",
+                "lastSixHoursMedianRssMiB",
+                "firstSixHoursMedianFileDescriptors",
+                "lastSixHoursMedianFileDescriptors",
+                "firstSixHoursMedianConnections",
+                "lastSixHoursMedianConnections",
+                "successRate"
+              ],
+              "properties": {
+                "durationSeconds": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000000
+                },
+                "firstSixHoursMedianRssMiB": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000000
+                },
+                "lastSixHoursMedianRssMiB": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000000
+                },
+                "firstSixHoursMedianFileDescriptors": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000000
+                },
+                "lastSixHoursMedianFileDescriptors": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000000
+                },
+                "firstSixHoursMedianConnections": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000000
+                },
+                "lastSixHoursMedianConnections": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000000
+                },
+                "successRate": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

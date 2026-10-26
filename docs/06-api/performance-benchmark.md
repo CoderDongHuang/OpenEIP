@@ -2,7 +2,7 @@
 
 ## Surface Decision
 
-The v0.9 Performance module has no REST endpoint, database table, event topic,
+The bounded GET benchmark subcomponent has no REST endpoint, database table, event topic,
 frontend view, SDK method, or Plugin SPI. It is an operator-invoked CLI under
 `benchmark/` and emits an aggregate JSON evidence document. The explicit
 non-applicability decision prevents the harness from becoming a runtime
@@ -41,3 +41,6 @@ schema version; existing fields cannot be renamed, removed, or retyped within
 v1.
 
 [performance-schema]: ../../contracts/performance/performance-benchmark-result.v1.schema.json
+## Full-module scope correction (2026-10-26)
+
+The N/A decisions above apply only to the GET utility. The complete v0.9 module adds management HTTP, shared-state and deployment design under the proposed [operations contract](performance-operations.md); it cannot inherit a module-wide no-API/no-DB/no-UI decision.

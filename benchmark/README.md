@@ -4,6 +4,11 @@
 标准库实现的 HTTP GET 基线工具；它只测量显式指定端点的控制面延迟和
 传输结果，不代表生产容量、HA、扩容或真实模型质量。
 
+完整 v0.9 仍必须交付压测、调优、高可用、扩容、稳定性；当前仅完成 GET 子组件。
+完整范围、运维契约与待执行验收见[SDD](../docs/04-sdd/performance-module.md)、
+[契约](../docs/06-api/performance-operations.md)和[测试矩阵](../docs/13-testing/v0.9-performance-test-plan.md)。
+新业务 runner 尚未实现，不得把下面命令当作全模块验收。
+
 ## 运行
 
 目标 URL 是必填项，私有/回环地址还必须显式加
