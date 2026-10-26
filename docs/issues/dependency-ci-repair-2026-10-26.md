@@ -49,5 +49,7 @@ Security Scan 的仓库扫描与 Python runtime 未报告阻断项，但 Java ru
 
 本地 Gradle 验证因 Gradle Wrapper 下载的证书链失败而未完成；本地 Python 全量依赖安装也因镜像网络中断未形成独立通过结论。上述限制不覆盖 GitHub CI 的实际结果。
 
+后续修复提交 `3ea1566` 的 [CI run 40341616442](https://github.com/CoderDongHuang/OpenEIP/actions/runs/40341616442) 已通过 Java Build & Test、Python Lint & Test、Frontend Lint & Build、Documentation Build 与 Foundation Configuration。Security Scan 仅剩 Spring 6.2.19 的两项 CRITICAL；LZ4 与 Jackson 的报告已清零。替代 PR #140 因此仍是待审查修复包，不是当前可合并或可发布状态。
+
 替代 PR、关闭操作与最终合并由真实 GitHub 状态记录，不登记自动 Approval。
 用户负责审批、合并；本轮不发布版本、不移动既有 tag。
