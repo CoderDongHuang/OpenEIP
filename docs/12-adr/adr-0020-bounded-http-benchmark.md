@@ -2,7 +2,9 @@
 
 ## Status
 
-Proposed; implementation-ready local decision. Scope: v0.9 Performance baseline slice.
+Proposed; historical bounded GET decision only, without recorded architecture acceptance.
+
+2026-10-26 correction: this decision cannot define the whole v0.9 boundary; shared state and HA require [ADR-0021](adr-0021-performance-shared-state-ha.md) and coding-before-review is recorded as a process gap.
 
 ## Date
 
@@ -52,7 +54,7 @@ result schema, with optional nearest-rank P99 threshold evaluation.
 
 | Option | Advantage | Disadvantage | Decision |
 |---|---|---|---|
-| Third-party load generator | Rich scenarios and reporting | Runtime/supply-chain cost and out-of-scope topology claims | Rejected |
+| Third-party load generator | Rich scenarios and reporting | Extra runtime/supply-chain cost for this GET utility; broader business loads remain required by RFC-0012 | Rejected |
 | Default `urllib` opener | Minimal code | Automatic redirects and DNS resolution are not bounded | Rejected |
 | Unpinned per-request DNS | May recover from an unavailable address | Allows DNS rebinding during a run | Rejected |
 | Standard-library pinned client | Portable and auditable | Deliberately limited scenario model | Selected |

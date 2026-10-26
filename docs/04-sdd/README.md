@@ -28,4 +28,4 @@
 - [x] [Governance SDD](governance-module.md) (accepted; RFC-0009 and ADR-0015/0016/0017/0018 approved)
 - [ ] BI SDD
 - [x] [Marketplace SDD](marketplace-module.md) (v0.8.0-alpha)
-- [x] [Performance SDD](performance-module.md) (v0.9.0-alpha baseline harness)
+- [ ] [Performance SDD](performance-module.md)（完整模块 Proposed；GET 子组件已实现，WP1～WP4 待设计审批后交付）

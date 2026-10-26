@@ -1,6 +1,6 @@
 # Deploy
 
-`v0.2.0-alpha` 的单节点 MVP 容器部署配置。Kubernetes 与 Helm 在对应路线版本实现。
+当前 Compose 是单节点开发部署配置，不是 HA 拓扑。v0.9 最小 Kubernetes/HA/HPA 方案见[部署设计](../docs/10-deployment/v0.9-performance-ha.md)（Proposed，部署产物待实现）；完整 Helm 属后续 LTS。
 
 ## 目录结构
 
@@ -26,9 +26,8 @@ docker compose up --build
 
 启动后访问 <http://localhost:3000>。Compose 会同时启动 Java 控制面所需的 MySQL，并由
 `platform-app` 聚合 Auth、Document、Knowledge、Chat 与 Agent Java 模块。上传的原始文件保存在
-`document-files` volume；该本地适配器只用于单节点 MVP，生产部署需替换为受管对象存储。
-Python 侧默认使用确定性 Provider 和内存向量库；Kafka、Milvus 与真实模型适配器不在默认
-Compose 中启用。
+`document-files` volume；该本地卷仅支持单节点开发；v0.9 拟通过 HA RWX 共享存储保持现有 ObjectStorage 契约，受管对象存储另行评估。
+Python 开发环境默认使用确定性 Provider，但默认 Compose 已启用 Milvus 持久向量检索、Elasticsearch 全文检索及其 etcd/MinIO 依赖；它们均为开发单节点配置。真实模型需要独立凭据与配置，不能用确定性结果推断质量。
 
 该 Compose 仅用于本地开发。MySQL 使用本地凭据，并显式设置
 `JWT_ALLOW_EPHEMERAL_KEY=true`，因此 Java 容器重启后已有 Token 会失效。

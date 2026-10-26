@@ -11,6 +11,8 @@
 - [Agent v0.6 Database Design](agent-v0.6-schema.md) (accepted; migration and rollback evidence recorded)
 - [Governance Database Design](governance-schema.md) (accepted for architecture review; migration target `V2.7.0`)
 
+- [Performance 共享状态设计](performance-state.md)（Proposed；租约/Redis/迁移回滚，尚无已执行 Migration）
+
 ## 待完成
 
 - [ ] 数据库 ER 图

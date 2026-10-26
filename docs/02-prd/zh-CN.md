@@ -81,6 +81,27 @@ LLM system/developer 指令执行。
 
 ---
 
+### 0.8 v0.9 Performance 完整需求（Proposed，2026-10-26）
+
+本节补齐第九模块验收定义，待 RFC-0012/架构接受后实施，不修改既有 Accepted 需求的状态。
+GET benchmark 已合并只是 PERF-001 的子组件，不表示其余功能可从模块范围中移除。
+
+| ID | 优先级 | 用户需求 | 验收标准 |
+|---|---|---|---|
+| PERF-001 | P0 | 测试人员重现业务负载 | 认证、文件、OCR、解析、Embedding、RAG、Chat/Agent SSE、Workflow、Connector、Marketplace 场景与固定数据集；三轮、并发1/4/16、每轮≥1,000测量操作，独立 GET v1 兼容 |
+| PERF-002 | P0 | 维护者基于瓶颈证据调优 | 同环境/数据/模型前后对比，三轮中位P99不增加、吞吐不降低（遵守OEP无性能退化）；有池/队列/并发边界、取消及回滚；无参考或环境不匹配不得 PASS |
+| PERF-003 | P0 | 运维在应用节点故障后继续服务 | Java/Python各三副本、Frontend两副本、共享密钥/文件和就绪摘流；单节点故障RTO≤60s、已确认持久业务RPO=0 |
+| PERF-004 | P0 | 运维随负载伸缩 | HPA实测3→6→3、PDB/资源/拓扑分散、连接预算，期间无丢失/重复提交或越权；不只验证配置可解析 |
+| PERF-005 | P0 | 运维验证稳定与恢复 | 24h长稳成功率≥99.9%，后6h的RSS/FD/连接中位数较前6h增长≤10%、队列有界；故障时间线、重复/丢失检查、恢复后权限/文件/hash/检索一致；备份灾备RTO≤30min/RPO≤15min |
+| PERF-006 | P0 | 审查者观察业务和依赖 | Prometheus/Grafana、Java→Python OTel链路、延迟/错误/资源/队列/恢复指标与告警演练；无Secret/原文/高基数身份label |
+| PERF-007 | P0 | 多副本保持安全语义 | 共享原子Auth/Webhook限流、Embedding协调、事务调度/租约fencing；Redis故障关闭；双实例竞争及跨租户测试 |
+| PERF-008 | P0 | 运维切换及恢复数据服务 | SAD 9.3 MySQL/Redis/Kafka/Milvus/MinIO及实际依赖ES/RWX的HA配置和真实切换/恢复；数据服务切换RTO≤120s，已确认MySQL业务RPO=0；ES/Milvus部分写可对账修复 |
+| PERF-009 | P0 | 维护者按流程安全发布 | 编码前RFC/ADR/架构决策，覆盖≥80%、真实集成、基准、安全与六项门禁、正式Review、最终候选整栈/多节点，tag/镜像/Release同SHA |
+
+以上数值为本次提出的验收目标，尚未测量或批准。详见
+[Performance SDD](../04-sdd/performance-module.md)、[RFC-0012](../11-rfc/rfc-0012-performance-reliability.md)
+和[纠偏记录](../issues/issue-0100-scope-correction.md)。v1.0 的SSO/LDAP、完整Helm分发和LTS支持仍属后续版本。
+
 ## 第一章：项目背景
 
 ### 1.1 为什么企业需要 AI

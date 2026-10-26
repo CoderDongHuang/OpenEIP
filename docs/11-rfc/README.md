@@ -17,9 +17,12 @@
 | [RFC-0009](rfc-0009-governance-platform-v1.md) | Enterprise Governance Platform v1 | Accepted |
 | [RFC-0010](rfc-0010-marketplace-catalog.md) | Tenant-Scoped Marketplace Catalog | Proposed |
 | [RFC-0011](rfc-0011-performance-evidence.md) | Reproducible Performance Evidence | Proposed |
+| [RFC-0012](rfc-0012-performance-reliability.md) | v0.9 完整压测/调优/HA/扩容/稳定性范围纠偏 | Proposed；新公开讨论/投票待记录 |
 
 ## RFC 编号规则
 
 ```
 RFC-0001    ← 顺序编号，永不重复，即使被拒绝也不重用
 ```
+
+RFC-0011 仅为 GET 子组件，不能替代 RFC-0012 的完整范围决定。

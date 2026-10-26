@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+### Corrected
+
+- v0.9 范围恢复为压测、调优、高可用、扩容、稳定性；原 GET baseline 仅为已实现子组件，完整模块未完成、未发布。
+- 补充 PERF-001～009、完整 SDD、RFC-0012/ADR-0021、共享状态、运维契约、HA 部署及验收设计（Proposed）；修正 17 步审计和发布判断，保留历史测试事实。
+- 新运行功能须先通过完整设计的公开 RFC/ADR 和编码前架构审查；设计文档不代表功能已实现。
+
 ### Added
 - v0.9 Performance baseline slice: dependency-free bounded HTTP GET benchmark with explicit target validation, private-network opt-in, redirect blocking, timeout/body-size limits, P50/P95/P99 metrics, error classification, and optional P99 gate.
 - Machine-readable local fixture evidence and SDD, test plan, and alpha release checklist for the performance boundary.
@@ -14,6 +20,11 @@
 
 ### Security
 - Benchmark evidence redacts response content and credentials, never follows redirects, and records only the target scheme and hostname.
+
+### Validation
+- PR #127 was formally approved and merged as `993569a`; all six main-branch CI jobs passed in run `34688340556`.
+- The merged-main benchmark completed 200/200 requests with P99 34.292 ms against a 100 ms threshold and zero errors.
+- Publication remains blocked until RFC-0011, ADR-0020, and independent architecture/security decisions are recorded.
 
 ## [0.7.0-alpha] - 2026-09-06
 

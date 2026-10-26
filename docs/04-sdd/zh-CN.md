@@ -306,6 +306,15 @@ data: {"code": "LLM-S-001", "message": "模型调用超时"}
 
 ---
 
+### 3.9 v0.9 Performance 运维契约（Proposed，2026-10-26）
+
+Performance完整模块保留既有业务API、SSE、SDK与Plugin SPI；GET CLI/JSON v1兼容。
+新增运维健康/指标、业务负载结果及共享状态的设计分别见
+[运维契约](../06-api/performance-operations.md)、[共享状态](../05-database/performance-state.md)
+与[模块SDD](performance-module.md)。这些新增设计尚未实现，不能将完整模块标记为无DB/UI/HTTP影响。
+管理探针与指标不套用业务分页/envelope，须在独立OpenAPI中明确200/503及管理网络边界；
+公开业务Gateway不暴露指标/管理详情。无公共压测或故障注入接口。
+
 ## 第四章：数据库命名规范
 
 ### 4.1 表命名
