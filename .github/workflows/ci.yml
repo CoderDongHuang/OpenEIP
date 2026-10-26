@@ -137,6 +137,10 @@ jobs:
         run: npm ci
       - name: Validate dependency tree
         run: npm ls --all
+      - name: Typecheck documentation site
+        run: npm run typecheck
+      - name: Verify safe image parser
+        run: npm run test:safety
       - name: Build
         run: npm run build
 

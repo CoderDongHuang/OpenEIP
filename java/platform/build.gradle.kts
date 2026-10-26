@@ -20,7 +20,9 @@ plugins {
 group = "com.openeip"
 version = "0.7.0-alpha"
 
-val nettyVersion = "4.1.137.Final"
+val nettyVersion = "4.1.139.Final"
+val jacksonVersion = "2.21.7"
+val lz4Version = "1.11.4"
 
 subprojects {
     apply(plugin = "java")
@@ -56,6 +58,15 @@ subprojects {
             if (requested.group == "io.netty") {
                 useVersion(nettyVersion)
                 because("Netty modules must use the same patched release")
+            }
+            if (requested.group == "com.fasterxml.jackson.core"
+                && requested.name in setOf("jackson-core", "jackson-databind")) {
+                useVersion(jacksonVersion)
+                because("Jackson core and databind must use the patched release")
+            }
+            if (requested.group == "at.yawk.lz4") {
+                useVersion(lz4Version)
+                because("lz4-java must use the patched release")
             }
         }
     }
@@ -93,8 +104,8 @@ subprojects {
         dependencies {
             dependency("io.netty:netty-codec:$nettyVersion")
             dependency("io.netty:netty-handler:$nettyVersion")
-            dependency("org.postgresql:postgresql:42.7.13")
-            dependency("org.apache.tomcat.embed:tomcat-embed-core:10.1.59")
+            dependency("org.postgresql:postgresql:42.7.14")
+            dependency("org.apache.tomcat.embed:tomcat-embed-core:10.1.61")
         }
     }
 

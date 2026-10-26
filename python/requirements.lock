@@ -20,7 +20,7 @@ attrs==26.1.0
     #   referencing
 cachetools==7.1.6
     # via pymilvus
-certifi==2026.6.17
+certifi==2026.10.23
     # via
     #   elastic-transport
     #   httpcore
@@ -81,7 +81,7 @@ orjson==3.11.9
     # via pymilvus
 pandas==3.0.5
     # via pymilvus
-pillow==12.3.0
+pillow==13.0.0
     # via
     #   openeip-engine (pyproject.toml)
     #   python-pptx
@@ -101,7 +101,7 @@ pydantic-settings==2.14.2
     # via
     #   mcp
     #   openeip-engine (pyproject.toml)
-pyjwt==2.13.0
+pyjwt==2.15.1
     # via mcp
 pymilvus==2.6.17
     # via openeip-engine (pyproject.toml)
@@ -164,7 +164,7 @@ typing-inspection==0.4.2
     #   pydantic-settings
 tzdata==2026.3
     # via pandas
-urllib3==2.7.0
+urllib3==2.8.0
     # via
     #   elastic-transport
     #   requests
