@@ -20,7 +20,7 @@ plugins {
 group = "com.openeip"
 version = "0.7.0-alpha"
 
-val nettyVersion = "4.1.137.Final"
+val nettyVersion = "4.1.139.Final"
 
 subprojects {
     apply(plugin = "java")
@@ -93,8 +93,8 @@ subprojects {
         dependencies {
             dependency("io.netty:netty-codec:$nettyVersion")
             dependency("io.netty:netty-handler:$nettyVersion")
-            dependency("org.postgresql:postgresql:42.7.13")
-            dependency("org.apache.tomcat.embed:tomcat-embed-core:10.1.59")
+            dependency("org.postgresql:postgresql:42.7.14")
+            dependency("org.apache.tomcat.embed:tomcat-embed-core:10.1.61")
         }
     }
 
